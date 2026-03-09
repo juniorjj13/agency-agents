@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DermAtual - Clube de Artigos | Atualização Científica para Dermatologistas</title>
+  <meta name="description" content="Atualização científica na medida certa para decisões clínicas mais seguras — sem sobrecarga. 1 artigo por semana com curadoria especializada." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #faf9f7;
+      --white: #ffffff;
+      --surface: #f3f1ed;
+      --border: #e2ded6;
+      --primary: #1a6b5a;
+      --primary-dark: #145647;
+      --primary-light: #e8f5f0;
+      --primary-glow: rgba(26, 107, 90, 0.12);
+      --accent: #c9944a;
+      --accent-light: #fdf6ec;
+      --text: #1a1a1a;
+      --text2: #4a4a4a;
+      --text3: #7a7a7a;
+      --danger: #c0392b;
+      --radius: 12px;
+      --radius-lg: 20px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+      --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; }
+
+    /* UTILITY */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+    .text-center { text-align: center; }
+    .section-tag {
+      display: inline-block;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.15em; color: var(--primary);
+      padding: 0.35rem 1rem; background: var(--primary-light);
+      border-radius: 100px; margin-bottom: 1rem;
+    }
+    .highlight { color: var(--primary); }
+
+    /* ==================== NAV ==================== */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 0;
+    }
+    .navbar .container {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 800; color: var(--primary);
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-cta-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.25rem;
+      background: var(--primary); color: #fff;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      transition: background 0.2s;
+    }
+    .nav-cta-btn:hover { background: var(--primary-dark); }
+
+    /* ==================== HERO ==================== */
+    .hero {
+      padding: 8rem 0 5rem;
+      background: linear-gradient(180deg, var(--white) 0%, var(--bg) 100%);
+      position: relative;
+    }
+    .hero-inner {
+      max-width: 780px; margin: 0 auto; text-align: center;
+      padding: 0 1.5rem;
+    }
+    .hero-overline {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; font-weight: 600; color: var(--primary);
+      margin-bottom: 1.25rem;
+    }
+    .hero-overline .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800; line-height: 1.15;
+      color: var(--text); margin-bottom: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--primary) 0%, #2a9d8f 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+      color: var(--text2); max-width: 620px; margin: 0 auto 2rem;
+    }
+    .hero-checks {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .hero-check {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);
+    }
+    .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .btn-main {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #2a9d8f 100%);
+      color: #fff; border-radius: 12px;
+      font-size: 1.05rem; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(26, 107, 90, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none; cursor: pointer;
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26,107,90,0.35); }
+    .btn-note { font-size: 0.78rem; color: var(--text3); }
+
+    /* ==================== PAIN POINTS ==================== */
+    .pain-section { padding: 5rem 0; }
+    .pain-header { max-width: 600px; margin: 0 auto 2.5rem; text-align: center; }
+    .pain-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+      font-weight: 800; margin-bottom: 0.5rem;
+    }
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem; max-width: 900px; margin: 0 auto 2.5rem;
+    }
+    .pain-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      display: flex; align-items: flex-start; gap: 0.75rem;
+    }
+    .pain-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .pain-text { font-size: 0.925rem; color: var(--text2); line-height: 1.6; }
+    .pain-truth {
+      text-align: center; max-width: 560px; margin: 0 auto;
+      background: var(--primary-light); border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.25rem 1.5rem;
+    }
+    .pain-truth p {
+      font-size: 1rem; font-weight: 600; color: var(--primary-dark);
+    }
+
+    /* ==================== WHAT IS ==================== */
+    .whatis { padding: 5rem 0; background: var(--white); }
+    .whatis-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+    }
+    .whatis-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800; margin-bottom: 1rem;
+    }
+    .whatis-content p { color: var(--text2); font-size: 0.95rem; margin-bottom: 1.25rem; }
+    .whatis-pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .pillar {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--primary-light); border-radius: 8px;
+      padding: 0.65rem 0.9rem; font-size: 0.85rem; font-weight: 600;
+      color: var(--primary-dark);
+    }
+    .whatis-visual {
+      background: linear-gradient(135deg, var(--primary-light) 0%, #d5efe8 100%);
+      border-radius: var(--radius-lg); padding: 2.5rem;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      min-height: 300px;
+    }
+    .whatis-visual-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .whatis-visual h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; color: var(--primary-dark); margin-bottom: 0.5rem;
+    }
+    .whatis-visual p { font-size: 0.85rem; color: var(--primary); }
+
+    /* ==================== BENEFITS ==================== */
+    .benefits { padding: 5rem 0; }
+    .benefits-header { text-align: center; max-width: 600px; margin: 0 auto 3rem; }
+    .benefits-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800;
+    }
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem; max-width: 950px; margin: 0 auto;
+    }
+    .benefit-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .benefit-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .benefit-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .benefit-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .benefit-desc { font-size: 0.85rem; color: var(--text2); }
+
+    /* ==================== WHY IT WORKS ==================== */
+    .why-works { padding: 5rem 0; background: var(--white); }
+    .why-inner { max-width: 900px; margin: 0 auto; }
+    .why-header { text-align: center; max-width: 600px; margin: 0 auto 3rem; }
+    .why-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800;
+    }
+    .why-header p { color: var(--text2); margin-top: 0.5rem; }
+    .why-list { display: flex; flex-direction: column; gap: 1rem; }
+    .why-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      background: var(--bg); border-radius: var(--radius); padding: 1.25rem 1.5rem;
+    }
+    .why-check {
+      flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; margin-top: 0.1rem;
+    }
+    .why-item-text h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .why-item-text p { font-size: 0.85rem; color: var(--text2); }
+    .why-result {
+      text-align: center; margin-top: 2.5rem;
+      background: var(--accent-light); border: 1px solid rgba(201,148,74,0.25);
+      border-radius: var(--radius); padding: 1.25rem 1.5rem;
+    }
+    .why-result p { font-size: 0.95rem; font-weight: 600; color: var(--accent); }
+
+    /* ==================== FOR WHO ==================== */
+    .for-who { padding: 5rem 0; }
+    .for-who-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+    .for-who h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800;
+      margin-bottom: 2rem;
+    }
+    .for-who-list {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      text-align: left;
+    }
+    .for-who-item {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem;
+    }
+    .for-who-check { color: var(--primary); font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .for-who-item p { font-size: 0.9rem; color: var(--text2); }
+
+    /* ==================== PRICING ==================== */
+    .pricing { padding: 5rem 0; background: var(--white); }
+    .pricing-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+    .pricing h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .pricing-sub { color: var(--text2); margin-bottom: 2rem; }
+    .pricing-card {
+      background: var(--bg);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-badge {
+      position: absolute; top: 0; right: 0;
+      background: var(--accent); color: #fff;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 1.2rem;
+      border-radius: 0 0 0 12px;
+    }
+    .pricing-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 800; color: var(--primary-dark);
+      margin-bottom: 0.25rem;
+    }
+    .pricing-plan { font-size: 0.85rem; color: var(--text3); margin-bottom: 1.5rem; }
+    .pricing-price {
+      display: flex; align-items: baseline; justify-content: center;
+      gap: 0.3rem; margin-bottom: 0.25rem;
+    }
+    .pricing-installment { font-size: 0.9rem; color: var(--text2); }
+    .pricing-amount {
+      font-size: 3rem; font-weight: 900; color: var(--primary);
+      letter-spacing: -0.03em;
+    }
+    .pricing-cash {
+      font-size: 0.85rem; color: var(--text3); margin-bottom: 1.5rem;
+    }
+    .pricing-features {
+      list-style: none; text-align: left;
+      display: flex; flex-direction: column; gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+    .pricing-features li {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.875rem; color: var(--text2);
+    }
+    .pricing-features li .pf-icon { color: var(--primary); font-weight: 700; }
+    .pricing-daily {
+      background: var(--primary-light); border-radius: 8px;
+      padding: 0.75rem; margin-bottom: 1.5rem;
+      font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;
+    }
+    .pricing-card .btn-main { width: 100%; font-size: 1.1rem; padding: 1.1rem 2rem; }
+
+    /* ==================== BONUS ==================== */
+    .bonus { padding: 5rem 0; }
+    .bonus-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+    .bonus h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 800;
+      margin-bottom: 2rem;
+    }
+    .bonus-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .bonus-card {
+      background: var(--accent-light); border: 1px solid rgba(201,148,74,0.2);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .bonus-card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .bonus-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--accent); }
+    .bonus-card p { font-size: 0.85rem; color: var(--text2); }
+
+    /* ==================== GUARANTEE ==================== */
+    .guarantee { padding: 5rem 0; background: var(--white); }
+    .guarantee-inner {
+      max-width: 700px; margin: 0 auto; text-align: center;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 3rem 2rem;
+    }
+    .guarantee-shield { font-size: 3.5rem; margin-bottom: 1rem; }
+    .guarantee h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem;
+    }
+    .guarantee p { color: var(--text2); font-size: 0.95rem; max-width: 500px; margin: 0 auto 0.75rem; }
+    .guarantee .risk { font-weight: 700; color: var(--primary); font-size: 1rem; }
+
+    /* ==================== FAQ ==================== */
+    .faq { padding: 5rem 0; }
+    .faq-inner { max-width: 700px; margin: 0 auto; }
+    .faq-header { text-align: center; margin-bottom: 2.5rem; }
+    .faq-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 800;
+    }
+    .faq-item {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 0.75rem; overflow: hidden;
+    }
+    .faq-q {
+      width: 100%; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: none; border: none; cursor: pointer;
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+      font-family: inherit; text-align: left;
+    }
+    .faq-q:hover { background: var(--surface); }
+    .faq-q .arrow { font-size: 1.25rem; color: var(--text3); transition: transform 0.3s; }
+    .faq-item.open .faq-q .arrow { transform: rotate(180deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+    }
+    .faq-a-inner {
+      padding: 0 1.5rem 1.25rem;
+      font-size: 0.9rem; color: var(--text2); line-height: 1.7;
+    }
+    .faq-item.open .faq-a { max-height: 300px; }
+
+    /* ==================== FINAL CTA ==================== */
+    .final-cta {
+      padding: 5rem 0; text-align: center;
+      background: linear-gradient(135deg, var(--primary) 0%, #2a9d8f 100%);
+      color: #fff;
+    }
+    .final-cta-inner { max-width: 640px; margin: 0 auto; }
+    .final-cta h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.25rem); font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .final-cta p { opacity: 0.9; margin-bottom: 2rem; font-size: 1.05rem; }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: #fff; color: var(--primary);
+      border-radius: 12px; font-size: 1.05rem; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+    }
+    .btn-white:hover { transform: translateY(-2px); }
+    .final-details {
+      display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+      margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.85;
+    }
+
+    /* ==================== TRUST BAR ==================== */
+    .trust-bar {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0;
+    }
+    .trust-items {
+      display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; color: var(--text3); font-weight: 500;
+    }
+    .trust-icon { font-size: 1.1rem; }
+
+    /* ==================== FOOTER ==================== */
+    footer {
+      padding: 2rem 0; text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .footer-copy { font-size: 0.8rem; color: var(--text3); }
+    .footer-copy a { color: var(--primary); }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .whatis-inner { grid-template-columns: 1fr; }
+      .whatis-visual { min-height: 200px; }
+      .for-who-list { grid-template-columns: 1fr; }
+      .bonus-cards { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .whatis-pillars { grid-template-columns: 1fr; }
+      .hero-checks { flex-direction: column; align-items: center; }
+      .pricing-card { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====== NAVBAR ====== -->
+<nav class="navbar">
+  <div class="container">
+    <div class="nav-brand">Derm<span>Atual</span></div>
+    <a class="nav-cta-btn" href="https://pay.hotmart.com/V104055098P?off=6zkjijq9&checkoutMode=10">
+      Entrar no Clube
+    </a>
+  </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-overline">
+      <span class="dot"></span>
+      Clube de Artigos para Dermatologistas
+    </div>
+    <h1>
+      Atualização científica na medida certa para <span class="grad">decisões clínicas mais seguras</span>
+    </h1>
+    <p class="hero-sub">
+      No meio de um caso desafiador, o que você precisa não é mais opinião — é <strong>evidência confiável</strong>, com aplicação real no consultório. Receba 1 artigo por semana, cuidadosamente selecionado.
+    </p>
+    <div class="hero-checks">
+      <span class="hero-check">✅ Sem ruído</span>
+      <span class="hero-check">✅ Sem "conteúdo infinito"</span>
+      <span class="hero-check">✅ Só o que muda sua prática</span>
+    </div>
+    <div class="hero-actions">
+      <a class="btn-main" href="https://pay.hotmart.com/V104055098P?off=6zkjijq9&checkoutMode=10">
+        Quero Entrar no Clube Agora →
+      </a>
+      <span class="btn-note">Acesso imediato · Garantia de 7 dias · 12x de R$ 97</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PAIN POINTS ====== -->
+<section class="pain-section">
+  <div class="container">
+    <div class="pain-header">
+      <span class="section-tag">Você se identifica?</span>
+      <h2>Você já passou por isso?</h2>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">😵</div>
+        <div class="pain-text">A internet tem <strong>informação demais</strong> e pouca evidência confiável.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">⏩</div>
+        <div class="pain-text">Os conteúdos "rápidos" <strong>não aprofundam</strong> o que realmente importa.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">⏰</div>
+        <div class="pain-text">Você até quer ler artigos… mas <strong>falta tempo</strong> na agenda cheia.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">😰</div>
+        <div class="pain-text">A sensação é que sempre tem algo importante <strong>passando despercebido</strong>.</div>
+      </div>
+    </div>
+    <div class="pain-truth">
+      <p>📌 A verdade é simples: não dá pra acompanhar tudo — mas dá pra acompanhar <strong>o que importa</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== WHAT IS ====== -->
+<section class="whatis">
+  <div class="container">
+    <div class="whatis-inner">
+      <div class="whatis-content">
+        <span class="section-tag">O que é</span>
+        <h2>O que é o DermAtual — <span class="highlight">Clube de Artigos</span>?</h2>
+        <p>
+          Uma comunidade de atualização científica com <strong>curadoria feita por dermatologista com mais de 10 anos de experiência como preceptora</strong>. Você recebe o melhor da evidência científica sem precisar gastar horas filtrando, comparando ou duvidando da fonte.
+        </p>
+        <div class="whatis-pillars">
+          <div class="pillar">📌 Dermatologia clínica</div>
+          <div class="pillar">📌 Aplicação prática</div>
+          <div class="pillar">📌 Decisões seguras</div>
+          <div class="pillar">📌 Ritmo certo</div>
+        </div>
+      </div>
+      <div class="whatis-visual">
+        <div class="whatis-visual-icon">📚</div>
+        <h3>1 artigo por semana</h3>
+        <p>Curadoria especializada + áudio + comunidade</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== BENEFITS ====== -->
+<section class="benefits">
+  <div class="container">
+    <div class="benefits-header">
+      <span class="section-tag">Benefícios</span>
+      <h2>O que muda na sua <span class="highlight">prática clínica</span>?</h2>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">🛡️</div>
+        <div class="benefit-title">Mais segurança para conduzir casos</div>
+        <div class="benefit-desc">Tome decisões com base em evidência sólida, não em suposições.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🧠</div>
+        <div class="benefit-title">Repertório científico sempre fresco</div>
+        <div class="benefit-desc">Mantenha-se atualizado com os estudos mais relevantes da área.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🎯</div>
+        <div class="benefit-title">Clareza no que realmente importa</div>
+        <div class="benefit-desc">Sem sobrecarga. Foco no que faz diferença no dia a dia.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">💡</div>
+        <div class="benefit-title">Menos dependência de "achismos"</div>
+        <div class="benefit-desc">Substitua opinião por evidência aplicada à prática clínica.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">💬</div>
+        <div class="benefit-title">Argumentação forte e moderna</div>
+        <div class="benefit-desc">Condutas atualizadas para apresentar com confiança.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">👥</div>
+        <div class="benefit-title">Ambiente para discutir e evoluir</div>
+        <div class="benefit-desc">Comunidade exclusiva + consultoria mensal em grupo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== WHY IT WORKS ====== -->
+<section class="why-works">
+  <div class="why-inner container">
+    <div class="why-header">
+      <span class="section-tag">Diferencial</span>
+      <h2>Por que o DermAtual <span class="highlight">funciona</span>?</h2>
+      <p>Porque não é "mais uma assinatura". Aqui você tem:</p>
+    </div>
+    <div class="why-list">
+      <div class="why-item">
+        <div class="why-check">✓</div>
+        <div class="why-item-text">
+          <h4>Curadoria por quem entende a prática clínica</h4>
+          <p>Artigos selecionados por dermatologista com mais de 10 anos de experiência como preceptora.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-check">✓</div>
+        <div class="why-item-text">
+          <h4>Ritmo sustentável: 1 artigo por semana</h4>
+          <p>Perfeito para quem tem agenda cheia e não quer acumular conteúdo.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-check">✓</div>
+        <div class="why-item-text">
+          <h4>Comunidade exclusiva + consultoria mensal</h4>
+          <p>Troque experiências, discuta casos clínicos e participe de consultoria em grupo todos os meses.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-check">✓</div>
+        <div class="why-item-text">
+          <h4>Aplicação real, não teoria solta</h4>
+          <p>Evidência confiável, direto ao ponto — focado no que muda sua conduta.</p>
+        </div>
+      </div>
+    </div>
+    <div class="why-result">
+      <p>📌 Resultado: você se mantém atualizado <strong>sem abandonar, sem acumular conteúdo e sem culpa</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOR WHO ====== -->
+<section class="for-who">
+  <div class="container">
+    <div class="for-who-inner">
+      <span class="section-tag">Para quem é</span>
+      <h2>O DermAtual é para <span class="highlight">você</span>?</h2>
+      <div class="for-who-list">
+        <div class="for-who-item">
+          <span class="for-who-check">✔</span>
+          <p><strong>Médicos e dermatologistas</strong> que querem evidência aplicada na rotina clínica.</p>
+        </div>
+        <div class="for-who-item">
+          <span class="for-who-check">✔</span>
+          <p><strong>Profissionais</strong> que atendem clínica e querem mais segurança nas condutas.</p>
+        </div>
+        <div class="for-who-item">
+          <span class="for-who-check">✔</span>
+          <p>Quem tem <strong>pouco tempo</strong>, mas não abre mão da excelência e da atualização.</p>
+        </div>
+        <div class="for-who-item">
+          <span class="for-who-check">✔</span>
+          <p>Quem quer aprender no <strong>ritmo certo</strong> e com consistência ao longo do ano.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PRICING ====== -->
+<section class="pricing" id="preco">
+  <div class="container">
+    <div class="pricing-inner">
+      <span class="section-tag">Investimento</span>
+      <h2>Entre agora para o <span class="highlight">DermAtual</span></h2>
+      <p class="pricing-sub">Chega de sobrecarga e conteúdo solto. Atualize sua dermatologia com segurança e consistência.</p>
+
+      <div class="pricing-card">
+        <div class="pricing-badge">Plano Anual</div>
+        <div class="pricing-title">DermAtual — Clube de Artigos</div>
+        <div class="pricing-plan">Acesso por 12 meses</div>
+
+        <div class="pricing-price">
+          <span class="pricing-installment">12x de</span>
+          <span class="pricing-amount">R$ 97</span>
+        </div>
+        <div class="pricing-cash">ou <strong>R$ 938</strong> à vista</div>
+
+        <div class="pricing-daily">
+          Menos de <strong>R$ 3 por dia</strong> para ter curadoria científica, artigo semanal, áudio e comunidade.
+        </div>
+
+        <ul class="pricing-features">
+          <li><span class="pf-icon">📌</span> Acesso imediato à plataforma</li>
+          <li><span class="pf-icon">📌</span> 1 artigo científico por semana com curadoria</li>
+          <li><span class="pf-icon">📌</span> Áudio resumo de cada artigo</li>
+          <li><span class="pf-icon">📌</span> Comunidade exclusiva de membros</li>
+          <li><span class="pf-icon">📌</span> 1 consultoria mensal em grupo</li>
+          <li><span class="pf-icon">📌</span> Conteúdo focado em dermatologia clínica</li>
+          <li><span class="pf-icon">📌</span> Garantia incondicional de 7 dias</li>
+        </ul>
+
+        <a class="btn-main" href="https://pay.hotmart.com/V104055098P?off=6zkjijq9&checkoutMode=10">
+          Quero Entrar no Clube Agora →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== BONUS ====== -->
+<section class="bonus">
+  <div class="container">
+    <div class="bonus-inner">
+      <span class="section-tag">Bônus Exclusivos</span>
+      <h2>E você ainda recebe <span class="highlight">bônus</span></h2>
+      <div class="bonus-cards">
+        <div class="bonus-card">
+          <div class="bonus-card-icon">🩺</div>
+          <h4>Consultoria Mensal em Grupo</h4>
+          <p>Discussão de casos clínicos reais com colegas e orientação especializada todos os meses.</p>
+        </div>
+        <div class="bonus-card">
+          <div class="bonus-card-icon">🎧</div>
+          <h4>Áudio dos Artigos</h4>
+          <p>Escute os resumos no caminho para o consultório, na academia ou quando preferir.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== GUARANTEE ====== -->
+<section class="guarantee">
+  <div class="container">
+    <div class="guarantee-inner">
+      <div class="guarantee-shield">🛡️</div>
+      <h2>Garantia Incondicional de 7 Dias</h2>
+      <p>
+        Entre, explore o conteúdo e a comunidade. Se não fizer sentido pra você, é só solicitar o reembolso dentro do prazo.
+      </p>
+      <p class="risk">✅ Risco zero. A decisão é toda sua.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FAQ ====== -->
+<section class="faq">
+  <div class="container">
+    <div class="faq-inner">
+      <div class="faq-header">
+        <span class="section-tag">Dúvidas</span>
+        <h2>Perguntas Frequentes</h2>
+      </div>
+
+      <div class="faq-item open">
+        <button class="faq-q">
+          Preciso ter muito tempo disponível?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Não. Você recebe 1 artigo por semana + áudio curto. Foi feito para quem tem agenda cheia.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          O conteúdo é muito técnico ou prático?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">É ciência com foco em dermatologia clínica aplicada — o que realmente muda conduta no dia a dia.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          E se eu perder uma semana?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sem problema. Todo o conteúdo fica disponível e você retoma quando quiser, no seu ritmo.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          Posso discutir casos clínicos?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Sim! Você entra nos grupos para trocar experiências e discutir casos com outros membros, além de participar de uma consultoria em grupo todo mês.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FINAL CTA ====== -->
+<section class="final-cta">
+  <div class="container">
+    <div class="final-cta-inner">
+      <h2>Atualize sua dermatologia com segurança e consistência</h2>
+      <p>Chega de sobrecarga. Tenha evidência confiável, no ritmo certo, com curadoria especializada.</p>
+      <a class="btn-white" href="https://pay.hotmart.com/V104055098P?off=6zkjijq9&checkoutMode=10">
+        Quero Entrar no Clube Agora →
+      </a>
+      <div class="final-details">
+        <span>📌 Acesso imediato</span>
+        <span>📌 Garantia de 7 dias</span>
+        <span>📌 12x de R$ 97</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== TRUST BAR ====== -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-items">
+      <div class="trust-item">
+        <span class="trust-icon">🛡️</span>
+        7 dias de garantia
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🔒</span>
+        Compra 100% segura
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🔐</span>
+        Dados protegidos
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">✅</span>
+        Conteúdo aprovado
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="container">
+    <p class="footer-copy">
+      &copy; 2026 DermAtual — Clube de Artigos · A. J. Oliveira Servicos Medicos LTDA · Todos os direitos reservados
+    </p>
+  </div>
+</footer>
+
+<!-- ====== FAQ TOGGLE SCRIPT ====== -->
+<script>
+  document.querySelectorAll('.faq-q').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = this.closest('.faq-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(el) {
+        el.classList.remove('open');
+      });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>
