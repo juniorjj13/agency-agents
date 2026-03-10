@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Agency — AI Specialists Ready to Transform Your Workflow</title>
+  <meta name="description" content="61 specialized AI agents across 9 divisions. From frontend wizards to Reddit community ninjas. Your complete AI dream team, at your fingertips." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #09090b;
+      --bg-2:      #111113;
+      --bg-3:      #18181b;
+      --border:    rgba(255,255,255,.07);
+      --text:      #fafafa;
+      --muted:     #a1a1aa;
+      --accent:    #a855f7;
+      --accent-2:  #7c3aed;
+      --accent-3:  #06b6d4;
+      --gold:      #f59e0b;
+      --green:     #22c55e;
+      --radius:    14px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      height: 64px;
+      background: rgba(9,9,11,.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.1rem; font-weight: 700; letter-spacing: -.02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .875rem;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      display: flex; gap: .75rem;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .55rem 1.25rem; border-radius: var(--radius-sm);
+      font-size: .875rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; border: none; transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #fff;
+      box-shadow: 0 0 24px rgba(168,85,247,.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 36px rgba(168,85,247,.5);
+    }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+    .btn-lg { padding: .8rem 1.8rem; font-size: 1rem; border-radius: var(--radius); }
+    .btn-sm { padding: .4rem 1rem; font-size: .8rem; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 1.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(6,182,212,.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.3);
+      border-radius: 999px; padding: .3rem 1rem .3rem .5rem;
+      font-size: .8rem; font-weight: 500; color: #c084fc;
+      margin-bottom: 1.75rem;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 900; letter-spacing: -.04em;
+      line-height: 1.05;
+      max-width: 14ch;
+      margin: 0 auto .5rem;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,.4));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero h1 .accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted); max-width: 52ch; margin: 1.25rem auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 4rem;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-stat-label { font-size: .8rem; color: var(--muted); margin-top: .1rem; }
+
+    .hero-divider {
+      width: 1px; height: 40px; background: var(--border);
+      align-self: center;
+    }
+
+    /* ── SECTION WRAPPER ── */
+    section { padding: 5rem 1.5rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .section-eyebrow {
+      font-size: .75rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800; letter-spacing: -.03em;
+      line-height: 1.15; margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-size: 1.05rem; color: var(--muted);
+      max-width: 54ch; line-height: 1.7;
+    }
+
+    /* ── DIVISIONS ── */
+    .divisions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 3rem;
+    }
+    .division-card {
+      background: var(--bg-2);
+      padding: 1.75rem;
+      transition: background .2s;
+      cursor: default;
+    }
+    .division-card:hover { background: var(--bg-3); }
+
+    .division-icon {
+      font-size: 1.75rem; margin-bottom: .75rem;
+      display: block;
+    }
+    .division-name {
+      font-size: 1.05rem; font-weight: 700;
+      margin-bottom: .4rem;
+    }
+    .division-desc {
+      font-size: .875rem; color: var(--muted); line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .division-agents {
+      display: flex; flex-wrap: wrap; gap: .35rem;
+    }
+    .agent-chip {
+      display: inline-flex; align-items: center; gap: .25rem;
+      background: rgba(255,255,255,.05); border: 1px solid var(--border);
+      border-radius: 999px; padding: .2rem .65rem;
+      font-size: .72rem; color: var(--muted);
+      transition: all .2s;
+    }
+    .agent-chip:hover {
+      background: rgba(168,85,247,.1); border-color: rgba(168,85,247,.3);
+      color: #c084fc;
+    }
+
+    /* ── QUICKSTART ── */
+    .quickstart { background: var(--bg-2); }
+    .quickstart-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; margin-top: 3rem;
+    }
+    @media (max-width: 720px) { .quickstart-grid { grid-template-columns: 1fr; } }
+
+    .step-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .step-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+    .step-desc { font-size: .875rem; color: var(--muted); margin-bottom: 1rem; }
+
+    .code-block {
+      background: #000; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); overflow: hidden;
+    }
+    .code-header {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .6rem 1rem; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-dot-r { background: #ff5f57; }
+    .code-dot-y { background: #febc2e; }
+    .code-dot-g { background: #28c840; }
+    .code-body { padding: 1rem; overflow-x: auto; }
+    .code-body pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem; line-height: 1.7;
+      color: #e2e8f0;
+    }
+    .code-body .cmd { color: #86efac; }
+    .code-body .cmt { color: #6b7280; }
+
+    /* ── TOOLS ── */
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .tool-card {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem;
+      display: flex; flex-direction: column; gap: .5rem;
+      transition: all .2s;
+    }
+    .tool-card:hover {
+      border-color: rgba(168,85,247,.3);
+      background: rgba(168,85,247,.05);
+      transform: translateY(-2px);
+    }
+    .tool-icon { font-size: 1.5rem; }
+    .tool-name { font-size: .9rem; font-weight: 700; }
+    .tool-path { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--muted); }
+
+    /* ── WHY ── */
+    .why-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .why-card {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem;
+      position: relative; overflow: hidden;
+    }
+    .why-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent-3));
+    }
+    .why-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+    .why-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+    .why-desc { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── QUOTES ── */
+    .quotes { background: var(--bg-2); }
+    .quotes-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .quote-card {
+      background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem;
+      position: relative;
+    }
+    .quote-card::before {
+      content: '"';
+      position: absolute; top: .5rem; left: 1.25rem;
+      font-size: 4rem; line-height: 1; font-weight: 900;
+      color: rgba(168,85,247,.15); font-family: Georgia, serif;
+    }
+    .quote-text {
+      font-size: .9rem; line-height: 1.7; color: var(--muted);
+      padding-top: 1rem; margin-bottom: 1rem; font-style: italic;
+    }
+    .quote-author {
+      font-size: .8rem; font-weight: 700; color: var(--accent);
+    }
+    .quote-role { font-size: .75rem; color: var(--muted); }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center; padding: 6rem 1.5rem;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(124,58,237,.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900; letter-spacing: -.04em;
+      margin-bottom: 1rem;
+    }
+    .cta-section p { color: var(--muted); font-size: 1.05rem; margin-bottom: 2.5rem; }
+    .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-brand {
+      font-size: .9rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      color: var(--muted); text-decoration: none; font-size: .8rem;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: .8rem; color: var(--muted); }
+
+    /* ── RESPONSIVE NAV ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-cta .btn:first-child { display: none; }
+    }
+    @media (max-width: 480px) {
+      .hero-divider { display: none; }
+      .hero-stats { gap: 1.5rem; }
+    }
+
+    /* ── SCROLL ANIMATION ── */
+    .fade-up {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1; transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <span class="nav-logo">🎭 The Agency</span>
+    <ul class="nav-links">
+      <li><a href="#divisions">Divisions</a></li>
+      <li><a href="#quickstart">Quick Start</a></li>
+      <li><a href="#tools">Tools</a></li>
+      <li><a href="#why">Why The Agency</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="https://github.com/msitarzewski/agency-agents" class="btn btn-outline btn-sm" target="_blank" rel="noopener">
+        ★ Star on GitHub
+      </a>
+      <a href="#quickstart" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      61 Specialized AI Agents · 9 Divisions · Battle-tested
+    </div>
+
+    <h1>
+      <span>Your AI Dream</span><br />
+      <span class="accent">Team Awaits.</span>
+    </h1>
+
+    <p>
+      A complete AI agency at your fingertips — from frontend wizards to Reddit
+      community ninjas, from whimsy injectors to reality checkers. Each agent is a
+      specialized expert with personality, processes, and proven deliverables.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#quickstart" class="btn btn-primary btn-lg">
+        ⚡ Get Started Free
+      </a>
+      <a href="https://github.com/msitarzewski/agency-agents" class="btn btn-outline btn-lg" target="_blank" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">61</div>
+        <div class="hero-stat-label">Specialized Agents</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">9</div>
+        <div class="hero-stat-label">Divisions</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">10k+</div>
+        <div class="hero-stat-label">Lines of Personality</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">7</div>
+        <div class="hero-stat-label">Tool Integrations</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── DIVISIONS ── -->
+  <section id="divisions">
+    <div class="container">
+      <p class="section-eyebrow fade-up">The Roster</p>
+      <h2 class="section-title fade-up">Every specialist you need,<br />already hired.</h2>
+      <p class="section-sub fade-up">
+        Think of it as assembling your dream team — except they're AI specialists
+        who never sleep, never complain, and always deliver.
+      </p>
+
+      <div class="divisions-grid fade-up">
+
+        <div class="division-card">
+          <span class="division-icon">💻</span>
+          <div class="division-name">Engineering Division</div>
+          <div class="division-desc">Building the future, one commit at a time.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🎨 Frontend Dev</span>
+            <span class="agent-chip">🏗️ Backend Architect</span>
+            <span class="agent-chip">📱 Mobile Builder</span>
+            <span class="agent-chip">🤖 AI Engineer</span>
+            <span class="agent-chip">🚀 DevOps</span>
+            <span class="agent-chip">⚡ Rapid Prototyper</span>
+            <span class="agent-chip">💎 Senior Dev</span>
+            <span class="agent-chip">🔒 Security</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">🎨</span>
+          <div class="division-name">Design Division</div>
+          <div class="division-desc">Making it beautiful, usable, and delightful.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🎯 UI Designer</span>
+            <span class="agent-chip">🔍 UX Researcher</span>
+            <span class="agent-chip">🏛️ UX Architect</span>
+            <span class="agent-chip">🎭 Brand Guardian</span>
+            <span class="agent-chip">📖 Visual Storyteller</span>
+            <span class="agent-chip">✨ Whimsy Injector</span>
+            <span class="agent-chip">📷 Image Prompt Eng</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">📢</span>
+          <div class="division-name">Marketing Division</div>
+          <div class="division-desc">Growing your audience, one authentic interaction at a time.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🚀 Growth Hacker</span>
+            <span class="agent-chip">📝 Content Creator</span>
+            <span class="agent-chip">🐦 Twitter Engager</span>
+            <span class="agent-chip">📱 TikTok Strategist</span>
+            <span class="agent-chip">📸 Instagram Curator</span>
+            <span class="agent-chip">🤝 Reddit Builder</span>
+            <span class="agent-chip">📱 App Store Optimizer</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">📊</span>
+          <div class="division-name">Product Division</div>
+          <div class="division-desc">Building the right thing at the right time.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🎯 Sprint Prioritizer</span>
+            <span class="agent-chip">🔍 Trend Researcher</span>
+            <span class="agent-chip">💬 Feedback Synthesizer</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">🎬</span>
+          <div class="division-name">Project Management</div>
+          <div class="division-desc">Keeping the trains running on time and under budget.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🎬 Studio Producer</span>
+            <span class="agent-chip">🐑 Project Shepherd</span>
+            <span class="agent-chip">⚙️ Studio Operations</span>
+            <span class="agent-chip">🧪 Experiment Tracker</span>
+            <span class="agent-chip">👔 Senior PM</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">🧪</span>
+          <div class="division-name">Testing Division</div>
+          <div class="division-desc">Breaking things so your users don't have to.</div>
+          <div class="division-agents">
+            <span class="agent-chip">📸 Evidence Collector</span>
+            <span class="agent-chip">🔍 Reality Checker</span>
+            <span class="agent-chip">📊 Test Analyzer</span>
+            <span class="agent-chip">⚡ Perf Benchmarker</span>
+            <span class="agent-chip">🔌 API Tester</span>
+            <span class="agent-chip">♿ A11y Auditor</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">🛟</span>
+          <div class="division-name">Support Division</div>
+          <div class="division-desc">The backbone that keeps operations running smoothly.</div>
+          <div class="division-agents">
+            <span class="agent-chip">💬 Support Responder</span>
+            <span class="agent-chip">📊 Analytics Reporter</span>
+            <span class="agent-chip">💰 Finance Tracker</span>
+            <span class="agent-chip">🏗️ Infra Maintainer</span>
+            <span class="agent-chip">⚖️ Legal Compliance</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">🥽</span>
+          <div class="division-name">Spatial Computing</div>
+          <div class="division-desc">Building the immersive future of AR/VR/XR.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🏗️ XR Interface Architect</span>
+            <span class="agent-chip">💻 macOS/Metal Eng</span>
+            <span class="agent-chip">🌐 XR Immersive Dev</span>
+            <span class="agent-chip">🍎 visionOS Eng</span>
+          </div>
+        </div>
+
+        <div class="division-card">
+          <span class="division-icon">🎯</span>
+          <div class="division-name">Specialized Division</div>
+          <div class="division-desc">The unique experts who don't fit in a single box.</div>
+          <div class="division-agents">
+            <span class="agent-chip">🎭 Agents Orchestrator</span>
+            <span class="agent-chip">📊 Data Analytics</span>
+            <span class="agent-chip">🔍 LSP/Index Eng</span>
+            <span class="agent-chip">🔐 Identity & Trust</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── QUICK START ── -->
+  <section id="quickstart" class="quickstart">
+    <div class="container">
+      <p class="section-eyebrow fade-up">Quick Start</p>
+      <h2 class="section-title fade-up">Up and running<br />in minutes.</h2>
+      <p class="section-sub fade-up">Choose your integration method and start deploying AI specialists immediately.</p>
+
+      <div class="quickstart-grid">
+        <div class="step-card fade-up">
+          <div class="step-num">1</div>
+          <div class="step-title">Claude Code (Recommended)</div>
+          <div class="step-desc">Copy agents directly into your Claude Code directory and activate any specialist instantly.</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-dot code-dot-r"></span>
+              <span class="code-dot code-dot-y"></span>
+              <span class="code-dot code-dot-g"></span>
+            </div>
+            <div class="code-body">
+              <pre><span class="cmt"># Copy agents to Claude Code</span>
+<span class="cmd">cp -r agency-agents/* \
+  ~/.claude/agents/</span>
+
+<span class="cmt"># Activate in your session:</span>
+<span class="cmt"># "Use the Frontend Developer</span>
+<span class="cmt">#  agent to build a component"</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card fade-up">
+          <div class="step-num">2</div>
+          <div class="step-title">Multi-Tool Install</div>
+          <div class="step-desc">Convert and install agents for Cursor, Aider, Windsurf, Gemini CLI, or OpenCode in one step.</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-dot code-dot-r"></span>
+              <span class="code-dot code-dot-y"></span>
+              <span class="code-dot code-dot-g"></span>
+            </div>
+            <div class="code-body">
+              <pre><span class="cmt"># Generate integration files</span>
+<span class="cmd">./scripts/convert.sh</span>
+
+<span class="cmt"># Interactive install</span>
+<span class="cmt"># (auto-detects your tools)</span>
+<span class="cmd">./scripts/install.sh</span>
+
+<span class="cmt"># Or target a specific tool</span>
+<span class="cmd">./scripts/install.sh \
+  --tool cursor</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card fade-up">
+          <div class="step-num">3</div>
+          <div class="step-title">Activate Your Specialists</div>
+          <div class="step-desc">Reference any agent in your AI conversations and watch the specialists take over.</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-dot code-dot-r"></span>
+              <span class="code-dot code-dot-y"></span>
+              <span class="code-dot code-dot-g"></span>
+            </div>
+            <div class="code-body">
+              <pre><span class="cmt"># Claude Code examples:</span>
+
+<span class="cmd">"Use the Frontend Developer
+ agent to review this React
+ component."</span>
+
+<span class="cmd">"Activate the Reality Checker
+ to verify production
+ readiness."</span>
+
+<span class="cmd">"Use the Growth Hacker to
+ plan our launch strategy."</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card fade-up">
+          <div class="step-num">4</div>
+          <div class="step-title">Orchestrate a Full Team</div>
+          <div class="step-desc">Deploy multiple specialists simultaneously for complex projects needing cross-functional expertise.</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-dot code-dot-r"></span>
+              <span class="code-dot code-dot-y"></span>
+              <span class="code-dot code-dot-g"></span>
+            </div>
+            <div class="code-body">
+              <pre><span class="cmt"># Full agency deployment:</span>
+
+<span class="cmd">"Use the Agents Orchestrator
+ to coordinate Backend Arch,
+ Frontend Dev, Growth Hacker,
+ and Reality Checker for
+ our MVP launch."</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TOOLS ── -->
+  <section id="tools">
+    <div class="container">
+      <p class="section-eyebrow fade-up">Integrations</p>
+      <h2 class="section-title fade-up">Works with every tool<br />you already use.</h2>
+      <p class="section-sub fade-up">
+        Native support for all major agentic coding tools. One set of agents, every platform.
+      </p>
+      <div class="tools-grid fade-up">
+        <div class="tool-card">
+          <span class="tool-icon">🤖</span>
+          <div class="tool-name">Claude Code</div>
+          <div class="tool-path">~/.claude/agents/</div>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">⚡</span>
+          <div class="tool-name">Cursor</div>
+          <div class="tool-path">.cursor/rules/</div>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🌊</span>
+          <div class="tool-name">Windsurf</div>
+          <div class="tool-path">.windsurfrules</div>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🔧</span>
+          <div class="tool-name">Aider</div>
+          <div class="tool-path">CONVENTIONS.md</div>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">♊</span>
+          <div class="tool-name">Gemini CLI</div>
+          <div class="tool-path">~/.gemini/extensions/</div>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🚀</span>
+          <div class="tool-name">Antigravity</div>
+          <div class="tool-path">~/.gemini/antigravity/</div>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">💻</span>
+          <div class="tool-name">OpenCode</div>
+          <div class="tool-path">.opencode/agent/</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WHY ── -->
+  <section id="why">
+    <div class="container">
+      <p class="section-eyebrow fade-up">Why The Agency</p>
+      <h2 class="section-title fade-up">Not just prompts.<br />Real specialists.</h2>
+      <p class="section-sub fade-up">
+        What makes The Agency different from generic AI prompts or one-off prompt collections.
+      </p>
+
+      <div class="why-grid fade-up">
+        <div class="why-card">
+          <div class="why-icon">🎭</div>
+          <div class="why-title">Strong Personality</div>
+          <div class="why-desc">Not generic "act as a developer" templates — real character, distinct voice, and a consistent approach that shapes every output.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">📋</div>
+          <div class="why-title">Clear Deliverables</div>
+          <div class="why-desc">Concrete outputs with real code examples, not vague guidance. Each agent knows exactly what it produces and how to measure success.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">✅</div>
+          <div class="why-title">Success Metrics</div>
+          <div class="why-desc">Measurable quality standards and outcome benchmarks built into every agent — so you always know when the job is truly done.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🔄</div>
+          <div class="why-title">Proven Workflows</div>
+          <div class="why-desc">Step-by-step processes battle-tested in real production environments, not hypothetical scenarios or academic exercises.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🔓</div>
+          <div class="why-title">Fully Transparent</div>
+          <div class="why-desc">Open source, forkable, and fully adaptable. No black box — read every line, modify every personality, own your AI team completely.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🚀</div>
+          <div class="why-title">Multi-Tool Native</div>
+          <div class="why-desc">Works across Claude Code, Cursor, Windsurf, Aider, Gemini CLI, and more. Write once, deploy everywhere with automated conversion scripts.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── QUOTES ── -->
+  <section class="quotes">
+    <div class="container">
+      <p class="section-eyebrow fade-up">From The Agency Floor</p>
+      <h2 class="section-title fade-up">Hear from the specialists.</h2>
+      <div class="quotes-grid fade-up">
+        <div class="quote-card">
+          <p class="quote-text">I don't just test your code — I default to finding 3–5 issues and require visual proof for everything. No screenshots, no sign-off.</p>
+          <div class="quote-author">Evidence Collector</div>
+          <div class="quote-role">Testing Division</div>
+        </div>
+        <div class="quote-card">
+          <p class="quote-text">You're not marketing on Reddit — you're becoming a valued community member who happens to represent a brand. Authenticity is non-negotiable.</p>
+          <div class="quote-author">Reddit Community Builder</div>
+          <div class="quote-role">Marketing Division</div>
+        </div>
+        <div class="quote-card">
+          <p class="quote-text">Every playful element must serve a functional or emotional purpose. Design delight that enhances rather than distracts — always.</p>
+          <div class="quote-author">Whimsy Injector</div>
+          <div class="quote-role">Design Division</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="fade-up">
+        Your AI dream team<br />is ready to deploy.
+      </h2>
+      <p class="fade-up">
+        61 specialists. 9 divisions. Zero onboarding time.<br />
+        Start building with The Agency today — it's free and open source.
+      </p>
+      <div class="cta-actions fade-up">
+        <a href="https://github.com/msitarzewski/agency-agents" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+          ★ Star on GitHub
+        </a>
+        <a href="#quickstart" class="btn btn-outline btn-lg">
+          ⚡ Quick Start Guide
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;width:100%">
+      <span class="footer-brand">🎭 The Agency</span>
+      <nav class="footer-links">
+        <a href="https://github.com/msitarzewski/agency-agents" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/msitarzewski/agency-agents/discussions" target="_blank" rel="noopener">Community</a>
+        <a href="https://github.com/msitarzewski/agency-agents/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/sponsors/msitarzewski" target="_blank" rel="noopener">Sponsor ❤️</a>
+      </nav>
+      <span class="footer-copy">MIT License · Made with ❤️ by the community</span>
+    </div>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-up animations
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      }),
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
