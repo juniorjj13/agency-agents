@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surfing Trader – Escola Para Traders</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:   #00e5a0;
+      --red:     #e53935;
+      --dark:    #1a1a1a;
+      --darker:  #111111;
+      --text:    #ffffff;
+      --text-muted: #cccccc;
+      --section-pad: 80px 24px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--darker);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Utility ── */
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+    .tag-green  { color: var(--green); }
+    .tag-red    { color: var(--red); }
+
+    /* ── CTA Button ── */
+    .cta-btn {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 18px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: filter .2s, transform .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .cta-btn:hover { filter: brightness(1.15); transform: translateY(-2px); }
+
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px 80px;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.80) 100%),
+        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+    }
+
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width: 110px;
+      height: 110px;
+    }
+
+    .logo-name {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .logo-name span { display: block; }
+
+    .badge-escola {
+      display: inline-block;
+      border: 2px solid rgba(255,255,255,.8);
+      border-radius: 50px;
+      padding: 10px 36px;
+      font-size: .85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      color: var(--text-muted);
+    }
+
+    #hero h1 {
+      font-size: clamp(1.7rem, 5vw, 2.4rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--green);
+      line-height: 1.2;
+      margin-bottom: 20px;
+      max-width: 600px;
+    }
+
+    #hero p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    /* ══════════════════════════════════════════
+       PROBLEM
+    ══════════════════════════════════════════ */
+    #problem {
+      padding: var(--section-pad);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.70) 0%, rgba(0,0,0,.85) 100%),
+        url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+    }
+
+    #problem .questions {
+      font-size: 1.15rem;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 48px;
+      line-height: 2;
+    }
+
+    #problem h2 {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 32px;
+    }
+
+    .fail-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    .fail-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    .fail-list li::before {
+      content: '●';
+      color: var(--green);
+      font-size: .7rem;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .quote-block {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════════
+       METHODOLOGY
+    ══════════════════════════════════════════ */
+    #methodology {
+      padding: var(--section-pad);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.88) 100%),
+        url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+      text-align: center;
+    }
+
+    #methodology h2 {
+      font-size: clamp(1.4rem, 4vw, 1.9rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 48px;
+      line-height: 1.25;
+    }
+
+    .method-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 540px;
+      margin: 0 auto 56px;
+      text-align: left;
+    }
+
+    .method-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    .method-list li .check {
+      color: var(--green);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ══════════════════════════════════════════
+       ABOUT
+    ══════════════════════════════════════════ */
+    #about {
+      padding: var(--section-pad);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.85) 100%),
+        url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+      text-align: center;
+    }
+
+    #about h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .about-name {
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 32px;
+    }
+
+    .about-bio {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 28px;
+      line-height: 1.85;
+    }
+
+    /* ══════════════════════════════════════════
+       CTA FINAL
+    ══════════════════════════════════════════ */
+    #cta-final {
+      padding: var(--section-pad);
+      background: linear-gradient(135deg, #0d1f1a 0%, #0a0a0a 100%);
+      text-align: center;
+    }
+
+    #cta-final h2 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 16px;
+      line-height: 1.25;
+    }
+
+    #cta-final p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      padding: 32px 24px;
+      background: #0a0a0a;
+      text-align: center;
+      color: #555;
+      font-size: .85rem;
+    }
+
+    footer strong { color: var(--green); }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 480px) {
+      .cta-btn { font-size: 1rem; padding: 16px 28px; }
+      .badge-escola { font-size: .75rem; padding: 8px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <div class="logo-wrap">
+      <!-- SVG placeholder logo – replace with actual logo image -->
+      <svg class="logo-icon" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="55" cy="55" r="54" stroke="#00e5a0" stroke-width="2" fill="rgba(0,0,0,0.4)"/>
+        <!-- Wave / C shape -->
+        <path d="M70 30 C40 30 22 45 22 60 C22 75 38 85 58 82 C42 78 32 68 33 58 C34 46 47 38 65 40 Z"
+              fill="#1a4a42"/>
+        <!-- Candlestick bars -->
+        <rect x="45" y="18" width="5" height="22" rx="2" fill="#e8d5a0"/>
+        <rect x="55" y="12" width="5" height="28" rx="2" fill="#e8d5a0"/>
+        <rect x="65" y="20" width="5" height="18" rx="2" fill="#e8d5a0"/>
+        <rect x="75" y="15" width="5" height="24" rx="2" fill="#e8d5a0"/>
+        <rect x="85" y="22" width="5" height="16" rx="2" fill="#e8d5a0"/>
+      </svg>
+      <div class="logo-name">
+        <span>SURFING</span>
+        <span>TRADER</span>
+      </div>
+    </div>
+
+    <div class="badge-escola">Escola Para Traders</div>
+
+    <h1>Formação Profissional em Day Trade<br>Do Zero à Consistência<br>Com Método, Estrutura e<br>Acompanhamento Real</h1>
+
+    <p>Aprenda a operar com leitura estrutural, gestão e direcionamento prático ao vivo</p>
+
+    <a href="#cta-final" class="cta-btn">Quero Começar Agora</a>
+  </section>
+
+  <!-- ══ PROBLEM ══ -->
+  <section id="problem">
+    <div class="container">
+      <p class="questions">
+        Cansado de perder dinheiro por operar sem estrutura?<br>
+        Já fez cursos que não deram acompanhamento?<br>
+        Opera baseado em emoção?<br>
+        Vive trocando de estratégia?
+      </p>
+
+      <h2>A Maioria dos Traders Falha Porque:</h2>
+
+      <ul class="fail-list">
+        <li>Opera sem método validado.</li>
+        <li>Não possui regras claras.</li>
+        <li>Não entende estrutura de mercado.</li>
+        <li>Não aplica gerenciamento profissional.</li>
+        <li>Depende de terceiros para tomar decisão.</li>
+      </ul>
+
+      <div class="quote-block">
+        <p class="tag-green">"O problema não é o mercado.</p>
+        <p class="tag-red">É operar sem método."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ METHODOLOGY ══ -->
+  <section id="methodology">
+    <div class="container">
+      <h2>"Metodologia Estruturada para Formar Traders Consistentes"</h2>
+
+      <ul class="method-list">
+        <li><span class="check">✓</span> 3 dias para nivelamento e abertura de conta</li>
+        <li><span class="check">✓</span> 3 dias intensivos AO VIVO do MÉTODO pelo Zoom</li>
+        <li><span class="check">✓</span> Estrutura completa de leitura do mercado</li>
+        <li><span class="check">✓</span> Aplicação na prática dos 5 Pilares</li>
+        <li><span class="check">✓</span> Sala ao vivo no Discord</li>
+        <li><span class="check">✓</span> Reforço semanal pelo Zoom</li>
+        <li><span class="check">✓</span> Plataforma Surf Flix com vídeos gravados</li>
+        <li><span class="check">✓</span> Acompanhamento contínuo por WhatsApp</li>
+      </ul>
+
+      <a href="#cta-final" class="cta-btn">Quero Me Inscrever</a>
+    </div>
+  </section>
+
+  <!-- ══ ABOUT ══ -->
+  <section id="about">
+    <div class="container">
+      <h2>Quem é</h2>
+      <p class="about-name">Juliano Rodrigues</p>
+
+      <p class="about-bio">
+        Trader profissional desde 2014 e fundador da Surfing Trader, Juliano Rodrigues
+        construiu sua autoridade operando e gerindo capital de alto nível no mercado financeiro.
+      </p>
+
+      <p class="about-bio">
+        Durante seis anos, integrou um grupo privado de investidores responsável pela
+        administração de mais de R$ 100 milhões, conduzindo contratos de longo prazo com
+        consistência, disciplina e gestão técnica estruturada.
+      </p>
+
+      <p class="about-bio">
+        Sua formação é baseada em experiência real de mercado – não teoria. Ensina que
+        resultado sustentável não vem de previsão, mas de leitura de estrutura, controle
+        emocional e aplicação rigorosa de <strong style="color:#fff;">MÉTODO</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ CTA FINAL ══ -->
+  <section id="cta-final">
+    <div class="container">
+      <h2>Pronto Para Operar com Método e Consistência?</h2>
+      <p>
+        Junte-se a traders que já transformaram sua forma de operar.
+        Vagas limitadas — inscreva-se agora e comece sua formação.
+      </p>
+      <a href="#" class="cta-btn">Garantir Minha Vaga</a>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <p>&copy; 2024 <strong>Surfing Trader</strong> – Escola Para Traders. Todos os direitos reservados.</p>
+  </footer>
+
+</body>
+</html>
