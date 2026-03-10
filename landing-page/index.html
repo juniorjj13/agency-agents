@@ -3,57 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Surfing Trader – Escola Para Traders</title>
+  <meta name="description" content="Surfing Trader – Formação Profissional em Day Trade. Do zero à consistência com método, estrutura e acompanhamento real. Online e ao vivo." />
+  <title>Surfing Trader – Formação Profissional em Day Trade 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
   <style>
-    /* ── Reset & Base ── */
+    /* ═══════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green:   #00e5a0;
-      --red:     #e53935;
-      --dark:    #1a1a1a;
-      --darker:  #111111;
-      --text:    #ffffff;
-      --text-muted: #cccccc;
-      --section-pad: 80px 24px;
+      --green:        #00e5a0;
+      --green-dark:   #00b87d;
+      --red:          #e53935;
+      --yellow:       #ffd600;
+      --discord:      #5865f2;
+      --dark:         #161616;
+      --darker:       #0d0d0d;
+      --card-bg:      rgba(255,255,255,.05);
+      --card-border:  rgba(255,255,255,.10);
+      --text:         #ffffff;
+      --text-muted:   #b0b0b0;
+      --pad:          90px 20px;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
       background: var(--darker);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.65;
+      overflow-x: hidden;
     }
 
     /* ── Utility ── */
-    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container   { max-width: 700px; margin: 0 auto; padding: 0 20px; }
+    .text-green  { color: var(--green); }
+    .text-red    { color: var(--red); }
+    .text-yellow { color: var(--yellow); }
+    .text-center { text-align: center; }
+    .fw-900      { font-weight: 900; }
+    .upper       { text-transform: uppercase; }
 
-    .tag-green  { color: var(--green); }
-    .tag-red    { color: var(--red); }
+    /* ── Section titles ── */
+    .section-title {
+      font-size: clamp(1.5rem, 4.5vw, 2rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto;
+    }
 
-    /* ── CTA Button ── */
-    .cta-btn {
-      display: inline-block;
-      background: var(--green);
+    /* ── CTA Buttons ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
       color: #000;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 18px 40px;
+      letter-spacing: .5px;
+      padding: 18px 44px;
       border-radius: 50px;
       text-decoration: none;
-      transition: filter .2s, transform .2s;
-      cursor: pointer;
       border: none;
+      cursor: pointer;
+      transition: filter .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 8px 32px rgba(0,229,160,.30);
+      white-space: nowrap;
     }
-    .cta-btn:hover { filter: brightness(1.15); transform: translateY(-2px); }
+    .btn-primary:hover {
+      filter: brightness(1.12);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(0,229,160,.45);
+    }
 
-    /* ══════════════════════════════════════════
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text);
+      font-size: .95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 14px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      border: 2px solid rgba(255,255,255,.35);
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── Scroll-in animation ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════════
+       STICKY BAR
+    ═══════════════════════════════════════ */
+    #sticky-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      background: rgba(13,13,13,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,229,160,.2);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transform: translateY(-100%);
+      transition: transform .35s ease;
+    }
+    #sticky-bar.show { transform: translateY(0); }
+    #sticky-bar .bar-brand {
+      font-size: .9rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--green);
+      white-space: nowrap;
+    }
+    #sticky-bar .btn-primary {
+      font-size: .85rem;
+      padding: 10px 22px;
+      box-shadow: none;
+    }
+
+    /* ═══════════════════════════════════════
        HERO
-    ══════════════════════════════════════════ */
+    ═══════════════════════════════════════ */
     #hero {
       position: relative;
       min-height: 100vh;
@@ -62,371 +166,1089 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 60px 24px 80px;
+      padding: 80px 20px 90px;
       background:
-        linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.80) 100%),
-        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+        linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.85) 100%),
+        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&auto=format&fit=crop&q=70') center/cover no-repeat;
     }
 
     .logo-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 32px;
+      gap: 10px;
+      margin-bottom: 28px;
     }
-
-    .logo-icon {
-      width: 110px;
-      height: 110px;
-    }
-
+    .logo-icon { width: 100px; height: 100px; }
     .logo-name {
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 900;
-      letter-spacing: 4px;
+      letter-spacing: 5px;
       color: var(--text);
       line-height: 1.1;
+      text-transform: uppercase;
     }
     .logo-name span { display: block; }
 
     .badge-escola {
       display: inline-block;
-      border: 2px solid rgba(255,255,255,.8);
+      border: 1.5px solid rgba(255,255,255,.5);
       border-radius: 50px;
-      padding: 10px 36px;
-      font-size: .85rem;
+      padding: 8px 32px;
+      font-size: .78rem;
       letter-spacing: 3px;
       text-transform: uppercase;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       color: var(--text-muted);
     }
 
     #hero h1 {
-      font-size: clamp(1.7rem, 5vw, 2.4rem);
+      font-size: clamp(1.75rem, 5.5vw, 2.6rem);
       font-weight: 900;
       text-transform: uppercase;
-      color: var(--green);
-      line-height: 1.2;
-      margin-bottom: 20px;
-      max-width: 600px;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      max-width: 640px;
     }
+    #hero h1 .white  { color: #fff; }
+    #hero h1 .green  { color: var(--green); }
 
-    #hero p {
+    #hero .hero-sub {
       font-size: 1.1rem;
       color: var(--text-muted);
       max-width: 480px;
-      margin-bottom: 40px;
+      margin-bottom: 12px;
     }
 
-    /* ══════════════════════════════════════════
+    .badge-live {
+      display: inline-block;
+      border: 2px solid var(--text);
+      border-radius: 50px;
+      padding: 10px 36px;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 16px 0 10px;
+      color: var(--text);
+    }
+
+    .hero-schedule {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .hero-tz {
+      font-size: .9rem;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+    }
+
+    /* ── Video embed ── */
+    .video-wrap {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto 40px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 60px rgba(0,0,0,.7);
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+    .video-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════
        PROBLEM
-    ══════════════════════════════════════════ */
+    ═══════════════════════════════════════ */
     #problem {
-      padding: var(--section-pad);
+      padding: var(--pad);
       background:
-        linear-gradient(180deg, rgba(0,0,0,.70) 0%, rgba(0,0,0,.85) 100%),
+        linear-gradient(180deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,.88) 100%),
         url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
     }
 
-    #problem .questions {
-      font-size: 1.15rem;
+    .questions {
+      font-size: 1.12rem;
       color: var(--text);
       text-align: center;
-      margin-bottom: 48px;
-      line-height: 2;
-    }
-
-    #problem h2 {
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 32px;
+      margin-bottom: 52px;
+      line-height: 2.1;
     }
 
     .fail-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       max-width: 520px;
-      margin: 0 auto 48px;
+      margin: 0 auto 52px;
     }
-
     .fail-list li {
       display: flex;
       align-items: flex-start;
       gap: 14px;
       font-size: 1.05rem;
       color: var(--text-muted);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 18px;
     }
-
-    .fail-list li::before {
-      content: '●';
-      color: var(--green);
-      font-size: .7rem;
-      margin-top: 6px;
+    .fail-list li .icon {
+      color: var(--red);
+      font-size: 1.1rem;
       flex-shrink: 0;
+      margin-top: 2px;
     }
 
-    .quote-block {
+    .quote-box {
+      background: linear-gradient(135deg, rgba(0,229,160,.08) 0%, rgba(0,229,160,.03) 100%);
+      border: 1px solid rgba(0,229,160,.25);
+      border-radius: 16px;
+      padding: 28px 24px;
       text-align: center;
-      font-size: 1.25rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .quote-box p {
+      font-size: 1.2rem;
       font-weight: 700;
       text-transform: uppercase;
       line-height: 1.5;
     }
 
-    /* ══════════════════════════════════════════
+    /* ═══════════════════════════════════════
        METHODOLOGY
-    ══════════════════════════════════════════ */
+    ═══════════════════════════════════════ */
     #methodology {
-      padding: var(--section-pad);
+      padding: var(--pad);
       background:
-        linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.88) 100%),
+        linear-gradient(180deg, rgba(0,0,0,.80) 0%, rgba(0,0,0,.92) 100%),
         url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
       text-align: center;
     }
 
-    #methodology h2 {
-      font-size: clamp(1.4rem, 4vw, 1.9rem);
-      font-weight: 900;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 48px;
-      line-height: 1.25;
+    .method-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      max-width: 600px;
+      margin: 40px auto 52px;
     }
+    @media (max-width: 480px) { .method-grid { grid-template-columns: 1fr; } }
 
-    .method-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      max-width: 540px;
-      margin: 0 auto 56px;
-      text-align: left;
-    }
-
-    .method-list li {
+    .method-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px 16px;
       display: flex;
       align-items: flex-start;
-      gap: 16px;
-      font-size: 1.05rem;
-      color: var(--text-muted);
+      gap: 12px;
+      text-align: left;
+      transition: border-color .2s, background .2s;
     }
-
-    .method-list li .check {
-      color: var(--green);
-      font-size: 1.2rem;
+    .method-card:hover {
+      border-color: rgba(0,229,160,.4);
+      background: rgba(0,229,160,.05);
+    }
+    .method-card .mc-icon {
+      font-size: 1.4rem;
       flex-shrink: 0;
       margin-top: 2px;
     }
+    .method-card .mc-text {
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .method-card .mc-text strong { color: var(--text); }
 
-    /* ══════════════════════════════════════════
+    /* ═══════════════════════════════════════
        ABOUT
-    ══════════════════════════════════════════ */
+    ═══════════════════════════════════════ */
     #about {
-      padding: var(--section-pad);
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.72) 0%, rgba(0,0,0,.85) 100%),
-        url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+      padding: var(--pad);
+      background: linear-gradient(180deg, #111 0%, #0d0d0d 100%);
       text-align: center;
     }
-
-    #about h2 {
-      font-size: 1.6rem;
+    .about-label {
+      font-size: .8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .about-name-title {
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
       font-weight: 900;
       text-transform: uppercase;
       color: var(--green);
-      margin-bottom: 8px;
+      margin-bottom: 36px;
     }
-
-    .about-name {
-      font-size: 2rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 32px;
-    }
-
     .about-bio {
       font-size: 1.05rem;
       color: var(--text-muted);
-      max-width: 560px;
-      margin: 0 auto 28px;
+      max-width: 580px;
+      margin: 0 auto 22px;
       line-height: 1.85;
     }
+    .stat-row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .stat-item { text-align: center; }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
 
-    /* ══════════════════════════════════════════
-       CTA FINAL
-    ══════════════════════════════════════════ */
-    #cta-final {
-      padding: var(--section-pad);
-      background: linear-gradient(135deg, #0d1f1a 0%, #0a0a0a 100%);
+    /* ═══════════════════════════════════════
+       DISCORD + SURF FLIX
+    ═══════════════════════════════════════ */
+    #platforms {
+      padding: var(--pad);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.92) 100%),
+        url('https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+    }
+
+    .platform-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 640px;
+      margin: 44px auto 0;
+    }
+    @media (max-width: 520px) { .platform-cards { grid-template-columns: 1fr; } }
+
+    .platform-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: transform .2s, border-color .2s;
+    }
+    .platform-card:hover { transform: translateY(-4px); border-color: rgba(0,229,160,.3); }
+
+    .platform-card .pc-logo {
+      font-size: 3.5rem;
+      margin-bottom: 14px;
+      display: block;
+      line-height: 1;
+    }
+    .platform-card .pc-name {
+      font-size: 1.3rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .platform-card .pc-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 8px;
+      padding: 6px 18px;
+      font-size: .82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+    .platform-card .pc-desc {
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .platform-card .pc-desc strong { color: var(--green); }
+
+    /* discord card */
+    .card-discord { border-color: rgba(88,101,242,.3); }
+    .card-discord .pc-name { color: var(--discord); }
+    .card-discord .pc-badge { background: rgba(88,101,242,.12); border-color: rgba(88,101,242,.3); color: var(--discord); }
+
+    /* surf flix card */
+    .card-surfflix { border-color: rgba(0,229,160,.2); }
+    .card-surfflix .pc-name { color: var(--green); }
+    .card-surfflix .pc-badge { background: rgba(0,229,160,.1); border-color: rgba(0,229,160,.25); color: var(--green); }
+
+    /* surfflix N logo */
+    .surfflix-n {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #21c45d;
+      font-style: italic;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+    .surfflix-n .sf-text {
+      font-size: 1.2rem;
+      font-style: normal;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #21c45d;
+    }
+
+    /* ═══════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════ */
+    #testimonials {
+      padding: var(--pad);
+      background: linear-gradient(180deg, #0d0d0d 0%, #111 100%);
       text-align: center;
     }
 
-    #cta-final h2 {
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      font-weight: 900;
-      text-transform: uppercase;
-      color: var(--green);
+    .shield-icon {
+      font-size: 3.5rem;
       margin-bottom: 16px;
-      line-height: 1.25;
+      display: block;
+      filter: drop-shadow(0 4px 16px rgba(0,229,160,.4));
     }
 
+    .testimonial-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 620px;
+      margin: 40px auto 0;
+    }
+
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px 20px;
+      display: flex;
+      gap: 16px;
+      text-align: left;
+      transition: border-color .2s;
+    }
+    .testimonial-card:hover { border-color: rgba(0,229,160,.3); }
+
+    .t-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-dark), #0a3d2a);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--green);
+      border: 2px solid rgba(0,229,160,.3);
+      overflow: hidden;
+    }
+    .t-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .t-body { flex: 1; }
+    .t-name {
+      font-size: .98rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .t-stars { color: var(--yellow); font-size: .85rem; margin-bottom: 6px; letter-spacing: 1px; }
+    .t-text { font-size: .92rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* ═══════════════════════════════════════
+       PRICING
+    ═══════════════════════════════════════ */
+    #pricing {
+      padding: var(--pad);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.92) 100%),
+        url('https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
+      text-align: center;
+    }
+
+    .price-comparison {
+      max-width: 540px;
+      margin: 40px auto 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .price-comparison-header {
+      background: rgba(255,255,255,.04);
+      padding: 18px 24px;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      font-size: .95rem;
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row .pr-label { color: var(--text-muted); }
+    .price-row .pr-value { font-weight: 700; color: var(--text); }
+    .price-row.total-row {
+      background: rgba(229,57,53,.07);
+      border-top: 1px solid rgba(229,57,53,.2);
+    }
+    .price-row.total-row .pr-label { color: var(--text); font-weight: 700; }
+    .price-row.total-row .pr-value { color: var(--red); font-size: 1.1rem; }
+
+    .price-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 24px;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .price-divider::before, .price-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.1);
+    }
+
+    .price-final-box {
+      max-width: 540px;
+      margin: 28px auto 0;
+      background: linear-gradient(135deg, rgba(0,229,160,.1) 0%, rgba(0,229,160,.04) 100%);
+      border: 2px solid rgba(0,229,160,.4);
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .pf-title {
+      font-size: .8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .pf-year {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .pf-amount {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .pf-or {
+      font-size: .9rem;
+      color: var(--text-muted);
+      margin: 8px 0;
+    }
+    .pf-installment {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .payment-icons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 12px;
+      margin-bottom: 28px;
+    }
+    .payment-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+    .payment-icon .pi-icon { font-size: 2rem; }
+
+    /* ═══════════════════════════════════════
+       BONUS
+    ═══════════════════════════════════════ */
+    #bonus {
+      padding: var(--pad);
+      background: linear-gradient(180deg, #111 0%, #0d0d0d 100%);
+      text-align: center;
+    }
+
+    .bonus-stamp {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 90px;
+      height: 90px;
+      border: 3px dashed var(--green);
+      border-radius: 50%;
+      font-size: .9rem;
+      font-weight: 900;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      background: rgba(0,229,160,.06);
+      box-shadow: 0 0 24px rgba(0,229,160,.2);
+    }
+
+    .bonus-card {
+      max-width: 520px;
+      margin: 32px auto 36px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px 28px;
+    }
+    .bonus-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .bonus-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 1rem;
+      color: #111;
+      font-weight: 600;
+      text-align: left;
+      line-height: 1.45;
+    }
+    .bonus-list li .bl-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .urgency-line {
+      font-size: .9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    /* ═══════════════════════════════════════
+       FINAL CTA
+    ═══════════════════════════════════════ */
+    #cta-final {
+      padding: var(--pad);
+      background: linear-gradient(135deg, #0b1f18 0%, #07100d 100%);
+      text-align: center;
+      border-top: 1px solid rgba(0,229,160,.15);
+    }
+    #cta-final .section-title { color: var(--green); }
     #cta-final p {
       color: var(--text-muted);
       font-size: 1.05rem;
       max-width: 480px;
-      margin: 0 auto 40px;
+      margin: 0 auto 36px;
     }
 
-    /* ══════════════════════════════════════════
-       FOOTER
-    ══════════════════════════════════════════ */
-    footer {
-      padding: 32px 24px;
-      background: #0a0a0a;
-      text-align: center;
-      color: #555;
+    .whatsapp-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25d366;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 18px 44px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 8px 32px rgba(37,211,102,.35);
+      transition: filter .2s, transform .2s, box-shadow .2s;
+    }
+    .whatsapp-cta:hover {
+      filter: brightness(1.1);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(37,211,102,.5);
+    }
+    .whatsapp-icon { font-size: 1.4rem; }
+
+    .cta-note {
+      margin-top: 18px;
       font-size: .85rem;
+      color: var(--text-muted);
     }
 
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    footer {
+      padding: 32px 20px;
+      background: #080808;
+      text-align: center;
+      color: #444;
+      font-size: .82rem;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
     footer strong { color: var(--green); }
 
-    /* ══════════════════════════════════════════
-       RESPONSIVE
-    ══════════════════════════════════════════ */
-    @media (max-width: 480px) {
-      .cta-btn { font-size: 1rem; padding: 16px 28px; }
-      .badge-escola { font-size: .75rem; padding: 8px 24px; }
+    /* ═══════════════════════════════════════
+       RESPONSIVE TWEAKS
+    ═══════════════════════════════════════ */
+    @media (max-width: 540px) {
+      :root { --pad: 64px 18px; }
+      .btn-primary { font-size: .95rem; padding: 16px 30px; }
+      .whatsapp-cta { font-size: .95rem; padding: 16px 28px; }
+      .price-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+      .stat-row { gap: 24px; }
+      #sticky-bar .bar-brand { font-size: .75rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ══ HERO ══ -->
-  <section id="hero">
-    <div class="logo-wrap">
-      <!-- SVG placeholder logo – replace with actual logo image -->
-      <svg class="logo-icon" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="55" cy="55" r="54" stroke="#00e5a0" stroke-width="2" fill="rgba(0,0,0,0.4)"/>
-        <!-- Wave / C shape -->
-        <path d="M70 30 C40 30 22 45 22 60 C22 75 38 85 58 82 C42 78 32 68 33 58 C34 46 47 38 65 40 Z"
-              fill="#1a4a42"/>
-        <!-- Candlestick bars -->
-        <rect x="45" y="18" width="5" height="22" rx="2" fill="#e8d5a0"/>
-        <rect x="55" y="12" width="5" height="28" rx="2" fill="#e8d5a0"/>
-        <rect x="65" y="20" width="5" height="18" rx="2" fill="#e8d5a0"/>
-        <rect x="75" y="15" width="5" height="24" rx="2" fill="#e8d5a0"/>
-        <rect x="85" y="22" width="5" height="16" rx="2" fill="#e8d5a0"/>
-      </svg>
-      <div class="logo-name">
-        <span>SURFING</span>
-        <span>TRADER</span>
+<!-- ══ STICKY BAR ══ -->
+<div id="sticky-bar">
+  <span class="bar-brand">Surfing Trader</span>
+  <a href="#cta-final" class="btn-primary">Garantir Minha Vaga</a>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section id="hero">
+  <div class="logo-wrap fade-up">
+    <svg class="logo-icon" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="55" cy="55" r="54" stroke="#00e5a0" stroke-width="1.5" fill="rgba(0,0,0,0.45)"/>
+      <path d="M70 30 C40 30 22 45 22 60 C22 75 38 85 58 82 C42 78 32 68 33 58 C34 46 47 38 65 40 Z" fill="#1a4a42"/>
+      <rect x="44" y="17" width="5" height="22" rx="2" fill="#e8d5a0"/>
+      <rect x="54" y="11" width="5" height="28" rx="2" fill="#e8d5a0"/>
+      <rect x="64" y="19" width="5" height="19" rx="2" fill="#e8d5a0"/>
+      <rect x="74" y="14" width="5" height="25" rx="2" fill="#e8d5a0"/>
+      <rect x="84" y="21" width="5" height="17" rx="2" fill="#e8d5a0"/>
+    </svg>
+    <div class="logo-name">
+      <span>SURFING</span>
+      <span>TRADER</span>
+    </div>
+  </div>
+
+  <div class="badge-escola fade-up">Escola Para Traders</div>
+
+  <!-- Video -->
+  <div class="video-wrap fade-up">
+    <iframe
+      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      title="Surfing Trader – Se você opera o dia todo para fazer $$$ você não entendeu o jogo"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+  </div>
+
+  <h1 class="fade-up">
+    <span class="white">F</span><span class="green">ormação Profissional<br>para Day Trade</span>
+  </h1>
+
+  <p class="hero-sub fade-up">Do Zero à Consistência com Método, Estrutura e Acompanhamento Real</p>
+
+  <div class="badge-live fade-up">Online e ao Vivo</div>
+  <p class="hero-schedule fade-up">3 noites das 19:30 até 22:30</p>
+  <p class="hero-tz fade-up">(horário de Brasília)</p>
+
+  <p class="hero-sub fade-up">Aprenda a operar com leitura estrutural, gestão e direcionamento prático ao vivo</p>
+
+  <a href="#cta-final" class="btn-primary fade-up" style="margin-top:12px;">
+    🚀 Quero Garantir Minha Vaga
+  </a>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PROBLEM
+══════════════════════════════════════════ -->
+<section id="problem">
+  <div class="container">
+    <p class="questions fade-up">
+      Cansado de perder dinheiro por operar sem estrutura?<br>
+      Já fez cursos que não deram acompanhamento?<br>
+      Opera baseado em emoção?<br>
+      Vive trocando de estratégia?
+    </p>
+
+    <h2 class="section-title text-green text-center fade-up">A Maioria dos Traders Falha Porque:</h2>
+
+    <ul class="fail-list fade-up">
+      <li><span class="icon">✗</span> Opera sem método validado.</li>
+      <li><span class="icon">✗</span> Não possui regras claras.</li>
+      <li><span class="icon">✗</span> Não entende estrutura de mercado.</li>
+      <li><span class="icon">✗</span> Não aplica gerenciamento profissional.</li>
+      <li><span class="icon">✗</span> Depende de terceiros para tomar decisão.</li>
+    </ul>
+
+    <div class="quote-box fade-up">
+      <p class="text-green">"O problema não é o mercado.</p>
+      <p class="text-red" style="margin-top:6px;">É operar sem método."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     METHODOLOGY
+══════════════════════════════════════════ -->
+<section id="methodology">
+  <div class="container">
+    <h2 class="section-title text-green text-center fade-up">
+      "Metodologia Estruturada<br>Para Formar Traders Consistentes"
+    </h2>
+    <p class="section-sub fade-up">
+      Um programa completo do zero à operação real com acompanhamento em cada etapa.
+    </p>
+
+    <div class="method-grid fade-up">
+      <div class="method-card">
+        <span class="mc-icon">📅</span>
+        <div class="mc-text"><strong>3 dias de nivelamento</strong><br>e abertura de conta</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">🎥</span>
+        <div class="mc-text"><strong>3 dias intensivos AO VIVO</strong><br>do MÉTODO pelo Zoom</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">📊</span>
+        <div class="mc-text"><strong>Estrutura completa</strong><br>de leitura do mercado</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">🏛️</span>
+        <div class="mc-text"><strong>Aplicação na prática</strong><br>dos 5 Pilares</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">💬</span>
+        <div class="mc-text"><strong>Sala ao vivo</strong><br>no Discord</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">🔄</span>
+        <div class="mc-text"><strong>Reforço semanal</strong><br>pelo Zoom</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">▶️</span>
+        <div class="mc-text"><strong>Plataforma Surf Flix</strong><br>com vídeos gravados</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">📱</span>
+        <div class="mc-text"><strong>Acompanhamento contínuo</strong><br>por WhatsApp</div>
       </div>
     </div>
 
-    <div class="badge-escola">Escola Para Traders</div>
+    <div class="text-center fade-up">
+      <a href="#cta-final" class="btn-primary">Quero Fazer Parte</a>
+    </div>
+  </div>
+</section>
 
-    <h1>Formação Profissional em Day Trade<br>Do Zero à Consistência<br>Com Método, Estrutura e<br>Acompanhamento Real</h1>
+<!-- ══════════════════════════════════════════
+     ABOUT
+══════════════════════════════════════════ -->
+<section id="about">
+  <div class="container">
+    <p class="about-label fade-up">Quem é</p>
+    <h2 class="about-name-title fade-up">Juliano Rodrigues</h2>
 
-    <p>Aprenda a operar com leitura estrutural, gestão e direcionamento prático ao vivo</p>
+    <p class="about-bio fade-up">
+      Trader profissional desde 2014 e fundador da Surfing Trader, Juliano Rodrigues
+      construiu sua autoridade operando e gerindo capital de alto nível no mercado financeiro.
+    </p>
 
-    <a href="#cta-final" class="cta-btn">Quero Começar Agora</a>
-  </section>
+    <p class="about-bio fade-up">
+      Durante seis anos, integrou um grupo privado de investidores responsável pela
+      administração de mais de <strong style="color:#fff;">R$ 100 milhões</strong>,
+      conduzindo contratos de longo prazo com consistência, disciplina e gestão técnica estruturada.
+    </p>
 
-  <!-- ══ PROBLEM ══ -->
-  <section id="problem">
-    <div class="container">
-      <p class="questions">
-        Cansado de perder dinheiro por operar sem estrutura?<br>
-        Já fez cursos que não deram acompanhamento?<br>
-        Opera baseado em emoção?<br>
-        Vive trocando de estratégia?
-      </p>
+    <p class="about-bio fade-up">
+      Sua formação é baseada em experiência real de mercado — não teoria. Ensina que resultado
+      sustentável não vem de previsão, mas de leitura de estrutura, controle emocional e
+      aplicação rigorosa de <strong style="color:#fff;">MÉTODO</strong>.
+    </p>
 
-      <h2>A Maioria dos Traders Falha Porque:</h2>
-
-      <ul class="fail-list">
-        <li>Opera sem método validado.</li>
-        <li>Não possui regras claras.</li>
-        <li>Não entende estrutura de mercado.</li>
-        <li>Não aplica gerenciamento profissional.</li>
-        <li>Depende de terceiros para tomar decisão.</li>
-      </ul>
-
-      <div class="quote-block">
-        <p class="tag-green">"O problema não é o mercado.</p>
-        <p class="tag-red">É operar sem método."</p>
+    <div class="stat-row fade-up">
+      <div class="stat-item">
+        <div class="stat-number">+10</div>
+        <div class="stat-label">Anos de mercado</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">R$100M+</div>
+        <div class="stat-label">Capital gerido</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">+500</div>
+        <div class="stat-label">Alunos formados</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ══ METHODOLOGY ══ -->
-  <section id="methodology">
-    <div class="container">
-      <h2>"Metodologia Estruturada para Formar Traders Consistentes"</h2>
+<!-- ══════════════════════════════════════════
+     DISCORD + SURF FLIX
+══════════════════════════════════════════ -->
+<section id="platforms">
+  <div class="container">
+    <h2 class="section-title text-green text-center fade-up">
+      Comunidade &amp; Plataforma
+    </h2>
+    <p class="section-sub text-center fade-up">
+      Duas ferramentas poderosas para acelerar sua evolução como trader.
+    </p>
 
-      <ul class="method-list">
-        <li><span class="check">✓</span> 3 dias para nivelamento e abertura de conta</li>
-        <li><span class="check">✓</span> 3 dias intensivos AO VIVO do MÉTODO pelo Zoom</li>
-        <li><span class="check">✓</span> Estrutura completa de leitura do mercado</li>
-        <li><span class="check">✓</span> Aplicação na prática dos 5 Pilares</li>
-        <li><span class="check">✓</span> Sala ao vivo no Discord</li>
-        <li><span class="check">✓</span> Reforço semanal pelo Zoom</li>
-        <li><span class="check">✓</span> Plataforma Surf Flix com vídeos gravados</li>
-        <li><span class="check">✓</span> Acompanhamento contínuo por WhatsApp</li>
+    <div class="platform-cards fade-up">
+      <!-- Discord -->
+      <div class="platform-card card-discord">
+        <span class="pc-logo">🎮</span>
+        <div class="pc-name">Discord</div>
+        <div class="pc-badge">Sala ao Vivo</div>
+        <p class="pc-desc">
+          Operamos com os alunos <strong>mostrando as marcações</strong>
+          e tirando dúvidas na hora. Suporte em tempo real durante o pregão.
+        </p>
+      </div>
+
+      <!-- Surf Flix -->
+      <div class="platform-card card-surfflix">
+        <div class="surfflix-n">
+          N
+          <div class="sf-text">Surf<br>Flix</div>
+        </div>
+        <div class="pc-badge">Aulas Gravadas</div>
+        <p class="pc-desc">
+          Onde ficam nossas aulas gravadas para você assistir e
+          estudar <strong>quando e onde quiser</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="container">
+    <span class="shield-icon fade-up">🛡️</span>
+    <h2 class="section-title text-green text-center fade-up">
+      Método Validado<br>Pelos Nossos Alunos
+    </h2>
+
+    <div class="testimonial-list fade-up">
+      <div class="testimonial-card">
+        <div class="t-avatar">DB</div>
+        <div class="t-body">
+          <div class="t-name">Danniel Barbosa</div>
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">
+            A escola Surfing Trader foi e está sendo de grande importância na minha evolução
+            como trader e como pessoa. O método é claro, o acompanhamento é real e os resultados aparecem.
+          </p>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="t-avatar">JP</div>
+        <div class="t-body">
+          <div class="t-name">João Pedro Vaz</div>
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">
+            A escolha de me tornar um profissional do mercado com a Surfing Trader foi a melhor
+            decisão que tomei. O Juliano ensina de verdade, com experiência real de mercado.
+          </p>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="t-avatar">KF</div>
+        <div class="t-body">
+          <div class="t-name">Keoma Farias</div>
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">
+            Sem dúvidas o melhor custo-benefício e o melhor lugar para se tornar profissional
+            no mercado. Aprendi a operar com consistência e deixei de depender de dicas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PRICING
+══════════════════════════════════════════ -->
+<section id="pricing">
+  <div class="container">
+    <h2 class="section-title text-green text-center fade-up">
+      Seu Investimento
+    </h2>
+    <p class="section-sub text-center fade-up">
+      Veja o que você estaria pagando separado — e o que você paga na Formação.
+    </p>
+
+    <div class="price-comparison fade-up">
+      <div class="price-comparison-header">Se você tivesse que pagar por:</div>
+      <div class="price-row">
+        <span class="pr-label">Curso estruturado</span>
+        <span class="pr-value">R$ 5.000,00</span>
+      </div>
+      <div class="price-row">
+        <span class="pr-label">Nivelamento técnico</span>
+        <span class="pr-value">R$ 1.200,00</span>
+      </div>
+      <div class="price-row">
+        <span class="pr-label">Acompanhamento</span>
+        <span class="pr-value">R$ 600,00</span>
+      </div>
+      <div class="price-row">
+        <span class="pr-label">Aulas complementares</span>
+        <span class="pr-value">R$ 600,00</span>
+      </div>
+      <div class="price-row total-row">
+        <span class="pr-label">O investimento seria muito superior</span>
+        <span class="pr-value">R$ 7.400,00</span>
+      </div>
+    </div>
+
+    <div class="price-divider fade-up">Mas hoje, na Formação Surfing Trader 2026</div>
+
+    <div class="price-final-box fade-up">
+      <p class="pf-title">Formação Surfing Trader</p>
+      <p class="pf-year">2026</p>
+      <p class="pf-amount">R$ 5.000</p>
+      <p class="pf-or">— ou —</p>
+      <p class="pf-installment">Parcelamento no cartão de crédito</p>
+
+      <div class="payment-icons">
+        <div class="payment-icon">
+          <span class="pi-icon">💳</span>
+          <span>Cartão</span>
+        </div>
+        <div class="payment-icon">
+          <span class="pi-icon">🔷</span>
+          <span>Pix</span>
+        </div>
+      </div>
+
+      <a href="#cta-final" class="btn-primary" style="width:100%;justify-content:center;">
+        Quero Me Inscrever Agora
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BONUS
+══════════════════════════════════════════ -->
+<section id="bonus">
+  <div class="container text-center">
+    <div class="bonus-stamp fade-up">Bônus</div>
+    <h2 class="section-title text-green fade-up">Bônus Para Você Aproveitar</h2>
+
+    <div class="bonus-card fade-up">
+      <ul class="bonus-list">
+        <li>
+          <span class="bl-icon">💬</span>
+          <span><strong>3 meses de sala ao vivo</strong> no Discord — acompanhamento em tempo real</span>
+        </li>
+        <li>
+          <span class="bl-icon">▶️</span>
+          <span><strong>3 meses de Surf-Flix</strong> com aulas gravadas da Formação para rever quando quiser</span>
+        </li>
+        <li>
+          <span class="bl-icon">📘</span>
+          <span><strong>E-book exclusivo</strong> com as estratégias e os 5 Pilares do método</span>
+        </li>
       </ul>
-
-      <a href="#cta-final" class="cta-btn">Quero Me Inscrever</a>
     </div>
-  </section>
 
-  <!-- ══ ABOUT ══ -->
-  <section id="about">
-    <div class="container">
-      <h2>Quem é</h2>
-      <p class="about-name">Juliano Rodrigues</p>
+    <p class="urgency-line fade-up">⚠️ Vagas limitadas por turma — não perca sua oportunidade.</p>
 
-      <p class="about-bio">
-        Trader profissional desde 2014 e fundador da Surfing Trader, Juliano Rodrigues
-        construiu sua autoridade operando e gerindo capital de alto nível no mercado financeiro.
-      </p>
+    <h3 class="section-title text-green fade-up" style="font-size:clamp(1.6rem,5vw,2.2rem);">
+      Garanta Já<br>a Sua Vaga!
+    </h3>
+  </div>
+</section>
 
-      <p class="about-bio">
-        Durante seis anos, integrou um grupo privado de investidores responsável pela
-        administração de mais de R$ 100 milhões, conduzindo contratos de longo prazo com
-        consistência, disciplina e gestão técnica estruturada.
-      </p>
+<!-- ══════════════════════════════════════════
+     FINAL CTA
+══════════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="container">
+    <h2 class="section-title text-green text-center fade-up">
+      Pronto Para Operar<br>com Método e Consistência?
+    </h2>
+    <p class="fade-up">
+      Junte-se a traders que já transformaram sua forma de operar.
+      Vagas limitadas — inscreva-se agora e comece sua formação na próxima turma.
+    </p>
 
-      <p class="about-bio">
-        Sua formação é baseada em experiência real de mercado – não teoria. Ensina que
-        resultado sustentável não vem de previsão, mas de leitura de estrutura, controle
-        emocional e aplicação rigorosa de <strong style="color:#fff;">MÉTODO</strong>.
-      </p>
+    <div class="text-center fade-up">
+      <a href="https://wa.me/5500000000000" target="_blank" rel="noopener" class="whatsapp-cta">
+        <span class="whatsapp-icon">💬</span>
+        Quero Fazer Parte da Próxima Formação
+      </a>
+      <p class="cta-note">Clique e fale agora pelo WhatsApp — resposta imediata</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ══ CTA FINAL ══ -->
-  <section id="cta-final">
-    <div class="container">
-      <h2>Pronto Para Operar com Método e Consistência?</h2>
-      <p>
-        Junte-se a traders que já transformaram sua forma de operar.
-        Vagas limitadas — inscreva-se agora e comece sua formação.
-      </p>
-      <a href="#" class="cta-btn">Garantir Minha Vaga</a>
-    </div>
-  </section>
+<!-- ══ FOOTER ══ -->
+<footer>
+  <p>&copy; 2026 <strong>Surfing Trader</strong> – Escola Para Traders. Todos os direitos reservados.</p>
+  <p style="margin-top:6px;">Resultados passados não garantem resultados futuros. Investimentos envolvem riscos.</p>
+</footer>
 
-  <!-- ══ FOOTER ══ -->
-  <footer>
-    <p>&copy; 2024 <strong>Surfing Trader</strong> – Escola Para Traders. Todos os direitos reservados.</p>
-  </footer>
+<!-- ══ SCRIPTS ══ -->
+<script>
+  /* ── Sticky bar ── */
+  const stickyBar = document.getElementById('sticky-bar');
+  window.addEventListener('scroll', () => {
+    stickyBar.classList.toggle('show', window.scrollY > 300);
+  }, { passive: true });
 
+  /* ── Scroll-in animations ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
