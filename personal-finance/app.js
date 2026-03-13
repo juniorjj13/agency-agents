@@ -46,6 +46,7 @@ function scheduleSync() {
         incomes:  state.incomes,
         expenses: state.expenses,
         goals:    state.goals,
+        debts:    state.debts,
         theme:    state.theme,
       });
       setSyncStatus('ok');
@@ -102,8 +103,10 @@ const state = {
   incomes: [],
   expenses: [],
   goals: [],
+  debts: [],
   theme: 'light',
   expenseFilter: 'all',
+  debtFilter: 'all',
   selectedEmoji: '✈️',
 };
 
@@ -119,6 +122,7 @@ function save() {
   localStorage.setItem('fs_incomes',  JSON.stringify(state.incomes));
   localStorage.setItem('fs_expenses', JSON.stringify(state.expenses));
   localStorage.setItem('fs_goals',    JSON.stringify(state.goals));
+  localStorage.setItem('fs_debts',    JSON.stringify(state.debts));
   localStorage.setItem('fs_theme',    state.theme);
   scheduleSync();
 }
@@ -127,6 +131,7 @@ function load() {
   state.incomes  = JSON.parse(localStorage.getItem('fs_incomes')  || '[]');
   state.expenses = JSON.parse(localStorage.getItem('fs_expenses') || '[]');
   state.goals    = JSON.parse(localStorage.getItem('fs_goals')    || '[]');
+  state.debts    = JSON.parse(localStorage.getItem('fs_debts')    || '[]');
   state.theme    = localStorage.getItem('fs_theme') || 'light';
 }
 
@@ -137,11 +142,13 @@ async function loadFromServer() {
     state.incomes  = data.incomes  || [];
     state.expenses = data.expenses || [];
     state.goals    = data.goals    || [];
+    state.debts    = data.debts    || [];
     state.theme    = data.theme    || 'light';
     // Persist locally too
     localStorage.setItem('fs_incomes',  JSON.stringify(state.incomes));
     localStorage.setItem('fs_expenses', JSON.stringify(state.expenses));
     localStorage.setItem('fs_goals',    JSON.stringify(state.goals));
+    localStorage.setItem('fs_debts',    JSON.stringify(state.debts));
     localStorage.setItem('fs_theme',    state.theme);
     return true;
   } catch {
@@ -233,8 +240,8 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 });
 
 // ── Navigation ─────────────────────────────────────────────
-const pages = ['dashboard', 'income', 'expenses', 'goals', 'learn'];
-const pageTitles = { dashboard: 'Dashboard', income: 'Rendimentos', expenses: 'Gastos', goals: 'Metas', learn: 'Aprender' };
+const pages = ['dashboard', 'income', 'expenses', 'goals', 'debts', 'learn'];
+const pageTitles = { dashboard: 'Dashboard', income: 'Rendimentos', expenses: 'Gastos', goals: 'Metas', debts: 'Dívidas', learn: 'Aprender' };
 
 function navigateTo(page) {
   pages.forEach(p => {
@@ -248,6 +255,7 @@ function navigateTo(page) {
   if (page === 'dashboard') renderDashboard();
   if (page === 'income')    renderMonthlyBreakdown('income');
   if (page === 'expenses')  renderMonthlyBreakdown('expense');
+  if (page === 'debts')     renderDebts();
 }
 
 document.querySelectorAll('.nav-item').forEach(el => {
@@ -1349,12 +1357,285 @@ document.getElementById('learnModal').addEventListener('click', e => {
   }
 });
 
+// ── DEBTS ───────────────────────────────────────────────────
+const debtTypeInfo = {
+  bancaria:  { icon: '🏦', label: 'Bancária' },
+  hipoteca:  { icon: '🏠', label: 'Hipoteca / Imóvel' },
+  carro:     { icon: '🚗', label: 'Financiamento Carro' },
+  cartao:    { icon: '💳', label: 'Cartão de Crédito' },
+  pessoal:   { icon: '👤', label: 'Empréstimo Pessoal' },
+  consorcio: { icon: '🤝', label: 'Consórcio' },
+  outros:    { icon: '✨', label: 'Outros' },
+};
+const debtStatusInfo = {
+  pagando:   { label: 'Pagando',    cls: 'debt-status-pagando' },
+  em_atraso: { label: 'Em atraso',  cls: 'debt-status-em_atraso' },
+  pausado:   { label: 'Pausado',    cls: 'debt-status-pausado' },
+  quitado:   { label: 'Quitado',    cls: 'debt-status-quitado' },
+};
+
+document.getElementById('debtForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const remaining  = parseFloat(document.getElementById('debtRemaining').value);
+  const installVal = parseFloat(document.getElementById('debtInstallmentValue').value);
+  const name       = document.getElementById('debtName').value.trim();
+  if (!name || isNaN(remaining) || remaining < 0 || isNaN(installVal) || installVal < 0) return;
+
+  const debt = {
+    id:                   uid(),
+    name,
+    type:                 document.getElementById('debtType').value,
+    status:               document.getElementById('debtStatus').value,
+    remainingAmount:      remaining,
+    totalAmount:          parseFloat(document.getElementById('debtTotalAmount').value) || remaining,
+    installmentValue:     installVal,
+    dueDay:               parseInt(document.getElementById('debtDueDay').value) || null,
+    paidInstallments:     parseInt(document.getElementById('debtPaidInstallments').value) || 0,
+    totalInstallments:    parseInt(document.getElementById('debtTotalInstallments').value) || null,
+    interestRate:         parseFloat(document.getElementById('debtRate').value) || 0,
+    rateType:             document.getElementById('debtRateType').value,
+    overdueInstallments:  parseInt(document.getElementById('debtOverdueInstallments').value) || 0,
+  };
+
+  state.debts.push(debt);
+  save();
+  renderDebts();
+  e.target.reset();
+  document.getElementById('debtOverdueInstallments').value = '0';
+  document.getElementById('debtPaidInstallments').value    = '0';
+  showToast('Dívida cadastrada! 📋');
+});
+
+// Debt filter tabs
+document.querySelectorAll('#debtTabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#debtTabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.debtFilter = tab.dataset.debtFilter;
+    renderDebtList();
+  });
+});
+
+function renderDebts() {
+  renderDebtKPIs();
+  renderDebtList();
+}
+
+function renderDebtKPIs() {
+  const active = state.debts.filter(d => d.status !== 'quitado');
+  const total  = active.reduce((s, d) => s + d.remainingAmount, 0);
+  const monthly = active
+    .filter(d => d.status === 'pagando' || d.status === 'em_atraso')
+    .reduce((s, d) => s + d.installmentValue, 0);
+  const overdueCount = active.filter(d => d.overdueInstallments > 0).length;
+  const income = getMonthlyIncome();
+  const burdenPct = income > 0 ? (monthly / income) * 100 : 0;
+
+  document.getElementById('kpiDebtTotal').textContent   = fmt(total);
+  document.getElementById('kpiDebtCount').textContent   =
+    state.debts.length === 0 ? 'nenhuma dívida' :
+    `${active.length} ativa${active.length !== 1 ? 's' : ''}`;
+  document.getElementById('kpiDebtMonthly').textContent = fmt(monthly);
+  document.getElementById('kpiDebtOverdue').textContent = overdueCount;
+  document.getElementById('kpiDebtBurden').textContent  = burdenPct.toFixed(1) + '%';
+
+  const overdueCard = document.getElementById('kpiDebtOverdueCard');
+  overdueCard.classList.toggle('has-overdue', overdueCount > 0);
+  document.getElementById('kpiDebtOverdueSub').textContent =
+    overdueCount > 0 ? `dívida${overdueCount > 1 ? 's' : ''} em atraso!` : 'sem atrasos';
+
+  // Commitment sub-label
+  const commitEl = document.getElementById('kpiDebtCommit');
+  if (income > 0) {
+    commitEl.textContent = `${burdenPct.toFixed(1)}% da renda mensal`;
+  } else {
+    commitEl.textContent = 'do orçamento mensal';
+  }
+
+  // Alert
+  const alertEl = document.getElementById('debtAlert');
+  if (overdueCount > 0) {
+    alertEl.style.display = 'flex';
+    alertEl.className = 'alert-box alert-danger';
+    alertEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>
+      <div><strong>Atenção:</strong> Você tem ${overdueCount} dívida${overdueCount > 1 ? 's' : ''} com parcelas em atraso. Regularize para evitar juros crescentes e negativação.</div>`;
+  } else if (burdenPct > 35 && monthly > 0) {
+    alertEl.style.display = 'flex';
+    alertEl.className = 'alert-box alert-warning';
+    alertEl.innerHTML = `<i class="fa-solid fa-circle-info"></i>
+      <div><strong>Comprometimento alto:</strong> Suas parcelas consomem ${burdenPct.toFixed(1)}% da renda. O recomendado é até 30%. Considere renegociar prazos.</div>`;
+  } else {
+    alertEl.style.display = 'none';
+  }
+}
+
+function renderDebtList() {
+  const list = document.getElementById('debtList');
+  const filtered = state.debtFilter === 'all'
+    ? state.debts
+    : state.debts.filter(d => d.status === state.debtFilter);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="list-empty">
+      <i class="fa-solid fa-hand-holding-dollar"></i>
+      <p>${state.debts.length === 0 ? 'Nenhuma dívida cadastrada ainda.<br>Adicione para controlar seus compromissos.' : 'Nenhuma dívida nessa categoria.'}</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = [...filtered].reverse().map(d => debtCardHTML(d)).join('');
+}
+
+function debtCardHTML(d) {
+  const typeInfo   = debtTypeInfo[d.type]   || { icon: '✨', label: d.type };
+  const statusInfo = debtStatusInfo[d.status] || { label: d.status, cls: '' };
+
+  const pct = d.totalInstallments > 0
+    ? Math.min(100, Math.round((d.paidInstallments / d.totalInstallments) * 100))
+    : (d.totalAmount > 0
+        ? Math.min(100, Math.round(((d.totalAmount - d.remainingAmount) / d.totalAmount) * 100))
+        : 0);
+
+  const fillCls = pct >= 100 ? 'fill-done' : d.overdueInstallments > 0 ? 'fill-danger' : '';
+  const cardCls = d.status === 'em_atraso' || d.overdueInstallments > 0
+    ? 'debt-overdue-card'
+    : d.status === 'quitado' ? 'debt-paid-card' : '';
+
+  const rateStr = d.interestRate > 0
+    ? `${d.interestRate}% a.${d.rateType === 'mensal' ? 'm' : 'a'}.`
+    : '—';
+
+  const installStr = d.totalInstallments
+    ? `${d.paidInstallments}/${d.totalInstallments} parcelas`
+    : d.paidInstallments > 0 ? `${d.paidInstallments} pagas` : '—';
+
+  return `
+    <div class="debt-card ${cardCls}" data-id="${d.id}">
+      <div class="debt-card-header">
+        <div class="debt-type-icon">${typeInfo.icon}</div>
+        <div class="debt-header-info">
+          <div class="debt-card-name">${escHtml(d.name)}</div>
+          <div class="debt-card-type">${typeInfo.label}</div>
+        </div>
+        <span class="debt-status-badge ${statusInfo.cls}">${statusInfo.label}</span>
+      </div>
+
+      ${d.overdueInstallments > 0 ? `
+        <div class="debt-overdue-banner">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          ${d.overdueInstallments} parcela${d.overdueInstallments > 1 ? 's' : ''} em atraso!
+        </div>` : ''}
+
+      ${d.totalInstallments || d.totalAmount > 0 ? `
+        <div class="debt-progress-section">
+          <div class="debt-progress-bar">
+            <div class="debt-progress-fill ${fillCls}" style="width:${pct}%"></div>
+          </div>
+          <div class="debt-progress-labels">
+            <strong>${installStr}</strong>
+            <span>${pct}% quitado</span>
+          </div>
+        </div>` : ''}
+
+      <div class="debt-details">
+        <div class="debt-detail">
+          <span class="debt-detail-label">Saldo devedor</span>
+          <span class="debt-detail-value" style="color:var(--danger)">${fmt(d.remainingAmount)}</span>
+        </div>
+        <div class="debt-detail">
+          <span class="debt-detail-label">Parcela mensal</span>
+          <span class="debt-detail-value">${fmt(d.installmentValue)}</span>
+        </div>
+        <div class="debt-detail">
+          <span class="debt-detail-label">Juros</span>
+          <span class="debt-detail-value">${rateStr}</span>
+        </div>
+        <div class="debt-detail">
+          <span class="debt-detail-label">Vencimento</span>
+          <span class="debt-detail-value">${d.dueDay ? 'Dia ' + d.dueDay : '—'}</span>
+        </div>
+      </div>
+
+      <div class="debt-card-actions">
+        <button class="btn-debt-edit" onclick="openDebtEdit('${d.id}')">
+          <i class="fa-solid fa-pen"></i> Editar
+        </button>
+        <button class="btn-debt-del" onclick="deleteDebt('${d.id}')" title="Excluir">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function deleteDebt(id) {
+  state.debts = state.debts.filter(d => d.id !== id);
+  save();
+  renderDebts();
+  showToast('Dívida removida', 'danger');
+}
+
+function openDebtEdit(id) {
+  const d = state.debts.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('debtEditId').value           = id;
+  document.getElementById('debtEditName').value         = d.name;
+  document.getElementById('debtEditType').value         = d.type;
+  document.getElementById('debtEditStatus').value       = d.status;
+  document.getElementById('debtEditRemaining').value    = d.remainingAmount;
+  document.getElementById('debtEditTotalAmount').value  = d.totalAmount || '';
+  document.getElementById('debtEditInstallment').value  = d.installmentValue;
+  document.getElementById('debtEditDueDay').value       = d.dueDay || '';
+  document.getElementById('debtEditPaid').value         = d.paidInstallments || 0;
+  document.getElementById('debtEditTotalInst').value    = d.totalInstallments || '';
+  document.getElementById('debtEditRate').value         = d.interestRate || '';
+  document.getElementById('debtEditRateType').value     = d.rateType || 'mensal';
+  document.getElementById('debtEditOverdue').value      = d.overdueInstallments || 0;
+  document.getElementById('debtEditModal').classList.add('show');
+}
+
+function closeDebtEditModal() {
+  document.getElementById('debtEditModal').classList.remove('show');
+}
+
+document.getElementById('debtEditClose').addEventListener('click', closeDebtEditModal);
+document.getElementById('debtEditModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('debtEditModal')) closeDebtEditModal();
+});
+
+document.getElementById('debtEditForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const id = document.getElementById('debtEditId').value;
+  const d  = state.debts.find(x => x.id === id);
+  if (!d) return;
+
+  d.name                = document.getElementById('debtEditName').value.trim();
+  d.type                = document.getElementById('debtEditType').value;
+  d.status              = document.getElementById('debtEditStatus').value;
+  d.remainingAmount     = parseFloat(document.getElementById('debtEditRemaining').value) || 0;
+  d.totalAmount         = parseFloat(document.getElementById('debtEditTotalAmount').value) || d.remainingAmount;
+  d.installmentValue    = parseFloat(document.getElementById('debtEditInstallment').value) || 0;
+  d.dueDay              = parseInt(document.getElementById('debtEditDueDay').value) || null;
+  d.paidInstallments    = parseInt(document.getElementById('debtEditPaid').value) || 0;
+  d.totalInstallments   = parseInt(document.getElementById('debtEditTotalInst').value) || null;
+  d.interestRate        = parseFloat(document.getElementById('debtEditRate').value) || 0;
+  d.rateType            = document.getElementById('debtEditRateType').value;
+  d.overdueInstallments = parseInt(document.getElementById('debtEditOverdue').value) || 0;
+
+  save();
+  renderDebts();
+  closeDebtEditModal();
+  showToast('Dívida atualizada! ✅');
+});
+
 // ── Expose globals for inline onclick ──────────────────────
 window.deleteIncome  = deleteIncome;
 window.deleteExpense = deleteExpense;
 window.deleteGoal    = deleteGoal;
 window.depositGoal   = depositGoal;
 window.openEditModal = openEditModal;
+window.deleteDebt    = deleteDebt;
+window.openDebtEdit  = openDebtEdit;
 
 // ── AUTH UI HELPERS ────────────────────────────────────────
 function updateAvatarUI() {
@@ -1541,6 +1822,7 @@ document.getElementById('registerForm').addEventListener('submit', async e => {
       incomes:  state.incomes,
       expenses: state.expenses,
       goals:    state.goals,
+      debts:    state.debts,
       theme:    state.theme,
     });
 
@@ -1563,6 +1845,7 @@ function renderAll() {
   renderIncomeList();
   renderExpenseList();
   renderGoalsList();
+  renderDebts();
   renderMonthlyBreakdown('income');
   renderMonthlyBreakdown('expense');
 }

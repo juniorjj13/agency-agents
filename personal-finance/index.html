@@ -40,6 +40,10 @@
       <i class="fa-solid fa-bullseye"></i>
       <span>Metas</span>
     </li>
+    <li class="nav-item" data-page="debts">
+      <i class="fa-solid fa-credit-card"></i>
+      <span>Dívidas</span>
+    </li>
     <li class="nav-item" data-page="learn">
       <i class="fa-solid fa-graduation-cap"></i>
       <span>Aprender</span>
@@ -457,6 +461,155 @@
     </div>
   </section>
 
+  <!-- ========== PAGE: DEBTS ========== -->
+  <section class="page" id="page-debts">
+    <div class="page-header-block">
+      <h2><i class="fa-solid fa-credit-card"></i> Minhas Dívidas</h2>
+      <p>Controle total das suas dívidas — financiamentos, hipoteca, cartão e mais.</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card debt-kpi-total">
+        <div class="kpi-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Saldo Devedor Total</div>
+          <div class="kpi-value" id="kpiDebtTotal">R$ 0,00</div>
+          <div class="kpi-sub" id="kpiDebtCount">nenhuma dívida</div>
+        </div>
+      </div>
+      <div class="kpi-card debt-kpi-monthly">
+        <div class="kpi-icon"><i class="fa-solid fa-calendar-check"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Parcela Mensal Total</div>
+          <div class="kpi-value" id="kpiDebtMonthly">R$ 0,00</div>
+          <div class="kpi-sub" id="kpiDebtCommit">do orçamento mensal</div>
+        </div>
+      </div>
+      <div class="kpi-card debt-kpi-overdue" id="kpiDebtOverdueCard">
+        <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Em Atraso</div>
+          <div class="kpi-value" id="kpiDebtOverdue">0</div>
+          <div class="kpi-sub" id="kpiDebtOverdueSub">sem atrasos</div>
+        </div>
+      </div>
+      <div class="kpi-card debt-kpi-burden">
+        <div class="kpi-icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Comprometimento</div>
+          <div class="kpi-value" id="kpiDebtBurden">0%</div>
+          <div class="kpi-sub">da renda com parcelas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box" id="debtAlert" style="display:none"></div>
+
+    <div class="two-col">
+      <!-- Form -->
+      <div class="card form-card">
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Adicionar Dívida</h3></div>
+        <form id="debtForm" class="finance-form">
+          <div class="form-group">
+            <label>Nome / Descrição</label>
+            <input type="text" id="debtName" placeholder="ex: Financiamento do Carro, Cartão Nubank…" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo</label>
+              <select id="debtType">
+                <option value="bancaria">🏦 Bancária</option>
+                <option value="hipoteca">🏠 Hipoteca / Imóvel</option>
+                <option value="carro">🚗 Financiamento Carro</option>
+                <option value="cartao">💳 Cartão de Crédito</option>
+                <option value="pessoal">👤 Empréstimo Pessoal</option>
+                <option value="consorcio">🤝 Consórcio</option>
+                <option value="outros">✨ Outros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="debtStatus">
+                <option value="pagando">✅ Pagando normalmente</option>
+                <option value="em_atraso">⚠️ Em atraso</option>
+                <option value="pausado">⏸️ Pausado / Negociando</option>
+                <option value="quitado">🎉 Quitado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Saldo devedor atual (R$)</label>
+              <input type="number" id="debtRemaining" placeholder="0,00" min="0" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Valor total da dívida (R$)</label>
+              <input type="number" id="debtTotalAmount" placeholder="0,00" min="0" step="0.01" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Valor da parcela (R$)</label>
+              <input type="number" id="debtInstallmentValue" placeholder="0,00" min="0" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Dia de vencimento</label>
+              <input type="number" id="debtDueDay" placeholder="ex: 10" min="1" max="31" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Parcelas pagas</label>
+              <input type="number" id="debtPaidInstallments" placeholder="0" min="0" value="0" />
+            </div>
+            <div class="form-group">
+              <label>Total de parcelas</label>
+              <input type="number" id="debtTotalInstallments" placeholder="ex: 60" min="1" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Taxa de juros (%)</label>
+              <input type="number" id="debtRate" placeholder="1,5" min="0" step="0.01" />
+            </div>
+            <div class="form-group">
+              <label>Período da taxa</label>
+              <select id="debtRateType">
+                <option value="mensal">Mensal (a.m.)</option>
+                <option value="anual">Anual (a.a.)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Parcelas em atraso</label>
+            <input type="number" id="debtOverdueInstallments" placeholder="0" min="0" value="0" />
+          </div>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Adicionar Dívida</button>
+        </form>
+      </div>
+
+      <!-- List -->
+      <div class="debt-list-col">
+        <div class="debt-list-header">
+          <h3><i class="fa-solid fa-list"></i> Dívidas cadastradas</h3>
+          <div class="tabs" id="debtTabs">
+            <button class="tab active" data-debt-filter="all">Todas</button>
+            <button class="tab" data-debt-filter="pagando">Pagando</button>
+            <button class="tab" data-debt-filter="em_atraso">Em atraso</button>
+            <button class="tab" data-debt-filter="quitado">Quitadas</button>
+          </div>
+        </div>
+        <div id="debtList">
+          <div class="list-empty">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+            <p>Nenhuma dívida cadastrada ainda.<br>Adicione para controlar seus compromissos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== PAGE: LEARN ========== -->
   <section class="page" id="page-learn">
     <div class="page-header-block">
@@ -734,6 +887,96 @@
         <div class="auth-switch">Já tem conta? <button type="button" class="btn-link" id="goLogin">Entrar</button></div>
       </form>
 
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: Edit Debt ===================== -->
+<div class="modal-overlay" id="debtEditModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>✏️ Editar Dívida</h3>
+      <button class="modal-close" id="debtEditClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="debtEditForm" class="finance-form" style="padding:0">
+        <input type="hidden" id="debtEditId" />
+        <div class="form-group">
+          <label>Nome / Descrição</label>
+          <input type="text" id="debtEditName" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="debtEditType">
+              <option value="bancaria">🏦 Bancária</option>
+              <option value="hipoteca">🏠 Hipoteca / Imóvel</option>
+              <option value="carro">🚗 Financiamento Carro</option>
+              <option value="cartao">💳 Cartão de Crédito</option>
+              <option value="pessoal">👤 Empréstimo Pessoal</option>
+              <option value="consorcio">🤝 Consórcio</option>
+              <option value="outros">✨ Outros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="debtEditStatus">
+              <option value="pagando">✅ Pagando normalmente</option>
+              <option value="em_atraso">⚠️ Em atraso</option>
+              <option value="pausado">⏸️ Pausado / Negociando</option>
+              <option value="quitado">🎉 Quitado</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Saldo devedor (R$)</label>
+            <input type="number" id="debtEditRemaining" min="0" step="0.01" required />
+          </div>
+          <div class="form-group">
+            <label>Valor total (R$)</label>
+            <input type="number" id="debtEditTotalAmount" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Parcela mensal (R$)</label>
+            <input type="number" id="debtEditInstallment" min="0" step="0.01" required />
+          </div>
+          <div class="form-group">
+            <label>Dia de vencimento</label>
+            <input type="number" id="debtEditDueDay" min="1" max="31" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Parcelas pagas</label>
+            <input type="number" id="debtEditPaid" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Total de parcelas</label>
+            <input type="number" id="debtEditTotalInst" min="1" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Taxa de juros (%)</label>
+            <input type="number" id="debtEditRate" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Período</label>
+            <select id="debtEditRateType">
+              <option value="mensal">Mensal (a.m.)</option>
+              <option value="anual">Anual (a.a.)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Parcelas em atraso</label>
+          <input type="number" id="debtEditOverdue" min="0" />
+        </div>
+        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+      </form>
     </div>
   </div>
 </div>
