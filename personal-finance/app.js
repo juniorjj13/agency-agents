@@ -2,6 +2,101 @@
    FinançasSim — Application Logic
    ============================================================ */
 
+// ── Auth state ─────────────────────────────────────────────
+const auth = {
+  token:   localStorage.getItem('fs_token') || null,
+  user:    JSON.parse(localStorage.getItem('fs_user') || 'null'),
+  premium: localStorage.getItem('fs_premium') === 'true',
+  serverAvailable: false,
+};
+
+// Relative URL — works when opened via the Node server
+const API = '/api';
+
+// ── API helpers ────────────────────────────────────────────
+async function apiCall(method, endpoint, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (auth.token) opts.headers['Authorization'] = `Bearer ${auth.token}`;
+  if (body)       opts.body = JSON.stringify(body);
+  const res  = await fetch(API + endpoint, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+  return data;
+}
+
+async function checkServerAvailable() {
+  try {
+    await fetch(API + '/ping', { method: 'GET', signal: AbortSignal.timeout(2000) });
+    auth.serverAvailable = true;
+  } catch {
+    auth.serverAvailable = false;
+  }
+}
+
+// ── Sync ───────────────────────────────────────────────────
+let syncTimer = null;
+
+function scheduleSync() {
+  if (!auth.token || !auth.serverAvailable) return;
+  setSyncStatus('syncing');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      await apiCall('PUT', '/data', {
+        incomes:  state.incomes,
+        expenses: state.expenses,
+        goals:    state.goals,
+        theme:    state.theme,
+      });
+      setSyncStatus('ok');
+      updateDropdownSync('ok');
+    } catch {
+      setSyncStatus('error');
+      updateDropdownSync('error');
+    }
+  }, 1400);
+}
+
+function setSyncStatus(status) {
+  const btn  = document.getElementById('syncBtn');
+  const icon = btn?.querySelector('i');
+  if (!btn || !icon) return;
+  btn.className = 'btn-icon';
+  if (!auth.token || !auth.serverAvailable) {
+    icon.className = 'fa-solid fa-hard-drive';
+    btn.title = 'Salvo localmente. Faça login para sincronizar na nuvem.';
+    return;
+  }
+  if (status === 'ok') {
+    icon.className = 'fa-solid fa-cloud-arrow-up';
+    btn.title = 'Dados sincronizados na nuvem ✓';
+    btn.classList.add('sync-ok');
+  } else if (status === 'syncing') {
+    icon.className = 'fa-solid fa-rotate';
+    btn.title = 'Sincronizando…';
+    btn.classList.add('sync-syncing');
+  } else {
+    icon.className = 'fa-solid fa-cloud-slash';
+    btn.title = 'Erro ao sincronizar. Dados salvos localmente.';
+    btn.classList.add('sync-error');
+  }
+}
+
+function updateDropdownSync(status) {
+  const el = document.getElementById('dropdownSync');
+  if (!el) return;
+  if (!auth.token || !auth.serverAvailable) {
+    el.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Modo local (sem login)';
+    return;
+  }
+  if (status === 'ok')
+    el.innerHTML = '<i class="fa-solid fa-cloud-arrow-up" style="color:var(--success)"></i> Sincronizado na nuvem';
+  else if (status === 'syncing')
+    el.innerHTML = '<i class="fa-solid fa-rotate" style="color:var(--warning)"></i> Sincronizando…';
+  else
+    el.innerHTML = '<i class="fa-solid fa-cloud-slash" style="color:var(--danger)"></i> Erro ao sincronizar';
+}
+
 // ── State ──────────────────────────────────────────────────
 const state = {
   incomes: [],
@@ -25,6 +120,7 @@ function save() {
   localStorage.setItem('fs_expenses', JSON.stringify(state.expenses));
   localStorage.setItem('fs_goals',    JSON.stringify(state.goals));
   localStorage.setItem('fs_theme',    state.theme);
+  scheduleSync();
 }
 
 function load() {
@@ -32,6 +128,25 @@ function load() {
   state.expenses = JSON.parse(localStorage.getItem('fs_expenses') || '[]');
   state.goals    = JSON.parse(localStorage.getItem('fs_goals')    || '[]');
   state.theme    = localStorage.getItem('fs_theme') || 'light';
+}
+
+async function loadFromServer() {
+  if (!auth.token || !auth.serverAvailable) return false;
+  try {
+    const data = await apiCall('GET', '/data');
+    state.incomes  = data.incomes  || [];
+    state.expenses = data.expenses || [];
+    state.goals    = data.goals    || [];
+    state.theme    = data.theme    || 'light';
+    // Persist locally too
+    localStorage.setItem('fs_incomes',  JSON.stringify(state.incomes));
+    localStorage.setItem('fs_expenses', JSON.stringify(state.expenses));
+    localStorage.setItem('fs_goals',    JSON.stringify(state.goals));
+    localStorage.setItem('fs_theme',    state.theme);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // ── Utils ──────────────────────────────────────────────────
@@ -1119,15 +1234,31 @@ document.querySelectorAll('.learn-card:not(.learn-card-premium)').forEach(card =
   card.addEventListener('click', () => openLearnModal(card.dataset.module));
 });
 
-// Premium cards → open paywall
+// Premium cards → open paywall (only if not yet unlocked)
 document.querySelectorAll('.learn-card-premium').forEach(card => {
-  card.addEventListener('click', openPaywallModal);
+  card.addEventListener('click', () => {
+    if (auth.premium) { openLearnModal(card.dataset.module); return; }
+    openPaywallModal();
+  });
 });
 document.querySelectorAll('.btn-premium-unlock').forEach(btn => {
-  btn.addEventListener('click', e => { e.stopPropagation(); openPaywallModal(); });
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (auth.premium) {
+      const card = btn.closest('.learn-card-premium');
+      if (card) openLearnModal(card.dataset.module);
+      return;
+    }
+    openPaywallModal();
+  });
 });
 
 function openPaywallModal() {
+  // Reset code field
+  const inp = document.getElementById('premiumCodeInput');
+  if (inp) inp.value = '';
+  const errEl = document.getElementById('paywallCodeError');
+  if (errEl) errEl.textContent = '';
   document.getElementById('paywallModal').classList.add('show');
 }
 function closePaywallModal() {
@@ -1141,10 +1272,65 @@ document.getElementById('paywallModal').addEventListener('click', e => {
 });
 
 document.getElementById('paywallCta').addEventListener('click', () => {
-  // Simulate payment flow — replace with real payment integration
   showToast('Redirecionando para o pagamento... 🔐');
   setTimeout(() => closePaywallModal(), 1800);
 });
+
+// ── Premium code unlock ────────────────────────────────────
+document.getElementById('premiumCodeBtn').addEventListener('click', handlePremiumCode);
+document.getElementById('premiumCodeInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handlePremiumCode();
+});
+document.getElementById('paywallLoginLink').addEventListener('click', () => {
+  closePaywallModal();
+  openAuthModal('login');
+});
+
+async function handlePremiumCode() {
+  const code  = document.getElementById('premiumCodeInput').value.trim();
+  const errEl = document.getElementById('paywallCodeError');
+  if (!code) { errEl.textContent = 'Digite o código de acesso.'; return; }
+  errEl.textContent = '';
+
+  // If logged in → validate on server
+  if (auth.token && auth.serverAvailable) {
+    try {
+      await apiCall('POST', '/premium/unlock', { code });
+      activatePremium();
+    } catch (err) {
+      errEl.textContent = err.message || 'Código inválido.';
+    }
+    return;
+  }
+
+  // If not logged in → local check (PREMIUM_CODE_LOCAL is intentionally visible
+  // as a fallback for demo; in production only server-side validation is used)
+  const LOCAL_CODE = 'FINANCASPRO2026';
+  if (code.toUpperCase() === LOCAL_CODE) {
+    activatePremium();
+  } else {
+    errEl.textContent = 'Código inválido. Faça login para validar via servidor.';
+  }
+}
+
+function activatePremium(showMsg = true) {
+  auth.premium = true;
+  localStorage.setItem('fs_premium', 'true');
+  // Visually unlock all premium cards
+  document.querySelectorAll('.learn-card-premium').forEach(card => {
+    card.classList.remove('learn-card-premium');
+    card.querySelector('.premium-lock-overlay')?.remove();
+    const tag = card.querySelector('.learn-tag-premium');
+    if (tag) { tag.className = 'learn-tag'; tag.innerHTML = 'Premium ✓'; }
+    const btn = card.querySelector('.btn-premium-unlock');
+    if (btn) { btn.className = 'btn-outline learn-btn'; btn.innerHTML = 'Aprender <i class="fa-solid fa-arrow-right"></i>'; }
+    // Re-bind click
+    card.addEventListener('click', () => openLearnModal(card.dataset.module));
+  });
+  closePaywallModal();
+  if (showMsg) showToast('🎉 Premium desbloqueado! Acesso total liberado.');
+  updateAvatarUI();
+}
 
 function openLearnModal(module) {
   const content = learnContent[module];
@@ -1170,8 +1356,220 @@ window.deleteGoal    = deleteGoal;
 window.depositGoal   = depositGoal;
 window.openEditModal = openEditModal;
 
+// ── AUTH UI HELPERS ────────────────────────────────────────
+function updateAvatarUI() {
+  const user     = auth.user;
+  const avatarEl = document.getElementById('avatarBtn');
+  const nameEl   = document.getElementById('dropdownName');
+  const emailEl  = document.getElementById('dropdownEmail');
+  const dAvatar  = document.getElementById('dropdownAvatar');
+  const authBtn  = document.getElementById('dropdownAuthBtn');
+  const logoutEl = document.getElementById('dropdownLogout');
+
+  if (user) {
+    const initials = user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    avatarEl.textContent  = initials;
+    dAvatar.textContent   = initials;
+    nameEl.textContent    = user.name;
+    emailEl.textContent   = user.email;
+    authBtn.style.display = 'none';
+    logoutEl.style.display = '';
+    if (user.premium || auth.premium) avatarEl.classList.add('premium-user');
+  } else {
+    avatarEl.textContent   = '?';
+    dAvatar.textContent    = '?';
+    nameEl.textContent     = 'Visitante';
+    emailEl.textContent    = 'Modo local';
+    authBtn.style.display  = '';
+    logoutEl.style.display = 'none';
+  }
+
+  setSyncStatus(auth.token && auth.serverAvailable ? 'ok' : 'local');
+  updateDropdownSync(auth.token && auth.serverAvailable ? 'ok' : 'local');
+}
+
+// Avatar dropdown toggle
+document.getElementById('avatarBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('userDropdown').classList.toggle('open');
+});
+document.addEventListener('click', () => {
+  document.getElementById('userDropdown').classList.remove('open');
+});
+document.getElementById('userDropdown').addEventListener('click', e => e.stopPropagation());
+
+document.getElementById('dropdownAuthBtn').addEventListener('click', () => {
+  document.getElementById('userDropdown').classList.remove('open');
+  openAuthModal('login');
+});
+
+document.getElementById('dropdownLogout').addEventListener('click', () => {
+  auth.token   = null;
+  auth.user    = null;
+  auth.premium = false;
+  localStorage.removeItem('fs_token');
+  localStorage.removeItem('fs_user');
+  localStorage.removeItem('fs_premium');
+  document.getElementById('userDropdown').classList.remove('open');
+  updateAvatarUI();
+  showToast('Você saiu da conta. Dados salvos localmente.');
+});
+
+// ── AUTH MODAL ─────────────────────────────────────────────
+function openAuthModal(tab = 'login') {
+  switchAuthTab(tab);
+  document.getElementById('authModal').classList.add('show');
+  setTimeout(() => {
+    const f = tab === 'login'
+      ? document.getElementById('loginEmail')
+      : document.getElementById('regName');
+    f?.focus();
+  }, 100);
+}
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('show');
+}
+
+document.getElementById('authModalClose').addEventListener('click', closeAuthModal);
+document.getElementById('authModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('authModal')) closeAuthModal();
+});
+
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display    = isLogin ? 'flex' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none' : 'flex';
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', isLogin ? i === 0 : i === 1);
+  });
+}
+
+document.getElementById('tabLogin').addEventListener('click',    () => switchAuthTab('login'));
+document.getElementById('tabRegister').addEventListener('click', () => switchAuthTab('register'));
+document.getElementById('goRegister').addEventListener('click',  () => switchAuthTab('register'));
+document.getElementById('goLogin').addEventListener('click',     () => switchAuthTab('login'));
+
+// Password visibility toggles
+document.querySelectorAll('.input-eye').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.target);
+    if (!input) return;
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    btn.querySelector('i').className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  });
+});
+
+// Login form
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginSubmit');
+  errEl.style.display = 'none';
+
+  if (!auth.serverAvailable) {
+    errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Servidor offline. Execute <code>npm start</code> na pasta personal-finance.';
+    errEl.style.display = 'flex';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Entrando…';
+  try {
+    const res = await apiCall('POST', '/login', { email, password });
+    auth.token = res.token;
+    auth.user  = res.user;
+    if (res.user.premium) auth.premium = true;
+    localStorage.setItem('fs_token',   res.token);
+    localStorage.setItem('fs_user',    JSON.stringify(res.user));
+    if (res.user.premium) localStorage.setItem('fs_premium', 'true');
+
+    // Load user data from server
+    const loaded = await loadFromServer();
+    if (loaded) {
+      renderAll();
+    }
+
+    closeAuthModal();
+    updateAvatarUI();
+    if (auth.premium) activatePremium(false);
+    showToast(`Bem-vindo(a), ${res.user.name.split(' ')[0]}! ☁️`);
+  } catch (err) {
+    errEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escHtml(err.message)}`;
+    errEl.style.display = 'flex';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Entrar';
+  }
+});
+
+// Register form
+document.getElementById('registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name     = document.getElementById('regName').value.trim();
+  const email    = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const confirm  = document.getElementById('regConfirm').value;
+  const errEl    = document.getElementById('regError');
+  const btn      = document.getElementById('regSubmit');
+  errEl.style.display = 'none';
+
+  if (!auth.serverAvailable) {
+    errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Servidor offline. Execute <code>npm start</code> na pasta personal-finance.';
+    errEl.style.display = 'flex';
+    return;
+  }
+  if (password !== confirm) {
+    errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> As senhas não coincidem.';
+    errEl.style.display = 'flex';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Criando conta…';
+  try {
+    const res = await apiCall('POST', '/register', { name, email, password });
+    auth.token = res.token;
+    auth.user  = res.user;
+    localStorage.setItem('fs_token', res.token);
+    localStorage.setItem('fs_user',  JSON.stringify(res.user));
+
+    // Push current local data to new account
+    await apiCall('PUT', '/data', {
+      incomes:  state.incomes,
+      expenses: state.expenses,
+      goals:    state.goals,
+      theme:    state.theme,
+    });
+
+    closeAuthModal();
+    updateAvatarUI();
+    showToast(`Conta criada! Dados sincronizados na nuvem ☁️`);
+  } catch (err) {
+    errEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escHtml(err.message)}`;
+    errEl.style.display = 'flex';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Criar conta grátis';
+  }
+});
+
+// ── Render all views ───────────────────────────────────────
+function renderAll() {
+  applyTheme();
+  renderDashboard();
+  renderIncomeList();
+  renderExpenseList();
+  renderGoalsList();
+  renderMonthlyBreakdown('income');
+  renderMonthlyBreakdown('expense');
+}
+
 // ── Init ───────────────────────────────────────────────────
-function init() {
+async function init() {
+  // 1. Load from localStorage first (instant)
   load();
   applyTheme();
 
@@ -1179,13 +1577,36 @@ function init() {
   document.getElementById('incomeMonth').value  = m;
   document.getElementById('expenseMonth').value = m;
 
-  renderDashboard();
-  renderIncomeList();
-  renderExpenseList();
-  renderGoalsList();
-  renderMonthlyBreakdown('income');
-  renderMonthlyBreakdown('expense');
+  // 2. Render immediately with local data
+  renderAll();
 
+  // 3. Check server availability in background
+  await checkServerAvailable();
+  updateAvatarUI();
+
+  // 4. If logged in and server is up, load from server (may update UI)
+  if (auth.token && auth.serverAvailable) {
+    try {
+      // Validate token is still good
+      await apiCall('GET', '/me');
+      const loaded = await loadFromServer();
+      if (loaded) renderAll();
+      setSyncStatus('ok');
+      updateDropdownSync('ok');
+    } catch {
+      // Token expired — log out silently
+      auth.token = null;
+      auth.user  = null;
+      localStorage.removeItem('fs_token');
+      localStorage.removeItem('fs_user');
+      updateAvatarUI();
+    }
+  }
+
+  // 5. Restore premium state if previously unlocked
+  if (auth.premium) activatePremium(false);
+
+  // 6. Load demo data if brand new user with no data
   if (state.incomes.length === 0 && state.expenses.length === 0 && state.goals.length === 0) {
     loadDemoData();
   }
