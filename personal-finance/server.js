@@ -45,6 +45,9 @@ db.exec(`
   );
 `);
 
+// Migration: add debts column to existing databases
+try { db.exec(`ALTER TABLE user_data ADD COLUMN debts TEXT DEFAULT '[]'`); } catch {} // already exists
+
 // ── Middleware ─────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname)));
@@ -128,12 +131,13 @@ app.get('/api/me', requireAuth, (req, res) => {
 // GET /api/data
 app.get('/api/data', requireAuth, (req, res) => {
   const row = db.prepare('SELECT * FROM user_data WHERE user_id = ?').get(req.user.id);
-  if (!row) return res.json({ incomes: [], expenses: [], goals: [], theme: 'light' });
+  if (!row) return res.json({ incomes: [], expenses: [], goals: [], debts: [], theme: 'light' });
 
   res.json({
     incomes:  safeJSON(row.incomes,  []),
     expenses: safeJSON(row.expenses, []),
     goals:    safeJSON(row.goals,    []),
+    debts:    safeJSON(row.debts,    []),
     theme:    row.theme || 'light',
     updatedAt: row.updated_at,
   });
@@ -141,15 +145,16 @@ app.get('/api/data', requireAuth, (req, res) => {
 
 // PUT /api/data
 app.put('/api/data', requireAuth, (req, res) => {
-  const { incomes = [], expenses = [], goals = [], theme = 'light' } = req.body || {};
+  const { incomes = [], expenses = [], goals = [], debts = [], theme = 'light' } = req.body || {};
 
   db.prepare(`
-    INSERT INTO user_data (user_id, incomes, expenses, goals, theme, updated_at)
-    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    INSERT INTO user_data (user_id, incomes, expenses, goals, debts, theme, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(user_id) DO UPDATE SET
       incomes    = excluded.incomes,
       expenses   = excluded.expenses,
       goals      = excluded.goals,
+      debts      = excluded.debts,
       theme      = excluded.theme,
       updated_at = CURRENT_TIMESTAMP
   `).run(
@@ -157,6 +162,7 @@ app.put('/api/data', requireAuth, (req, res) => {
     JSON.stringify(incomes),
     JSON.stringify(expenses),
     JSON.stringify(goals),
+    JSON.stringify(debts),
     theme
   );
 
