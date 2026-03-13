@@ -98,6 +98,51 @@ function updateDropdownSync(status) {
     el.innerHTML = '<i class="fa-solid fa-cloud-slash" style="color:var(--danger)"></i> Erro ao sincronizar';
 }
 
+// ── i18n ───────────────────────────────────────────────────
+const i18n = {
+  pt: {
+    nav_dashboard:'Dashboard', nav_income:'Rendimentos', nav_expenses:'Gastos',
+    nav_goals:'Metas', nav_debts:'Dívidas', nav_learn:'Aprender',
+    kpi_income:'Renda Mensal', kpi_expense:'Total de Gastos',
+    kpi_debt_service:'Parcelas/Mês', kpi_balance:'Saldo Livre',
+    kpi_savings:'Taxa de Poupança', kpi_savings_sub:'ideal: acima de 20%',
+    debt_commit_title:'Endividamento Mensal', debt_commit_link:'Gerenciar dívidas →',
+    learn_prev:'Introdução', learn_next:'Aprofundar',
+  },
+  en: {
+    nav_dashboard:'Dashboard', nav_income:'Income', nav_expenses:'Expenses',
+    nav_goals:'Goals', nav_debts:'Debts', nav_learn:'Learn',
+    kpi_income:'Monthly Income', kpi_expense:'Total Expenses',
+    kpi_debt_service:'Monthly Installments', kpi_balance:'Free Balance',
+    kpi_savings:'Savings Rate', kpi_savings_sub:'ideal: above 20%',
+    debt_commit_title:'Monthly Debt Exposure', debt_commit_link:'Manage debts →',
+    learn_prev:'Overview', learn_next:'Deep Dive',
+  },
+};
+
+function t(key) {
+  return (i18n[state.lang] || i18n.pt)[key] || key;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const val = t(el.dataset.i18n);
+    if (val) el.textContent = val;
+  });
+  document.documentElement.lang = state.lang === 'pt' ? 'pt-BR' : 'en';
+  const btn = document.getElementById('langToggle');
+  if (btn) {
+    btn.textContent = state.lang === 'pt' ? 'EN' : 'PT';
+    btn.title       = state.lang === 'pt' ? 'Switch to English' : 'Mudar para Português';
+  }
+  const titleMap = state.lang === 'pt'
+    ? { dashboard:'Dashboard', income:'Rendimentos', expenses:'Gastos', goals:'Metas', debts:'Dívidas', learn:'Aprender' }
+    : { dashboard:'Dashboard', income:'Income',      expenses:'Expenses', goals:'Goals', debts:'Debts',  learn:'Learn' };
+  Object.assign(pageTitles, titleMap);
+  const active = pages.find(p => document.getElementById(`page-${p}`)?.classList.contains('active'));
+  if (active) document.getElementById('topbarTitle').textContent = pageTitles[active] || active;
+}
+
 // ── State ──────────────────────────────────────────────────
 const state = {
   incomes: [],
@@ -105,6 +150,7 @@ const state = {
   goals: [],
   debts: [],
   theme: 'light',
+  lang: 'pt',
   expenseFilter: 'all',
   debtFilter: 'all',
   selectedEmoji: '✈️',
@@ -124,6 +170,7 @@ function save() {
   localStorage.setItem('fs_goals',    JSON.stringify(state.goals));
   localStorage.setItem('fs_debts',    JSON.stringify(state.debts));
   localStorage.setItem('fs_theme',    state.theme);
+  localStorage.setItem('fs_lang',     state.lang);
   scheduleSync();
 }
 
@@ -133,6 +180,7 @@ function load() {
   state.goals    = JSON.parse(localStorage.getItem('fs_goals')    || '[]');
   state.debts    = JSON.parse(localStorage.getItem('fs_debts')    || '[]');
   state.theme    = localStorage.getItem('fs_theme') || 'light';
+  state.lang     = localStorage.getItem('fs_lang')  || 'pt';
 }
 
 async function loadFromServer() {
@@ -233,10 +281,16 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   state.theme = state.theme === 'dark' ? 'light' : 'dark';
   applyTheme();
   save();
-  // Re-render charts to pick up new colors
   renderDashboard();
   renderMonthlyBreakdown('income');
   renderMonthlyBreakdown('expense');
+});
+
+document.getElementById('langToggle').addEventListener('click', () => {
+  state.lang = state.lang === 'pt' ? 'en' : 'pt';
+  save();
+  applyTranslations();
+  renderDashboard();
 });
 
 // ── Navigation ─────────────────────────────────────────────
@@ -314,11 +368,20 @@ const expenseCategories = [
 ];
 
 // ── DASHBOARD ──────────────────────────────────────────────
+function getMonthlyDebtService() {
+  return state.debts
+    .filter(d => d.status === 'pagando' || d.status === 'em_atraso')
+    .reduce((s, d) => s + (d.installmentValue || 0), 0);
+}
+
 function renderDashboard() {
-  const income  = getMonthlyIncome();
-  const expense = getMonthlyExpense();
-  const balance = income - expense;
-  const savingsRate = income > 0 ? Math.max(0, (balance / income) * 100) : 0;
+  const income       = getMonthlyIncome();
+  const expense      = getMonthlyExpense();
+  const debtService  = getMonthlyDebtService();
+  const balance      = income - expense - debtService;
+  const totalCommit  = expense + debtService;
+  const savingsRate  = income > 0 ? Math.max(0, (balance / income) * 100) : 0;
+  const dti          = income > 0 ? (debtService / income) * 100 : 0;
 
   // KPI cards
   document.getElementById('kpiIncome').textContent  = fmt(income);
@@ -327,32 +390,127 @@ function renderDashboard() {
   document.getElementById('kpiSavings').textContent = savingsRate.toFixed(1) + '%';
 
   document.getElementById('kpiIncomeSub').textContent =
-    state.incomes.length === 0 ? 'nenhum lançamento' :
+    state.incomes.length === 0 ? (state.lang === 'en' ? 'no entries' : 'nenhum lançamento') :
     `${state.incomes.length} fonte${state.incomes.length > 1 ? 's' : ''}`;
   document.getElementById('kpiExpenseSub').textContent =
-    state.expenses.length === 0 ? 'nenhum lançamento' :
+    state.expenses.length === 0 ? (state.lang === 'en' ? 'no entries' : 'nenhum lançamento') :
     `${state.expenses.length} item${state.expenses.length > 1 ? 's' : ''}`;
+
+  // Debt KPI
+  const activeDebts = state.debts.filter(d => d.status !== 'quitado');
+  const dsEl = document.getElementById('kpiDebtService');
+  const dsSubEl = document.getElementById('kpiDebtServiceSub');
+  if (dsEl) {
+    dsEl.textContent = fmt(debtService);
+    if (debtService > 0) {
+      dsEl.style.color = dti > 35 ? 'var(--danger)' : dti > 20 ? 'var(--warning)' : 'var(--text)';
+      dsSubEl.textContent = state.lang === 'en'
+        ? `${dti.toFixed(1)}% of income · ${activeDebts.length} debt${activeDebts.length !== 1 ? 's' : ''}`
+        : `${dti.toFixed(1)}% da renda · ${activeDebts.length} dívida${activeDebts.length !== 1 ? 's' : ''}`;
+    } else {
+      dsEl.style.color = '';
+      dsSubEl.textContent = state.lang === 'en' ? 'no active debts' : 'sem dívidas ativas';
+    }
+  }
+
+  // Balance sub-label
+  const balSubEl = document.getElementById('kpiBalanceSub');
+  if (balSubEl) {
+    balSubEl.textContent = debtService > 0
+      ? (state.lang === 'en' ? 'income − expenses − installments' : 'receita − gastos − parcelas')
+      : (state.lang === 'en' ? 'income − expenses' : 'receita − gastos');
+  }
 
   document.getElementById('kpiBalance').style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
 
-  renderHealthScore(savingsRate, income, expense);
-  renderMainAlert(income, expense, balance, savingsRate);
+  renderHealthScore(savingsRate, income, expense, dti);
+  renderMainAlert(income, expense, balance, savingsRate, debtService);
+  renderDebtDashCard(income, debtService, dti, activeDebts);
   renderExpenseChart();
-  renderBalanceChart(income, expense);
+  renderBalanceChart(income, expense, debtService);
   renderDashMonthlyChart();
-  renderInsights(income, expense, balance, savingsRate);
+  renderInsights(income, expense, balance, savingsRate, debtService, dti);
   renderGoalsPreview();
 }
 
-function renderHealthScore(savingsRate, income, expense) {
+function renderDebtDashCard(income, debtService, dti, activeDebts) {
+  const card = document.getElementById('debtDashCard');
+  if (!card) return;
+  if (activeDebts.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  const totalRemaining = activeDebts.reduce((s, d) => s + d.remainingAmount, 0);
+  const overdueCount   = activeDebts.filter(d => d.overdueInstallments > 0).length;
+  const lg             = state.lang;
+
+  // Sort by interest rate desc for analyst insight
+  const highest = [...activeDebts].sort((a, b) => b.interestRate - a.interestRate)[0];
+
+  document.getElementById('debtDashContent').innerHTML = `
+    <div class="debt-dash-grid">
+      <div class="ddc-stat">
+        <div class="ddc-label">${lg === 'en' ? 'Outstanding Balance' : 'Saldo Devedor Total'}</div>
+        <div class="ddc-value" style="color:var(--danger)">${fmt(totalRemaining)}</div>
+      </div>
+      <div class="ddc-stat">
+        <div class="ddc-label">${lg === 'en' ? 'Monthly Service' : 'Custo Mensal'}</div>
+        <div class="ddc-value">${fmt(debtService)}</div>
+        <div class="ddc-sub">${dti.toFixed(1)}% ${lg === 'en' ? 'of income (DTI)' : 'da renda (DTI)'}</div>
+      </div>
+      <div class="ddc-stat">
+        <div class="ddc-label">${lg === 'en' ? 'Active Debts' : 'Dívidas Ativas'}</div>
+        <div class="ddc-value">${activeDebts.length}</div>
+        ${overdueCount > 0 ? `<div class="ddc-sub ddc-danger"><i class="fa-solid fa-triangle-exclamation"></i> ${overdueCount} ${lg === 'en' ? 'overdue' : 'em atraso'}</div>` : ''}
+      </div>
+      <div class="ddc-stat">
+        <div class="ddc-label">${lg === 'en' ? 'Highest Rate' : 'Maior Taxa'}</div>
+        <div class="ddc-value" style="color:${highest.interestRate > 5 ? 'var(--danger)' : 'var(--warning)'}">
+          ${highest.interestRate > 0 ? `${highest.interestRate}% a.${highest.rateType === 'mensal' ? 'm' : 'a'}.` : '—'}
+        </div>
+        <div class="ddc-sub">${escHtml(highest.name)}</div>
+      </div>
+    </div>
+    <div class="ddc-dti-bar">
+      <div class="ddc-dti-label">
+        <span>${lg === 'en' ? 'Debt-to-Income (DTI)' : 'Comprometimento com Dívidas (DTI)'}</span>
+        <span class="ddc-dti-pct" style="color:${dti > 35 ? 'var(--danger)' : dti > 20 ? 'var(--warning)' : 'var(--success)'}">${dti.toFixed(1)}%</span>
+      </div>
+      <div class="ddc-bar-track">
+        <div class="ddc-bar-fill" style="width:${Math.min(100, dti)}%;background:${dti > 35 ? 'var(--danger)' : dti > 20 ? 'var(--warning)' : 'var(--success)'}"></div>
+        <div class="ddc-bar-marker" style="left:30%" title="${lg === 'en' ? 'Safe limit 30%' : 'Limite seguro 30%'}"></div>
+      </div>
+      <div class="ddc-dti-zones">
+        <span style="color:var(--success)">${lg === 'en' ? '0–20% ideal' : '0–20% ideal'}</span>
+        <span style="color:var(--warning)">${lg === 'en' ? '20–35% caution' : '20–35% atenção'}</span>
+        <span style="color:var(--danger)">${lg === 'en' ? '>35% danger' : '>35% perigoso'}</span>
+      </div>
+    </div>
+    ${highest.interestRate > 5 ? `
+    <div class="ddc-tip">
+      <i class="fa-solid fa-lightbulb"></i>
+      ${lg === 'en'
+        ? `<strong>Analyst tip:</strong> "${escHtml(highest.name)}" at ${highest.interestRate}%/month costs you ${fmt(highest.remainingAmount * (highest.interestRate/100))} in interest this month alone. Prioritize paying it off using the Avalanche method.`
+        : `<strong>Dica analítica:</strong> "${escHtml(highest.name)}" a ${highest.interestRate}%/mês te custa ${fmt(highest.remainingAmount * (highest.interestRate/100))} só em juros este mês. Priorize quitar pelo método Avalanche.`
+      }
+    </div>` : ''}
+  `;
+}
+
+function renderHealthScore(savingsRate, income, expense, dti = 0) {
   let score = 0;
-  if (income > 0 && expense <= income) score += 40;
-  if (savingsRate >= 20) score += 30;
-  else if (savingsRate >= 10) score += 15;
-  if (state.goals.length > 0) score += 15;
+  if (income > 0 && expense <= income) score += 30;
+  if (savingsRate >= 20) score += 25;
+  else if (savingsRate >= 10) score += 12;
+  if (state.goals.length > 0) score += 10;
   const fixedRatio = state.expenses.filter(e => e.type === 'fixo')
     .reduce((s, e) => s + parseFloat(e.amount), 0) / (income || 1);
   if (fixedRatio <= 0.5) score += 15;
+  // Debt health
+  if (dti === 0) score += 20;
+  else if (dti <= 20) score += 15;
+  else if (dti <= 35) score += 5;
+  const overdueDebts = state.debts.filter(d => d.overdueInstallments > 0).length;
+  if (overdueDebts > 0) score = Math.max(0, score - 20);
 
   score = Math.min(100, Math.max(0, score));
   const fill  = document.getElementById('healthBarFill');
@@ -371,31 +529,54 @@ function renderHealthScore(savingsRate, income, expense) {
   badge.style.color = color;
 }
 
-function renderMainAlert(income, expense, balance, savingsRate) {
+function renderMainAlert(income, expense, balance, savingsRate, debtService = 0) {
   const box = document.getElementById('mainAlert');
-  if (income === 0 && expense === 0) { box.style.display = 'none'; return; }
+  const lg  = state.lang;
+  const overdueDebts = state.debts.filter(d => d.overdueInstallments > 0);
+  if (income === 0 && expense === 0 && debtService === 0) { box.style.display = 'none'; return; }
   box.style.display = 'flex';
 
-  if (expense > income) {
+  // Overdue debts take highest priority
+  if (overdueDebts.length > 0) {
+    const totalOverdue = overdueDebts.reduce((s, d) => s + d.overdueInstallments, 0);
     box.className = 'alert-box alert-danger';
-    box.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>
-      <div><strong>Atenção:</strong> Você está gastando ${fmt(expense - income)} a mais do que ganha.
-      Isso gera dívidas e compromete seu futuro. Veja os pontos de melhora abaixo.</div>`;
+    box.innerHTML = lg === 'en'
+      ? `<i class="fa-solid fa-triangle-exclamation"></i>
+         <div><strong>Overdue debt alert!</strong> You have ${overdueDebts.length} debt(s) with ${totalOverdue} overdue installment(s). Each month of delay increases your balance via compound interest. Contact your creditor immediately to negotiate.</div>`
+      : `<i class="fa-solid fa-triangle-exclamation"></i>
+         <div><strong>Alerta de inadimplência!</strong> Você tem ${overdueDebts.length} dívida(s) com ${totalOverdue} parcela(s) em atraso. Cada mês de atraso aumenta o saldo via juros compostos. Entre em contato com o credor imediatamente para negociar.</div>`;
+    return;
+  }
+
+  const totalCommit = expense + debtService;
+  if (totalCommit > income) {
+    box.className = 'alert-box alert-danger';
+    box.innerHTML = lg === 'en'
+      ? `<i class="fa-solid fa-triangle-exclamation"></i>
+         <div><strong>Warning:</strong> Your total commitments (expenses + installments = ${fmt(totalCommit)}) exceed your income. You are going deeper into debt each month.</div>`
+      : `<i class="fa-solid fa-triangle-exclamation"></i>
+         <div><strong>Atenção:</strong> Seus compromissos totais (gastos + parcelas = ${fmt(totalCommit)}) superam sua renda. Você está se endividando mais a cada mês.</div>`;
   } else if (savingsRate < 10) {
     box.className = 'alert-box alert-warning';
-    box.innerHTML = `<i class="fa-solid fa-circle-info"></i>
-      <div><strong>Quase lá!</strong> Sua taxa de poupança está em ${savingsRate.toFixed(1)}%.
-      O ideal é guardar pelo menos 20% da sua renda.</div>`;
+    box.innerHTML = lg === 'en'
+      ? `<i class="fa-solid fa-circle-info"></i>
+         <div><strong>Almost there!</strong> Your savings rate is ${savingsRate.toFixed(1)}%. Aim for at least 20% of income.</div>`
+      : `<i class="fa-solid fa-circle-info"></i>
+         <div><strong>Quase lá!</strong> Sua taxa de poupança está em ${savingsRate.toFixed(1)}%. O ideal é guardar pelo menos 20% da sua renda.</div>`;
   } else if (savingsRate >= 20) {
     box.className = 'alert-box alert-success';
-    box.innerHTML = `<i class="fa-solid fa-circle-check"></i>
-      <div><strong>Parabéns!</strong> Você está poupando ${savingsRate.toFixed(1)}% da renda.
-      Continue assim — você está no caminho certo!</div>`;
+    box.innerHTML = lg === 'en'
+      ? `<i class="fa-solid fa-circle-check"></i>
+         <div><strong>Excellent!</strong> You are saving ${savingsRate.toFixed(1)}% of your income. Keep going — you are on the right track!</div>`
+      : `<i class="fa-solid fa-circle-check"></i>
+         <div><strong>Parabéns!</strong> Você está poupando ${savingsRate.toFixed(1)}% da renda. Continue assim — você está no caminho certo!</div>`;
   } else {
     box.className = 'alert-box alert-info';
-    box.innerHTML = `<i class="fa-solid fa-circle-info"></i>
-      <div><strong>Bom progresso!</strong> Você poupa ${savingsRate.toFixed(1)}%.
-      Tente chegar a 20% para acelerar seus sonhos financeiros.</div>`;
+    box.innerHTML = lg === 'en'
+      ? `<i class="fa-solid fa-circle-info"></i>
+         <div><strong>Good progress!</strong> You save ${savingsRate.toFixed(1)}%. Try to reach 20% to accelerate your financial goals.</div>`
+      : `<i class="fa-solid fa-circle-info"></i>
+         <div><strong>Bom progresso!</strong> Você poupa ${savingsRate.toFixed(1)}%. Tente chegar a 20% para acelerar seus sonhos financeiros.</div>`;
   }
 }
 
@@ -436,23 +617,29 @@ function renderExpenseChart() {
   });
 }
 
-function renderBalanceChart(income, expense) {
+function renderBalanceChart(income, expense, debtService = 0) {
   const canvas    = document.getElementById('balanceChart');
   const gridColor = state.theme === 'dark' ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
   const textColor = state.theme === 'dark' ? '#94a3b8' : '#475569';
+  const lg        = state.lang;
+  const freeBalance = income - expense - debtService;
+
+  const labels = debtService > 0
+    ? [lg === 'en' ? 'Income' : 'Renda', lg === 'en' ? 'Expenses' : 'Gastos', lg === 'en' ? 'Installments' : 'Parcelas', lg === 'en' ? 'Free Balance' : 'Saldo Livre']
+    : [lg === 'en' ? 'Income' : 'Rendimentos', lg === 'en' ? 'Expenses' : 'Gastos', lg === 'en' ? 'Balance' : 'Saldo'];
+  const data = debtService > 0
+    ? [income, expense, debtService, Math.abs(freeBalance)]
+    : [income, expense, Math.abs(income - expense)];
+  const colors = debtService > 0
+    ? ['rgba(16,185,129,.8)', 'rgba(239,68,68,.8)', 'rgba(249,115,22,.8)',
+        freeBalance >= 0 ? 'rgba(99,102,241,.8)' : 'rgba(239,68,68,.4)']
+    : ['rgba(16,185,129,.8)', 'rgba(239,68,68,.8)',
+        income >= expense ? 'rgba(99,102,241,.8)' : 'rgba(239,68,68,.4)'];
 
   if (balanceChart) balanceChart.destroy();
   balanceChart = new Chart(canvas, {
     type: 'bar',
-    data: {
-      labels: ['Rendimentos', 'Gastos', 'Saldo'],
-      datasets: [{
-        data: [income, expense, Math.abs(income - expense)],
-        backgroundColor: ['rgba(16,185,129,.8)', 'rgba(239,68,68,.8)',
-          income >= expense ? 'rgba(99,102,241,.8)' : 'rgba(239,68,68,.4)'],
-        borderRadius: 8, borderSkipped: false,
-      }],
-    },
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 8, borderSkipped: false }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.parsed.y)}` } } },
@@ -552,69 +739,144 @@ function renderDashMonthlyChart() {
 }
 
 // ── INSIGHTS ───────────────────────────────────────────────
-function renderInsights(income, expense, balance, savingsRate) {
-  const list = document.getElementById('insightsList');
+function renderInsights(income, expense, balance, savingsRate, debtService = 0, dti = 0) {
+  const list     = document.getElementById('insightsList');
   const insights = [];
+  const lg       = state.lang;
+  const totalCommit = expense + debtService;
 
   if (income === 0) {
     list.innerHTML = `<div class="insight-empty">
       <i class="fa-solid fa-wand-magic-sparkles"></i>
-      <p>Adicione seus rendimentos e gastos para receber dicas personalizadas!</p>
+      <p>${lg === 'en' ? 'Add your income and expenses to receive personalised tips!' : 'Adicione seus rendimentos e gastos para receber dicas personalizadas!'}</p>
     </div>`;
     return;
   }
 
-  if (expense > income) {
-    insights.push({ type:'danger', icon:'fa-fire', title:'Gastos maiores que a renda!',
-      desc:`Você gasta ${fmt(expense - income)} a mais do que ganha. Corte gastos variáveis e opcionais primeiro.` });
+  // ── Debt insights (from real state.debts data) ──────────
+  const overdueDebts = state.debts.filter(d => d.overdueInstallments > 0);
+  if (overdueDebts.length > 0) {
+    const totalInst = overdueDebts.reduce((s, d) => s + d.overdueInstallments, 0);
+    insights.push({ type:'danger', icon:'fa-triangle-exclamation',
+      title: lg === 'en' ? 'Overdue installments — act now!' : 'Parcelas em atraso — aja agora!',
+      desc: lg === 'en'
+        ? `${overdueDebts.length} debt(s) with ${totalInst} overdue installment(s). Late fees and compound interest can double your debt in months. Negotiate immediately.`
+        : `${overdueDebts.length} dívida(s) com ${totalInst} parcela(s) em atraso. Juros rotativos podem dobrar sua dívida em meses. Negocie imediatamente.`
+    });
   }
-  if (savingsRate < 10 && income > 0) {
-    insights.push({ type:'warning', icon:'fa-piggy-bank', title:'Taxa de poupança muito baixa',
-      desc:`Você poupa ${savingsRate.toFixed(1)}% — ideal é 20%. Pague-se primeiro: ao receber, transfira 20% antes de qualquer gasto.` });
+
+  if (dti > 35 && debtService > 0) {
+    const sorted = [...state.debts.filter(d => d.status !== 'quitado')].sort((a, b) => b.interestRate - a.interestRate);
+    const worst  = sorted[0];
+    insights.push({ type:'danger', icon:'fa-percent',
+      title: lg === 'en' ? `High DTI ratio: ${dti.toFixed(1)}%` : `DTI elevado: ${dti.toFixed(1)}%`,
+      desc: lg === 'en'
+        ? `${dti.toFixed(1)}% of your income goes to debt service. Safe threshold is 30%. Focus on the Avalanche method — attack "${worst?.name}" first (highest rate: ${worst?.interestRate}%).`
+        : `${dti.toFixed(1)}% da renda vai para parcelas. O limite saudável é 30%. Use o Método Avalanche — ataque "${worst?.name}" primeiro (maior taxa: ${worst?.interestRate}%).`
+    });
+  } else if (dti > 0 && dti <= 20) {
+    insights.push({ type:'success', icon:'fa-check-circle',
+      title: lg === 'en' ? `Healthy debt ratio: ${dti.toFixed(1)}%` : `DTI saudável: ${dti.toFixed(1)}%`,
+      desc: lg === 'en'
+        ? `Only ${dti.toFixed(1)}% of income goes to debt service — well below the 30% danger zone. Keep this ratio controlled as you grow income.`
+        : `Apenas ${dti.toFixed(1)}% da renda vai para dívidas — bem abaixo do limite de 30%. Mantenha esse controle conforme a renda cresce.`
+    });
+  }
+
+  // Check for high-interest debts (>5% am = credit card territory)
+  const highRateDebts = state.debts.filter(d => d.status !== 'quitado' && d.rateType === 'mensal' && d.interestRate > 5);
+  if (highRateDebts.length > 0) {
+    const monthCost = highRateDebts.reduce((s, d) => s + d.remainingAmount * (d.interestRate / 100), 0);
+    insights.push({ type:'danger', icon:'fa-fire',
+      title: lg === 'en' ? 'Predatory interest rates detected!' : 'Juros predatórios detectados!',
+      desc: lg === 'en'
+        ? `${highRateDebts.length} debt(s) above 5%/month costing you ${fmt(monthCost)}/month in interest alone. Consider personal loan consolidation (2–3%/month) to cut costs immediately.`
+        : `${highRateDebts.length} dívida(s) acima de 5%/mês custando ${fmt(monthCost)}/mês só em juros. Considere consolidar em empréstimo pessoal (2–3%/mês) para cortar esse custo imediatamente.`
+    });
+  }
+
+  // ── Income / expense insights ───────────────────────────
+  if (totalCommit > income) {
+    insights.push({ type:'danger', icon:'fa-fire',
+      title: lg === 'en' ? 'Total commitments exceed income!' : 'Compromissos totais excedem a renda!',
+      desc: lg === 'en'
+        ? `Expenses (${fmt(expense)}) + installments (${fmt(debtService)}) = ${fmt(totalCommit)} vs income ${fmt(income)}. You are accumulating debt every month.`
+        : `Gastos (${fmt(expense)}) + parcelas (${fmt(debtService)}) = ${fmt(totalCommit)} vs renda ${fmt(income)}. Você acumula dívida a cada mês.`
+    });
+  }
+
+  if (savingsRate < 10 && income > 0 && totalCommit <= income) {
+    insights.push({ type:'warning', icon:'fa-piggy-bank',
+      title: lg === 'en' ? 'Savings rate too low' : 'Taxa de poupança muito baixa',
+      desc: lg === 'en'
+        ? `You save ${savingsRate.toFixed(1)}% — target is 20%. Pay yourself first: transfer savings the day you get paid, before any other expense.`
+        : `Você poupa ${savingsRate.toFixed(1)}% — ideal é 20%. Pague-se primeiro: transfira os 20% assim que receber, antes de qualquer gasto.`
+    });
   } else if (savingsRate >= 20) {
-    insights.push({ type:'success', icon:'fa-star', title:'Poupança acima do ideal!',
-      desc:`Você poupa ${savingsRate.toFixed(1)}% — excelente! Agora pense em investir esse dinheiro (Tesouro Direto, CDB).` });
+    insights.push({ type:'success', icon:'fa-star',
+      title: lg === 'en' ? 'Savings above target!' : 'Poupança acima do ideal!',
+      desc: lg === 'en'
+        ? `You save ${savingsRate.toFixed(1)}% — excellent! Now diversify: Tesouro Direto, CDB, equity funds.`
+        : `Você poupa ${savingsRate.toFixed(1)}% — excelente! Pense agora em diversificar investimentos (Tesouro Direto, CDB, fundos).`
+    });
   }
 
   const fixedTotal = state.expenses.filter(e => e.type === 'fixo').reduce((s,e) => s + parseFloat(e.amount), 0);
-  const fixedRatio = income > 0 ? fixedTotal / income : 0;
+  const fixedRatio = income > 0 ? (fixedTotal + debtService) / income : 0;
   if (fixedRatio > 0.6) {
-    insights.push({ type:'danger', icon:'fa-lock', title:'Gastos fixos muito altos',
-      desc:`Fixos representam ${(fixedRatio*100).toFixed(0)}% da renda (ideal: até 50%). Renegocie contratos, troque planos, cancele o que não usa.` });
+    insights.push({ type:'danger', icon:'fa-lock',
+      title: lg === 'en' ? 'Fixed costs too high' : 'Custos fixos muito altos',
+      desc: lg === 'en'
+        ? `Fixed expenses + installments = ${(fixedRatio*100).toFixed(0)}% of income (target: ≤50%). Renegotiate contracts, downgrade plans, cancel unused services.`
+        : `Fixos + parcelas representam ${(fixedRatio*100).toFixed(0)}% da renda (ideal: até 50%). Renegocie contratos, troque planos, cancele o que não usa.`
+    });
   }
 
   const leisure = state.expenses.filter(e => e.category === 'lazer').reduce((s,e) => s + parseFloat(e.amount), 0);
   if (income > 0 && leisure / income > 0.3) {
-    insights.push({ type:'warning', icon:'fa-masks-theater', title:'Lazer comprometendo o orçamento',
-      desc:`Lazer em ${((leisure/income)*100).toFixed(0)}% da renda. Regra 50-30-20 sugere máximo 30% para desejos.` });
+    insights.push({ type:'warning', icon:'fa-masks-theater',
+      title: lg === 'en' ? 'Leisure budget over limit' : 'Lazer comprometendo o orçamento',
+      desc: lg === 'en'
+        ? `Leisure is ${((leisure/income)*100).toFixed(0)}% of income. The 50-30-20 rule caps desires at 30%.`
+        : `Lazer em ${((leisure/income)*100).toFixed(0)}% da renda. A regra 50-30-20 sugere máximo 30% para desejos.`
+    });
   }
 
   const subs = state.expenses.filter(e => e.category === 'assinaturas').reduce((s,e) => s + parseFloat(e.amount), 0);
   if (subs > 0) {
-    insights.push({ type:'info', icon:'fa-mobile-screen', title:'Revise suas assinaturas',
-      desc:`Você gasta ${fmt(subs)} em assinaturas. Cancele o que não usa — é fácil esquecer de serviços que cobram automaticamente.` });
-  }
-
-  const debt = state.expenses.filter(e => e.category === 'dividas').reduce((s,e) => s + parseFloat(e.amount), 0);
-  if (debt > 0) {
-    const dr = income > 0 ? debt / income : 0;
-    insights.push({ type: dr > 0.3 ? 'danger' : 'warning', icon:'fa-credit-card', title:'Dívidas em andamento',
-      desc:`Parcelas consomem ${fmt(debt)}/mês (${(dr*100).toFixed(0)}% da renda). Priorize quitar os de maiores juros primeiro.` });
+    insights.push({ type:'info', icon:'fa-mobile-screen',
+      title: lg === 'en' ? 'Review your subscriptions' : 'Revise suas assinaturas',
+      desc: lg === 'en'
+        ? `You spend ${fmt(subs)} on subscriptions. Cancel what you don't use — automatic charges are easy to forget.`
+        : `Você gasta ${fmt(subs)} em assinaturas. Cancele o que não usa — é fácil esquecer de serviços que cobram automaticamente.`
+    });
   }
 
   if (state.goals.length === 0) {
-    insights.push({ type:'info', icon:'fa-bullseye', title:'Defina uma meta financeira',
-      desc:'Quem tem objetivos claros economiza mais. Crie sua primeira meta na aba Metas!' });
+    insights.push({ type:'info', icon:'fa-bullseye',
+      title: lg === 'en' ? 'Set a financial goal' : 'Defina uma meta financeira',
+      desc: lg === 'en'
+        ? 'People with clear goals save more consistently. Create your first goal in the Goals tab!'
+        : 'Quem tem objetivos claros economiza mais. Crie sua primeira meta na aba Metas!'
+    });
   }
 
-  if (savingsRate > 0) {
-    insights.push({ type:'info', icon:'fa-shield-halved', title:'Crie uma reserva de emergência',
-      desc:`Tenha 3–6 meses de gastos guardados. Com ${fmt(expense)}/mês de gastos, você precisa de ${fmt(expense * 4)} como reserva mínima.` });
+  if (savingsRate > 0 && state.debts.filter(d => d.status !== 'quitado').length === 0) {
+    insights.push({ type:'info', icon:'fa-shield-halved',
+      title: lg === 'en' ? 'Build your emergency fund' : 'Crie uma reserva de emergência',
+      desc: lg === 'en'
+        ? `Have 3–6 months of expenses saved. With ${fmt(expense)}/month in expenses, you need at least ${fmt(expense * 4)} in a liquid, safe investment.`
+        : `Tenha 3–6 meses de gastos guardados. Com ${fmt(expense)}/mês de gastos, você precisa de ${fmt(expense * 4)} como reserva mínima em investimento líquido.`
+    });
   }
 
   if (insights.length === 0) {
-    insights.push({ type:'success', icon:'fa-trophy', title:'Suas finanças estão saudáveis!',
-      desc:'Continue monitorando e pense em diversificar investimentos para o dinheiro trabalhar por você.' });
+    insights.push({ type:'success', icon:'fa-trophy',
+      title: lg === 'en' ? 'Your finances look healthy!' : 'Suas finanças estão saudáveis!',
+      desc: lg === 'en'
+        ? 'Keep monitoring and consider diversifying investments to make your money work for you.'
+        : 'Continue monitorando e pense em diversificar investimentos para o dinheiro trabalhar por você.'
+    });
   }
 
   list.innerHTML = insights.map(i => `
@@ -1140,94 +1402,190 @@ function deleteGoal(id) {
 }
 
 // ── LEARN MODAL ────────────────────────────────────────────
+let learnCurrentPage = 0;
+let learnCurrentModule = null;
+
 const learnContent = {
   regra50: {
     title: '📊 A Regra 50-30-20',
-    body: `
-      <p>Essa é a estratégia mais simples e eficaz para organizar o seu orçamento. Divide sua renda em três partes:</p>
+    pages: [
+      `<p>Essa é a estratégia mais simples e eficaz para organizar o seu orçamento. Criada pela senadora americana Elizabeth Warren, divide sua renda líquida em três partes:</p>
       <div class="rule-visual">
         <div class="rule-block rule-50">50%<small>Necessidades</small></div>
         <div class="rule-block rule-30">30%<small>Desejos</small></div>
         <div class="rule-block rule-20">20%<small>Poupança</small></div>
       </div>
       <h4><i class="fa-solid fa-house"></i> 50% — Necessidades</h4>
-      <p>Aluguel, mercado, transporte, luz, água, saúde. Se passar de 50%, você precisa cortar ou aumentar a renda.</p>
+      <p>Aluguel, mercado, transporte, luz, água, saúde e parcelas de dívidas. Se passar de 50%, você precisa cortar ou aumentar a renda.</p>
       <h4><i class="fa-solid fa-star"></i> 30% — Desejos</h4>
-      <p>Restaurantes, viagens, roupas extras, streaming. Válidos, mas com limite.</p>
+      <p>Restaurantes, viagens, roupas extras, streaming. Válidos, mas com limite claro.</p>
       <h4><i class="fa-solid fa-piggy-bank"></i> 20% — Poupança</h4>
-      <p><strong>Pague-se primeiro:</strong> transfira os 20% assim que receber, antes de qualquer gasto.</p>
-    `,
+      <p><strong>Pague-se primeiro:</strong> transfira os 20% assim que receber, antes de qualquer gasto. Automatize essa transferência.</p>`,
+
+      `<h4><i class="fa-solid fa-sliders"></i> Adaptando para sua realidade</h4>
+      <p>A regra 50-30-20 é um ponto de partida, não uma lei rígida. Se você tem dívidas com juros altos, redistribua temporariamente para <strong>50-20-30</strong> — mais para quitar dívidas, menos para desejos.</p>
+      <h4><i class="fa-solid fa-calculator"></i> Exemplo prático com renda de R$ 5.000</h4>
+      <ul>
+        <li><strong>R$ 2.500 (50%)</strong> → Aluguel, mercado, transporte, plano de saúde, parcelas</li>
+        <li><strong>R$ 1.500 (30%)</strong> → Restaurantes, Netflix, roupas, lazer</li>
+        <li><strong>R$ 1.000 (20%)</strong> → Reserva de emergência, investimentos, metas</li>
+      </ul>
+      <h4><i class="fa-solid fa-triangle-exclamation"></i> Por que a maioria falha?</h4>
+      <p>O erro mais comum é não classificar corretamente. Assinatura de academia é <em>necessidade</em> ou <em>desejo</em>? Se você vai 4x por semana, pode ser necessidade. Se vai 1x, é desejo. Seja honesto consigo.</p>
+      <h4><i class="fa-solid fa-lightbulb"></i> Dica de analista</h4>
+      <p>Revise sua alocação a cada 6 meses. À medida que a renda cresce, o ideal é manter os 50% de necessidades no valor absoluto (não deixar crescer junto) e direcionar o excedente para poupança.</p>`,
+    ],
   },
   emergencia: {
     title: '🛡️ Reserva de Emergência',
-    body: `
-      <p>A base de toda vida financeira saudável. Sem ela, qualquer imprevisto vira dívida.</p>
+    pages: [
+      `<p>A base de toda vida financeira saudável. Sem ela, qualquer imprevisto — carro na oficina, demissão, problema de saúde — vira dívida de juros altos.</p>
       <h4><i class="fa-solid fa-calculator"></i> Quanto guardar?</h4>
       <ul>
-        <li><strong>Mínimo:</strong> 3 meses de gastos essenciais</li>
-        <li><strong>Ideal:</strong> 6 meses de gastos totais</li>
-        <li><strong>Autônomos:</strong> 12 meses</li>
+        <li><strong>Mínimo:</strong> 3 meses de gastos essenciais (emprego CLT estável)</li>
+        <li><strong>Ideal:</strong> 6 meses de todos os seus gastos mensais</li>
+        <li><strong>Autônomos / PJ:</strong> 12 meses — sua renda é variável e o risco é maior</li>
       </ul>
-      <h4><i class="fa-solid fa-bank"></i> Onde guardar?</h4>
+      <h4><i class="fa-solid fa-bank"></i> Onde guardar? (liquidez imediata é obrigatória)</h4>
       <ul>
-        <li><strong>Tesouro Selic</strong> — seguro e resgata em 1 dia</li>
-        <li><strong>CDB com liquidez diária</strong> — acima de 100% do CDI</li>
-        <li><strong>Conta remunerada</strong> de fintech (Nubank, Inter…)</li>
+        <li><strong>Tesouro Selic</strong> — mais seguro do Brasil, resgate em D+1, rendimento próximo à Selic</li>
+        <li><strong>CDB com liquidez diária acima de 100% CDI</strong> — bancos digitais oferecem isso</li>
+        <li><strong>Conta remunerada</strong> de fintech (Nubank, Inter, C6) — prático e rende CDI</li>
+      </ul>`,
+
+      `<h4><i class="fa-solid fa-stairs"></i> Como construir do zero, passo a passo</h4>
+      <p>Se você não tem reserva alguma, não entre em pânico. Construa em etapas:</p>
+      <ul>
+        <li><strong>Meta 1:</strong> R$ 1.000 — "para o extintor" (cobre imprevistos pequenos e evita cartão de crédito rotativo)</li>
+        <li><strong>Meta 2:</strong> 1 mês de gastos — estabilidade básica</li>
+        <li><strong>Meta 3:</strong> 3 meses — zona de conforto</li>
+        <li><strong>Meta 4:</strong> 6 meses — independência financeira real</li>
       </ul>
-    `,
+      <h4><i class="fa-solid fa-circle-question"></i> Quando usar a reserva?</h4>
+      <p>Use <strong>apenas</strong> para emergências reais: perda de emprego, problema de saúde urgente, carro essencial para trabalho. Viagem, eletrônico novo ou promoção <strong>não são emergências</strong>.</p>
+      <h4><i class="fa-solid fa-arrows-rotate"></i> Depois de usar, reconstrua</h4>
+      <p>Se precisou usar, priorize recompletar a reserva antes de qualquer outro investimento. É o seu escudo financeiro — sem ele, você está exposto.</p>
+      <h4><i class="fa-solid fa-lightbulb"></i> Dica de analista</h4>
+      <p>Mantenha a reserva em conta <em>separada</em> do banco do dia a dia. A fricção de precisar transferir ajuda a resistir ao impulso de usar o dinheiro para coisas não emergenciais.</p>`,
+    ],
   },
   dividas: {
     title: '💳 Como Sair das Dívidas',
-    body: `
-      <p>Com estratégia certa, é possível sair do vermelho mesmo com renda limitada.</p>
-      <h4><i class="fa-solid fa-snowflake"></i> Método Bola de Neve</h4>
-      <p>Quite a <strong>dívida de menor valor</strong> primeiro. A satisfação motiva a continuar.</p>
-      <h4><i class="fa-solid fa-mountain"></i> Método Avalanche</h4>
-      <p>Quite a <strong>dívida com maior juros</strong> primeiro. Economiza mais no longo prazo.</p>
-      <h4><i class="fa-solid fa-fire"></i> Cartão e cheque especial: emergência!</h4>
-      <p>Juros de 12–15% ao mês. Troque por empréstimo pessoal (2–5% ao mês) imediatamente.</p>
-    `,
+    pages: [
+      `<p>Com a estratégia certa, é possível sair do vermelho mesmo com renda limitada. O segredo é método, não sorte.</p>
+      <h4><i class="fa-solid fa-snowflake"></i> Método Bola de Neve (Snowball)</h4>
+      <p>Quite a <strong>dívida de menor saldo</strong> primeiro, independente dos juros. A cada dívida quitada, redirecione o valor da parcela para a próxima. O benefício é psicológico: vitórias rápidas criam momentum e motivam a continuar.</p>
+      <h4><i class="fa-solid fa-mountain"></i> Método Avalanche (matematicamente superior)</h4>
+      <p>Quite a <strong>dívida com maior taxa de juros</strong> primeiro. Você paga menos juros no total e sai das dívidas mais rápido. Melhor para quem tem disciplina e foco no longo prazo.</p>
+      <h4><i class="fa-solid fa-fire"></i> Cartão rotativo e cheque especial: emergência máxima</h4>
+      <p>Juros de 12–18% ao <strong>mês</strong> (mais de 200% ao ano). Troque por empréstimo pessoal (2–4% ao mês) <strong>imediatamente</strong>. Essa troca sozinha pode economizar milhares de reais.</p>`,
+
+      `<h4><i class="fa-solid fa-handshake"></i> Como negociar com credores</h4>
+      <p>Bancos e credoras preferem receber menos do que não receber nada. Dicas para negociação:</p>
+      <ul>
+        <li>Acesse portais como <strong>Serasa Limpa Nome</strong> ou <strong>Acordo Certo</strong> — descontos de até 99% em dívidas antigas</li>
+        <li>Ligue direto para o credor e pergunte sobre <em>proposta de quitação</em> — sempre há margem</li>
+        <li>Priorize dívidas com garantia real (financiamento de carro, hipoteca) — o bem pode ser retomado</li>
+      </ul>
+      <h4><i class="fa-solid fa-chart-line"></i> Entendendo os juros compostos (seu inimigo)</h4>
+      <p>Uma dívida de R$ 10.000 a 10% ao mês se torna R$ 31.384 em apenas 12 meses. Juros compostos trabalham <em>contra</em> você nas dívidas e <em>a favor</em> nos investimentos. Quanto mais tempo passa, pior fica.</p>
+      <h4><i class="fa-solid fa-shield-halved"></i> Prevenção: os 3 princípios</h4>
+      <ul>
+        <li><strong>Nunca use o limite do cartão como extensão da renda</strong> — é crédito, não salário</li>
+        <li><strong>Parcele apenas o que cabe no orçamento total</strong> — some todas as parcelas antes de comprar</li>
+        <li><strong>Tenha reserva de emergência</strong> — ela evita que imprevistos virem dívidas</li>
+      </ul>`,
+    ],
   },
   orcamento: {
-    title: '📋 Como Fazer um Orçamento',
-    body: `
-      <p>Orçamento não é restrição — é liberdade para gastar no que importa.</p>
-      <h4><i class="fa-solid fa-1"></i> Liste todos os rendimentos</h4>
-      <p>Salário líquido, freelas, aluguéis. Use valores reais do banco.</p>
-      <h4><i class="fa-solid fa-2"></i> Mapeie todos os gastos</h4>
-      <p>Abra extratos dos últimos 3 meses. Categorize tudo — até o cafézinho.</p>
-      <h4><i class="fa-solid fa-3"></i> Compare e ajuste</h4>
-      <p>Gastos > renda: corte variáveis primeiro. Use a regra 50-30-20.</p>
-      <h4><i class="fa-solid fa-4"></i> Revise todo mês</h4>
-      <p>Lançamentos aqui no FinançasSim ajudam a manter o controle automático.</p>
-    `,
+    title: '📋 Como Fazer um Orçamento Real',
+    pages: [
+      `<p>Orçamento não é restrição — é <strong>liberdade consciente</strong> para gastar no que realmente importa e parar de gastar no que não importa.</p>
+      <h4><i class="fa-solid fa-1"></i> Liste todos os rendimentos com precisão</h4>
+      <p>Salário líquido (depois do IR e INSS), freelas, aluguéis, dividendos. Use valores reais dos últimos 3 meses, não estimativas otimistas.</p>
+      <h4><i class="fa-solid fa-2"></i> Mapeie <em>todos</em> os gastos — sem exceção</h4>
+      <p>Abra os extratos bancários e de cartão dos últimos 3 meses. Categorize tudo, incluindo o cafezinho. Surpresa: a maioria das pessoas subestima seus gastos em 20–30%.</p>
+      <h4><i class="fa-solid fa-3"></i> Separe fixos de variáveis</h4>
+      <p><strong>Fixos:</strong> aluguel, prestações, planos, assinaturas. <strong>Variáveis:</strong> mercado, lazer, roupas, saúde. Fixos são difíceis de cortar no curto prazo; comece reduzindo variáveis.</p>
+      <h4><i class="fa-solid fa-4"></i> Defina metas de gasto por categoria</h4>
+      <p>Compare o real com o ideal (regra 50-30-20) e ajuste progressivamente. Cortes bruscos não sustentam — reduza 10–15% por mês.</p>`,
+
+      `<h4><i class="fa-solid fa-box"></i> Método dos Envelopes (modernizado)</h4>
+      <p>Crie contas separadas por categoria de gasto — ou use o recurso de "cofrinhos" de bancos digitais. Quando o envelope de lazer esvazia, acabou para o mês. Sem negociação.</p>
+      <h4><i class="fa-solid fa-zero"></i> Orçamento Base Zero</h4>
+      <p>Técnica usada por grandes empresas: cada centavo da renda tem destino definido. <strong>Renda − todos os gastos planejados = R$ 0,00</strong>. Nada "sobra" — o que iria sobrar já tem destino (investimento, meta, reserva).</p>
+      <h4><i class="fa-solid fa-calendar-check"></i> Rituais que funcionam</h4>
+      <ul>
+        <li><strong>Revisão semanal (5 min):</strong> compare lançamentos reais com o planejado</li>
+        <li><strong>Fechamento mensal (15 min):</strong> avalie o mês, ajuste o próximo</li>
+        <li><strong>Planejamento anual (2h):</strong> metas grandes, gastos sazonais (IPTU, IPVA, férias, 13º)</li>
+      </ul>
+      <h4><i class="fa-solid fa-lightbulb"></i> O erro mais caro</h4>
+      <p>Ignorar gastos sazonais no orçamento mensal. Divida despesas anuais por 12 e reserve mensalmente. Exemplo: IPVA de R$ 3.600/ano = reserve R$ 300/mês em conta separada.</p>`,
+    ],
   },
   investir: {
-    title: '📈 Começando a Investir',
-    body: `
-      <p>Antes: ✅ reserva de emergência completa e ✅ dívidas de alto custo quitadas.</p>
-      <h4><i class="fa-solid fa-shield"></i> Renda fixa (para começar)</h4>
+    title: '📈 Começando a Investir do Zero',
+    pages: [
+      `<p><strong>Pré-requisitos obrigatórios:</strong> ✅ Reserva de emergência completa e ✅ dívidas de alto custo (acima de 10% a.m.) quitadas. Investir com dívida cara é como encher uma banheira com o ralo aberto.</p>
+      <h4><i class="fa-solid fa-shield"></i> Renda fixa — onde começar (baixo risco)</h4>
       <ul>
-        <li><strong>Tesouro Direto (Selic):</strong> mais seguro do país, mínimo R$ 30</li>
-        <li><strong>CDB:</strong> garantia do FGC até R$ 250k — busque acima de 100% do CDI</li>
-        <li><strong>LCI/LCA:</strong> isentos de IR para pessoa física</li>
+        <li><strong>Tesouro Selic:</strong> o investimento mais seguro do Brasil. Rende a taxa Selic (hoje ~10-13% a.a.), mínimo R$ 30, liquidez D+1.</li>
+        <li><strong>CDB de banco digital:</strong> busque 110–120% do CDI com liquidez diária. Garantia do FGC até R$ 250k por CPF por instituição.</li>
+        <li><strong>LCI/LCA:</strong> isentos de Imposto de Renda para pessoa física. Geralmente requerem carência de 90 dias.</li>
       </ul>
-      <h4><i class="fa-solid fa-calendar"></i> Regra mais importante</h4>
-      <p><strong>Consistência bate performance.</strong> R$ 300/mês por 20 anos supera esperar ter R$ 100.000.</p>
-    `,
+      <h4><i class="fa-solid fa-building-columns"></i> A regra de ouro</h4>
+      <p><strong>Consistência supera performance.</strong> R$ 500/mês investidos por 20 anos a 10% a.a. = R$ 378.000. Esperar "ter mais para investir" custa caro demais.</p>`,
+
+      `<h4><i class="fa-solid fa-chart-pie"></i> Alocação de ativos — a jornada do investidor</h4>
+      <p>À medida que constrói patrimônio, diversifique progressivamente:</p>
+      <ul>
+        <li><strong>Fase 1 (0–R$ 20k):</strong> 100% renda fixa (reserva + CDB/Tesouro)</li>
+        <li><strong>Fase 2 (R$ 20k–R$ 100k):</strong> 70% renda fixa + 20% fundos de índice (IVVB11, BOVA11) + 10% FIIs</li>
+        <li><strong>Fase 3 (>R$ 100k):</strong> comece a estudar ações individuais e diversificação internacional</li>
+      </ul>
+      <h4><i class="fa-solid fa-clock"></i> O poder dos juros compostos a favor</h4>
+      <p>Albert Einstein chamou de "a oitava maravilha do mundo". R$ 10.000 a 10% a.a. se tornam:</p>
+      <ul>
+        <li>R$ 25.937 em 10 anos</li>
+        <li>R$ 67.275 em 20 anos</li>
+        <li>R$ 174.494 em 30 anos</li>
+      </ul>
+      <h4><i class="fa-solid fa-triangle-exclamation"></i> Armadilhas clássicas do iniciante</h4>
+      <ul>
+        <li><strong>Market timing:</strong> tentar "comprar na baixa, vender na alta" consistentemente é impossível até para profissionais</li>
+        <li><strong>Perseguir rentabilidade passada:</strong> o fundo que rendeu 50% no ano passado raramente repete</li>
+        <li><strong>Ignorar taxas:</strong> 2% de taxa de administração pode consumir 40% do seu patrimônio em 30 anos</li>
+      </ul>`,
+    ],
   },
   habitos: {
-    title: '🧠 Hábitos que Mudam Tudo',
-    body: `
-      <h4><i class="fa-solid fa-robot"></i> Automatize tudo</h4>
-      <p>Configure transferência automática no dia do salário para poupança. O que sai antes de ver, não sente falta.</p>
-      <h4><i class="fa-solid fa-cart-shopping"></i> Regra das 24 horas</h4>
-      <p>Antes de qualquer compra não planejada acima de R$ 100, espere 24h. A maioria passa.</p>
+    title: '🧠 Hábitos Financeiros que Mudam Tudo',
+    pages: [
+      `<h4><i class="fa-solid fa-robot"></i> Automatize tudo que puder</h4>
+      <p>Configure transferência automática para investimentos no <em>mesmo dia</em> do salário. O que sai antes de você ver, não é sentido como falta. Esse princípio é chamado de "poupança involuntária" e é responsável por 90% dos patrimônios construídos por assalariados.</p>
+      <h4><i class="fa-solid fa-cart-shopping"></i> A regra das 24 horas</h4>
+      <p>Antes de qualquer compra não planejada acima de R$ 150, espere 24 horas. Para compras acima de R$ 1.000, espere 7 dias. A maioria do impulso passa — estudos mostram que 60–70% das compras por impulso não são realizadas após o período de espera.</p>
       <h4><i class="fa-solid fa-sun"></i> Revise as finanças toda semana</h4>
-      <p>5 minutos toda segunda-feira evitam surpresas no fim do mês.</p>
-      <h4><i class="fa-solid fa-heart"></i> Desejo vs Necessidade</h4>
-      <p>Pergunte: "Isso vai me deixar mais feliz daqui a 1 ano?" Se não, provavelmente é impulso.</p>
-    `,
+      <p>5 minutos toda segunda-feira para conferir os lançamentos da semana anterior evita surpresas no fim do mês e mantém a consciência financeira ativa.</p>
+      <h4><i class="fa-solid fa-heart"></i> O teste do "eu futuro"</h4>
+      <p>Antes de cada gasto relevante, pergunte: <em>"Meu eu de daqui a 1 ano vai agradecer por essa compra?"</em> Se a resposta for não, provavelmente é impulso — não necessidade.</p>`,
+
+      `<h4><i class="fa-solid fa-brain"></i> A psicologia do dinheiro (vieses que te sabotam)</h4>
+      <ul>
+        <li><strong>Aversão à perda:</strong> a dor de perder R$ 100 é 2x maior que o prazer de ganhar R$ 100. Por isso postergamos cortar gastos — parece uma "perda".</li>
+        <li><strong>Desconto hiperbólico:</strong> preferimos R$ 100 hoje a R$ 150 em 1 mês, mesmo sendo irracional. Combata isso tornando o futuro mais "real" com metas concretas e visuais.</li>
+        <li><strong>Comparação social:</strong> gastar para "manter aparências" é a maior fonte de endividamento da classe média. O vizinho com carro novo pode estar afundado em parcelas.</li>
+      </ul>
+      <h4><i class="fa-solid fa-trophy"></i> Construindo identidade financeira</h4>
+      <p>O maior salto financeiro acontece quando você para de <em>fazer</em> coisas financeiras saudáveis e começa a <em>ser</em> uma pessoa financeiramente saudável. A identidade precede o comportamento.</p>
+      <h4><i class="fa-solid fa-book"></i> Leituras recomendadas</h4>
+      <ul>
+        <li><strong>A Psicologia Financeira</strong> — Morgan Housel (o melhor livro sobre comportamento e dinheiro)</li>
+        <li><strong>Pai Rico, Pai Pobre</strong> — Robert Kiyosaki (conceitos de ativos e passivos)</li>
+        <li><strong>O Homem Mais Rico da Babilônia</strong> — George Clason (princípios atemporais)</li>
+      </ul>`,
+    ],
   },
 };
 
@@ -1340,13 +1698,65 @@ function activatePremium(showMsg = true) {
   updateAvatarUI();
 }
 
-function openLearnModal(module) {
+function openLearnModal(module, page = 0) {
   const content = learnContent[module];
   if (!content) return;
-  document.getElementById('modalTitle').textContent = content.title;
-  document.getElementById('modalBody').innerHTML    = content.body;
+  learnCurrentModule = module;
+  learnCurrentPage   = page;
+  renderLearnPage();
   document.getElementById('learnModal').classList.add('show');
 }
+
+function renderLearnPage() {
+  const content = learnContent[learnCurrentModule];
+  if (!content) return;
+  const pages   = content.pages;
+  const page    = learnCurrentPage;
+  const total   = pages.length;
+
+  document.getElementById('modalTitle').textContent = content.title;
+  document.getElementById('modalBody').innerHTML    = pages[page];
+
+  // Pagination
+  const prevBtn = document.getElementById('learnPrev');
+  const nextBtn = document.getElementById('learnNext');
+  const indEl   = document.getElementById('learnPageIndicator');
+  const dotsEl  = document.getElementById('learnPageDots');
+  const lg      = state.lang;
+
+  indEl.textContent = `${page + 1} / ${total}`;
+  prevBtn.style.visibility = page === 0 ? 'hidden' : 'visible';
+  nextBtn.style.visibility = page >= total - 1 ? 'hidden' : 'visible';
+
+  // Update dot labels
+  const prevSpan = prevBtn.querySelector('[data-i18n]');
+  const nextSpan = nextBtn.querySelector('[data-i18n]');
+  if (prevSpan) prevSpan.textContent = lg === 'en' ? 'Overview' : 'Introdução';
+  if (nextSpan) nextSpan.textContent = lg === 'en' ? 'Deep Dive' : 'Aprofundar';
+
+  // Dots
+  dotsEl.querySelectorAll('.page-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === page);
+    dot.style.display = i < total ? '' : 'none';
+  });
+
+  // Scroll to top of body
+  document.getElementById('modalBody').scrollTop = 0;
+}
+
+document.getElementById('learnPrev').addEventListener('click', () => {
+  if (learnCurrentPage > 0) { learnCurrentPage--; renderLearnPage(); }
+});
+document.getElementById('learnNext').addEventListener('click', () => {
+  const total = learnContent[learnCurrentModule]?.pages.length || 1;
+  if (learnCurrentPage < total - 1) { learnCurrentPage++; renderLearnPage(); }
+});
+document.querySelectorAll('.page-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    learnCurrentPage = parseInt(dot.dataset.page);
+    renderLearnPage();
+  });
+});
 
 document.getElementById('modalClose').addEventListener('click', () => {
   document.getElementById('learnModal').classList.remove('show');
@@ -1841,6 +2251,7 @@ document.getElementById('registerForm').addEventListener('submit', async e => {
 // ── Render all views ───────────────────────────────────────
 function renderAll() {
   applyTheme();
+  applyTranslations();
   renderDashboard();
   renderIncomeList();
   renderExpenseList();
@@ -1855,6 +2266,7 @@ async function init() {
   // 1. Load from localStorage first (instant)
   load();
   applyTheme();
+  applyTranslations();
 
   const m = currentMonth();
   document.getElementById('incomeMonth').value  = m;

@@ -26,27 +26,27 @@
   <ul class="nav-menu">
     <li class="nav-item active" data-page="dashboard">
       <i class="fa-solid fa-chart-pie"></i>
-      <span>Dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </li>
     <li class="nav-item" data-page="income">
       <i class="fa-solid fa-arrow-trend-up"></i>
-      <span>Rendimentos</span>
+      <span data-i18n="nav_income">Rendimentos</span>
     </li>
     <li class="nav-item" data-page="expenses">
       <i class="fa-solid fa-arrow-trend-down"></i>
-      <span>Gastos</span>
+      <span data-i18n="nav_expenses">Gastos</span>
     </li>
     <li class="nav-item" data-page="goals">
       <i class="fa-solid fa-bullseye"></i>
-      <span>Metas</span>
+      <span data-i18n="nav_goals">Metas</span>
     </li>
     <li class="nav-item" data-page="debts">
       <i class="fa-solid fa-credit-card"></i>
-      <span>Dívidas</span>
+      <span data-i18n="nav_debts">Dívidas</span>
     </li>
     <li class="nav-item" data-page="learn">
       <i class="fa-solid fa-graduation-cap"></i>
-      <span>Aprender</span>
+      <span data-i18n="nav_learn">Aprender</span>
     </li>
   </ul>
 
@@ -64,6 +64,7 @@
   <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
   <div class="topbar-title" id="topbarTitle">Dashboard</div>
   <div class="topbar-actions">
+    <button class="btn-lang" id="langToggle" title="Switch to English">EN</button>
     <button class="btn-icon" id="syncBtn" title="Salvo localmente"><i class="fa-solid fa-hard-drive"></i></button>
     <button class="btn-icon" id="themeToggle" title="Alternar tema"><i class="fa-solid fa-moon"></i></button>
     <div class="avatar-wrap">
@@ -108,11 +109,11 @@
     </div>
 
     <!-- KPI Cards -->
-    <div class="kpi-grid">
+    <div class="kpi-grid kpi-grid-5">
       <div class="kpi-card income-card">
         <div class="kpi-icon"><i class="fa-solid fa-circle-up"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Total de Rendimentos</div>
+          <div class="kpi-label" data-i18n="kpi_income">Renda Mensal</div>
           <div class="kpi-value" id="kpiIncome">R$ 0,00</div>
           <div class="kpi-sub" id="kpiIncomeSub">nenhum lançamento</div>
         </div>
@@ -120,31 +121,48 @@
       <div class="kpi-card expense-card">
         <div class="kpi-icon"><i class="fa-solid fa-circle-down"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Total de Gastos</div>
+          <div class="kpi-label" data-i18n="kpi_expense">Total de Gastos</div>
           <div class="kpi-value" id="kpiExpense">R$ 0,00</div>
           <div class="kpi-sub" id="kpiExpenseSub">nenhum lançamento</div>
+        </div>
+      </div>
+      <div class="kpi-card debt-dash-card" id="kpiDebtDashCard">
+        <div class="kpi-icon"><i class="fa-solid fa-credit-card"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label" data-i18n="kpi_debt_service">Parcelas/Mês</div>
+          <div class="kpi-value" id="kpiDebtService">R$ 0,00</div>
+          <div class="kpi-sub" id="kpiDebtServiceSub">sem dívidas ativas</div>
         </div>
       </div>
       <div class="kpi-card balance-card" id="kpiBalanceCard">
         <div class="kpi-icon"><i class="fa-solid fa-scale-balanced"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Saldo Mensal</div>
+          <div class="kpi-label" data-i18n="kpi_balance">Saldo Livre</div>
           <div class="kpi-value" id="kpiBalance">R$ 0,00</div>
-          <div class="kpi-sub" id="kpiBalanceSub">receita − gastos</div>
+          <div class="kpi-sub" id="kpiBalanceSub">receita − gastos − parcelas</div>
         </div>
       </div>
       <div class="kpi-card savings-card">
         <div class="kpi-icon"><i class="fa-solid fa-piggy-bank"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Taxa de Poupança</div>
+          <div class="kpi-label" data-i18n="kpi_savings">Taxa de Poupança</div>
           <div class="kpi-value" id="kpiSavings">0%</div>
-          <div class="kpi-sub">ideal: acima de 20%</div>
+          <div class="kpi-sub" data-i18n="kpi_savings_sub">ideal: acima de 20%</div>
         </div>
       </div>
     </div>
 
     <!-- Alerta principal -->
     <div class="alert-box" id="mainAlert" style="display:none"></div>
+
+    <!-- Debt commitment summary card (shown when debts exist) -->
+    <div class="card debt-dash-summary" id="debtDashCard" style="display:none; margin-bottom:20px;">
+      <div class="card-header">
+        <h3><i class="fa-solid fa-link"></i> <span data-i18n="debt_commit_title">Endividamento Mensal</span></h3>
+        <button class="btn-link" data-page="debts" data-i18n="debt_commit_link">Gerenciar dívidas →</button>
+      </div>
+      <div id="debtDashContent" class="debt-dash-content"></div>
+    </div>
 
     <!-- Charts row -->
     <div class="charts-row">
@@ -810,12 +828,27 @@
 
 <!-- ===================== MODAL: Learn ===================== -->
 <div class="modal-overlay" id="learnModal">
-  <div class="modal">
+  <div class="modal modal-learn">
     <div class="modal-header">
-      <h3 id="modalTitle"></h3>
+      <div class="modal-header-left">
+        <h3 id="modalTitle"></h3>
+        <div class="learn-page-dots" id="learnPageDots">
+          <span class="page-dot active" data-page="0"></span>
+          <span class="page-dot" data-page="1"></span>
+        </div>
+      </div>
       <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer learn-pagination">
+      <button class="btn-page-nav" id="learnPrev" style="visibility:hidden">
+        <i class="fa-solid fa-arrow-left"></i> <span data-i18n="learn_prev">Introdução</span>
+      </button>
+      <span class="page-indicator" id="learnPageIndicator">1 / 2</span>
+      <button class="btn-page-nav btn-page-nav-next" id="learnNext">
+        <span data-i18n="learn_next">Aprofundar</span> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
   </div>
 </div>
 
