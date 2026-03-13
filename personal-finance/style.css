@@ -1060,6 +1060,328 @@ input::placeholder { color: var(--text-3); }
 .deposit-row button:hover { opacity: .85; }
 
 /* ============================================================
+   PREMIUM / PAYWALL
+   ============================================================ */
+.learn-card-premium {
+  position: relative;
+  overflow: hidden;
+}
+.learn-card-premium .learn-card-icon { filter: brightness(.65) saturate(.5); }
+.learn-card-premium .learn-card-body { opacity: .75; }
+.learn-card-premium:hover { transform: translateY(-2px); }
+
+.premium-lock-overlay {
+  position: absolute;
+  top: 10px; right: 10px;
+  z-index: 5;
+}
+.lock-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(6px);
+  border-radius: 99px;
+  color: #fbbf24;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.learn-tag-premium {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+[data-theme="dark"] .learn-tag-premium { background: rgba(245,158,11,.15) !important; color: #fbbf24 !important; }
+
+.btn-premium-unlock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 14px rgba(245,158,11,.3);
+}
+.btn-premium-unlock:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,.45); }
+
+/* Paywall modal */
+.paywall-modal {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.paywall-hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  padding: 40px 24px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.paywall-hero::before {
+  content: '';
+  position: absolute;
+  top: -30px; left: -30px;
+  width: 140px; height: 140px;
+  background: rgba(255,255,255,.05);
+  border-radius: 50%;
+}
+.paywall-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; right: -20px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,.04);
+  border-radius: 50%;
+}
+.paywall-icon {
+  width: 60px; height: 60px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  color: white;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(251,191,36,.4);
+  position: relative;
+  z-index: 1;
+}
+.paywall-hero h2 {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.paywall-badge {
+  padding: 2px 10px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 99px;
+  font-size: 13px;
+  color: white;
+}
+.paywall-hero p {
+  color: rgba(255,255,255,.75);
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+
+.paywall-features {
+  padding: 20px 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.paywall-feat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.paywall-feat i { color: var(--success); font-size: 12px; }
+
+.paywall-price {
+  padding: 12px 24px 16px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 4px 0;
+}
+.price-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.price-from   { font-size: 12px; color: var(--text-3); }
+.price-main   { font-size: 28px; font-weight: 900; font-family: 'Sora', sans-serif; color: var(--text); }
+.price-period { font-size: 14px; font-weight: 400; color: var(--text-2); }
+.price-sub    { font-size: 12px; color: var(--text-3); }
+
+.paywall-actions {
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.btn-paywall-cta {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 4px 18px rgba(245,158,11,.4);
+  font-family: 'Sora', sans-serif;
+  letter-spacing: -.2px;
+}
+.btn-paywall-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(245,158,11,.55); }
+.paywall-skip { color: var(--text-3); font-size: 12px; padding: 4px; }
+
+/* ============================================================
+   EDIT BUTTON
+   ============================================================ */
+.item-edit {
+  width: 28px; height: 28px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 12px;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.item-edit:hover { background: var(--brand); border-color: var(--brand); color: white; }
+
+/* ============================================================
+   MODAL SM (edit modal)
+   ============================================================ */
+.modal-sm { max-width: 480px; }
+
+/* ============================================================
+   MONTHLY BREAKDOWN
+   ============================================================ */
+.monthly-card .card-header { flex-wrap: wrap; gap: 8px; }
+
+.monthly-kpi-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.monthly-kpi {
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.monthly-kpi strong { font-weight: 700; }
+
+.monthly-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.monthly-chart-wrap {
+  padding: 20px;
+  min-height: 260px;
+  border-right: 1px solid var(--border);
+}
+
+.monthly-table-wrap {
+  overflow-y: auto;
+  max-height: 320px;
+}
+
+.monthly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.monthly-table th {
+  text-align: left;
+  padding: 10px 14px;
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+.monthly-table td {
+  padding: 10px 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.monthly-table tr:last-child td { border-bottom: none; }
+.monthly-table tbody tr:hover td { background: var(--bg); }
+.monthly-table .total-row td {
+  font-weight: 800;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  border-top: 2px solid var(--border);
+  border-bottom: none;
+}
+.month-bar-cell { width: 80px; }
+.month-bar-bg {
+  height: 6px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.month-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.month-zero { color: var(--text-3); font-style: italic; }
+.month-count {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 1px 6px;
+}
+
+/* Dashboard monthly kpis strip */
+.month-kpis {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.month-kpi-pill {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+.pill-income  { background: var(--success-light); color: var(--success); }
+.pill-expense { background: var(--danger-light);  color: var(--danger); }
+.pill-balance { background: #ede9fe; color: var(--brand); }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1100px) {
@@ -1071,6 +1393,8 @@ input::placeholder { color: var(--text-3); }
   .charts-row { grid-template-columns: 1fr; }
   .two-col { grid-template-columns: 1fr; }
   .form-card { order: -1; }
+  .monthly-content { grid-template-columns: 1fr; }
+  .monthly-chart-wrap { border-right: none; border-bottom: 1px solid var(--border); }
 }
 
 @media (max-width: 768px) {

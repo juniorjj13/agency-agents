@@ -12,6 +12,13 @@ const state = {
   selectedEmoji: '✈️',
 };
 
+// ── Chart instances ────────────────────────────────────────
+let expenseChart       = null;
+let balanceChart       = null;
+let dashMonthlyChart   = null;
+let incomeMonthChart   = null;
+let expenseMonthChart  = null;
+
 // ── Persistence ────────────────────────────────────────────
 function save() {
   localStorage.setItem('fs_incomes',  JSON.stringify(state.incomes));
@@ -32,12 +39,32 @@ const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(String(str)));
+  return div.innerHTML;
+}
+
+// Last N months as array of { key: "2025-03", label: "Mar/25" }
+function getLast12Months() {
+  const months = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key   = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
+                   .replace('.', '').replace(' ', '/');
+    months.push({ key, label });
+  }
+  return months;
+}
+
 function getMonthlyIncome() {
   return state.incomes.reduce((sum, i) => {
     const amount = parseFloat(i.amount);
-    if (i.freq === 'semanal')    return sum + amount * 4.33;
-    if (i.freq === 'quinzenal')  return sum + amount * 2;
-    if (i.freq === 'anual')      return sum + amount / 12;
+    if (i.freq === 'semanal')   return sum + amount * 4.33;
+    if (i.freq === 'quinzenal') return sum + amount * 2;
+    if (i.freq === 'anual')     return sum + amount / 12;
     return sum + amount; // mensal + unico
   }, 0);
 }
@@ -46,12 +73,31 @@ function getMonthlyExpense() {
   return state.expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
 }
 
+// Group items by month field → map { "2025-03": totalAmount }
+function groupByMonth(items) {
+  const map = {};
+  items.forEach(item => {
+    const m = item.month || currentMonth();
+    map[m] = (map[m] || 0) + parseFloat(item.amount);
+  });
+  return map;
+}
+
+function countByMonth(items) {
+  const map = {};
+  items.forEach(item => {
+    const m = item.month || currentMonth();
+    map[m] = (map[m] || 0) + 1;
+  });
+  return map;
+}
+
 // ── Toast ──────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = `toast toast-${type} show`;
-  setTimeout(() => { t.className = 'toast'; }, 3000);
+  setTimeout(() => { t.className = 'toast'; }, 3200);
 }
 
 // ── Theme ──────────────────────────────────────────────────
@@ -65,17 +111,15 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   state.theme = state.theme === 'dark' ? 'light' : 'dark';
   applyTheme();
   save();
+  // Re-render charts to pick up new colors
+  renderDashboard();
+  renderMonthlyBreakdown('income');
+  renderMonthlyBreakdown('expense');
 });
 
 // ── Navigation ─────────────────────────────────────────────
 const pages = ['dashboard', 'income', 'expenses', 'goals', 'learn'];
-const pageTitles = {
-  dashboard: 'Dashboard',
-  income: 'Rendimentos',
-  expenses: 'Gastos',
-  goals: 'Metas',
-  learn: 'Aprender',
-};
+const pageTitles = { dashboard: 'Dashboard', income: 'Rendimentos', expenses: 'Gastos', goals: 'Metas', learn: 'Aprender' };
 
 function navigateTo(page) {
   pages.forEach(p => {
@@ -87,12 +131,13 @@ function navigateTo(page) {
   document.getElementById('topbarTitle').textContent = pageTitles[page] || page;
   closeSidebar();
   if (page === 'dashboard') renderDashboard();
+  if (page === 'income')    renderMonthlyBreakdown('income');
+  if (page === 'expenses')  renderMonthlyBreakdown('expense');
 }
 
 document.querySelectorAll('.nav-item').forEach(el => {
   el.addEventListener('click', () => navigateTo(el.dataset.page));
 });
-
 document.querySelectorAll('[data-page]').forEach(el => {
   if (!el.classList.contains('nav-item')) {
     el.addEventListener('click', () => navigateTo(el.dataset.page));
@@ -110,11 +155,7 @@ document.getElementById('menuBtn').addEventListener('click', openSidebar);
 document.getElementById('sidebarClose').addEventListener('click', closeSidebar);
 overlay.addEventListener('click', closeSidebar);
 
-// ── Chart Instances ────────────────────────────────────────
-let expenseChart = null;
-let balanceChart = null;
-
-// ── Category Helpers ───────────────────────────────────────
+// ── Category helpers ───────────────────────────────────────
 const categoryEmoji = {
   moradia: '🏠', alimentacao: '🍽️', transporte: '🚗', saude: '💊',
   educacao: '📚', lazer: '🎉', vestuario: '👕', assinaturas: '📱',
@@ -125,6 +166,28 @@ const categoryEmoji = {
 const categoryColors = [
   '#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6',
   '#ec4899','#14b8a6','#f97316','#64748b',
+];
+
+const incomeCategories = [
+  { value: 'salario',      label: '💼 Salário' },
+  { value: 'freela',       label: '💻 Freela / Autônomo' },
+  { value: 'investimento', label: '📈 Investimentos' },
+  { value: 'aluguel',      label: '🏠 Aluguel' },
+  { value: 'bonus',        label: '🎁 Bônus / 13º' },
+  { value: 'pensao',       label: '👨‍👩‍👧 Pensão / Benefício' },
+  { value: 'outros',       label: '✨ Outros' },
+];
+const expenseCategories = [
+  { value: 'moradia',      label: '🏠 Moradia' },
+  { value: 'alimentacao',  label: '🍽️ Alimentação' },
+  { value: 'transporte',   label: '🚗 Transporte' },
+  { value: 'saude',        label: '💊 Saúde' },
+  { value: 'educacao',     label: '📚 Educação' },
+  { value: 'lazer',        label: '🎉 Lazer' },
+  { value: 'vestuario',    label: '👕 Vestuário' },
+  { value: 'assinaturas',  label: '📱 Assinaturas' },
+  { value: 'dividas',      label: '💳 Dívidas / Parcelas' },
+  { value: 'outros',       label: '✨ Outros' },
 ];
 
 // ── DASHBOARD ──────────────────────────────────────────────
@@ -147,25 +210,14 @@ function renderDashboard() {
     state.expenses.length === 0 ? 'nenhum lançamento' :
     `${state.expenses.length} item${state.expenses.length > 1 ? 's' : ''}`;
 
-  // Balance card color
-  const balCard = document.getElementById('kpiBalanceCard');
-  balCard.style.setProperty('--balance-color', balance >= 0 ? 'var(--success)' : 'var(--danger)');
   document.getElementById('kpiBalance').style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
 
-  // Health score
   renderHealthScore(savingsRate, income, expense);
-
-  // Alert
   renderMainAlert(income, expense, balance, savingsRate);
-
-  // Charts
   renderExpenseChart();
   renderBalanceChart(income, expense);
-
-  // Insights
+  renderDashMonthlyChart();
   renderInsights(income, expense, balance, savingsRate);
-
-  // Goals preview
   renderGoalsPreview();
 }
 
@@ -185,10 +237,10 @@ function renderHealthScore(savingsRate, income, expense) {
   const badge = document.getElementById('badgeValue');
 
   let txt, color;
-  if (score >= 80) { txt = 'Excelente 🌟'; color = 'var(--success)'; }
-  else if (score >= 60) { txt = 'Bom 👍';  color = '#84cc16'; }
-  else if (score >= 40) { txt = 'Regular ⚠️'; color = 'var(--warning)'; }
-  else { txt = 'Precisa de atenção 🚨'; color = 'var(--danger)'; }
+  if      (score >= 80) { txt = 'Excelente 🌟';         color = 'var(--success)'; }
+  else if (score >= 60) { txt = 'Bom 👍';               color = '#84cc16'; }
+  else if (score >= 40) { txt = 'Regular ⚠️';           color = 'var(--warning)'; }
+  else                  { txt = 'Precisa de atenção 🚨'; color = 'var(--danger)'; }
 
   fill.style.width  = score + '%';
   label.textContent = score + ' / 100';
@@ -204,22 +256,22 @@ function renderMainAlert(income, expense, balance, savingsRate) {
   if (expense > income) {
     box.className = 'alert-box alert-danger';
     box.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>
-      <div><strong>Atenção:</strong> Você está gastando ${fmt(expense - income)} a mais do que ganha por mês.
+      <div><strong>Atenção:</strong> Você está gastando ${fmt(expense - income)} a mais do que ganha.
       Isso gera dívidas e compromete seu futuro. Veja os pontos de melhora abaixo.</div>`;
   } else if (savingsRate < 10) {
     box.className = 'alert-box alert-warning';
     box.innerHTML = `<i class="fa-solid fa-circle-info"></i>
       <div><strong>Quase lá!</strong> Sua taxa de poupança está em ${savingsRate.toFixed(1)}%.
-      O ideal é guardar pelo menos 20% da sua renda. Pequenos cortes fazem uma grande diferença!</div>`;
+      O ideal é guardar pelo menos 20% da sua renda.</div>`;
   } else if (savingsRate >= 20) {
     box.className = 'alert-box alert-success';
     box.innerHTML = `<i class="fa-solid fa-circle-check"></i>
-      <div><strong>Parabéns!</strong> Você está poupando ${savingsRate.toFixed(1)}% da sua renda.
-      Continue assim — você está no caminho certo para a liberdade financeira!</div>`;
+      <div><strong>Parabéns!</strong> Você está poupando ${savingsRate.toFixed(1)}% da renda.
+      Continue assim — você está no caminho certo!</div>`;
   } else {
     box.className = 'alert-box alert-info';
     box.innerHTML = `<i class="fa-solid fa-circle-info"></i>
-      <div><strong>Bom progresso!</strong> Você poupa ${savingsRate.toFixed(1)}% da sua renda.
+      <div><strong>Bom progresso!</strong> Você poupa ${savingsRate.toFixed(1)}%.
       Tente chegar a 20% para acelerar seus sonhos financeiros.</div>`;
   }
 }
@@ -229,13 +281,11 @@ function renderExpenseChart() {
   const empty  = document.getElementById('expenseChartEmpty');
 
   if (state.expenses.length === 0) {
-    empty.style.display = 'flex';
-    canvas.style.display = 'none';
+    empty.style.display = 'flex'; canvas.style.display = 'none';
     if (expenseChart) { expenseChart.destroy(); expenseChart = null; }
     return;
   }
-  empty.style.display = 'none';
-  canvas.style.display = 'block';
+  empty.style.display = 'none'; canvas.style.display = 'block';
 
   const grouped = {};
   state.expenses.forEach(e => {
@@ -246,25 +296,17 @@ function renderExpenseChart() {
   const labels = Object.keys(grouped).map(k => `${categoryEmoji[k] || '✨'} ${k.charAt(0).toUpperCase() + k.slice(1)}`);
   const data   = Object.values(grouped);
   const colors = categoryColors.slice(0, data.length);
+  const textColor = state.theme === 'dark' ? '#94a3b8' : '#475569';
 
   if (expenseChart) expenseChart.destroy();
   expenseChart = new Chart(canvas, {
     type: 'doughnut',
     data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }] },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            padding: 16, boxWidth: 12, font: { size: 12, family: 'Inter' },
-            color: getComputedStyle(document.documentElement).getPropertyValue('--text-2').trim() || '#475569',
-          },
-        },
-        tooltip: {
-          callbacks: { label: ctx => ` ${fmt(ctx.parsed)}` },
-        },
+        legend: { position: 'bottom', labels: { padding: 14, boxWidth: 12, font: { size: 12, family: 'Inter' }, color: textColor } },
+        tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.parsed)}` } },
       },
       cutout: '65%',
     },
@@ -272,10 +314,9 @@ function renderExpenseChart() {
 }
 
 function renderBalanceChart(income, expense) {
-  const canvas = document.getElementById('balanceChart');
-  const isDark = state.theme === 'dark';
-  const gridColor = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
-  const textColor = isDark ? '#94a3b8' : '#475569';
+  const canvas    = document.getElementById('balanceChart');
+  const gridColor = state.theme === 'dark' ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+  const textColor = state.theme === 'dark' ? '#94a3b8' : '#475569';
 
   if (balanceChart) balanceChart.destroy();
   balanceChart = new Chart(canvas, {
@@ -286,29 +327,108 @@ function renderBalanceChart(income, expense) {
         data: [income, expense, Math.abs(income - expense)],
         backgroundColor: ['rgba(16,185,129,.8)', 'rgba(239,68,68,.8)',
           income >= expense ? 'rgba(99,102,241,.8)' : 'rgba(239,68,68,.4)'],
-        borderRadius: 8,
-        borderSkipped: false,
+        borderRadius: 8, borderSkipped: false,
       }],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.parsed.y)}` } },
-      },
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.parsed.y)}` } } },
       scales: {
         x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 12 } } },
-        y: {
-          grid: { color: gridColor },
-          ticks: { color: textColor, font: { size: 12 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' },
-          beginAtZero: true,
-        },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 12 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' }, beginAtZero: true },
       },
     },
   });
 }
 
+// ── DASHBOARD 12-month chart ───────────────────────────────
+function renderDashMonthlyChart() {
+  const months      = getLast12Months();
+  const incomeMap   = groupByMonth(state.incomes);
+  const expenseMap  = groupByMonth(state.expenses);
+
+  const incData  = months.map(m => incomeMap[m.key]  || 0);
+  const expData  = months.map(m => expenseMap[m.key] || 0);
+  const balData  = months.map((m, i) => incData[i] - expData[i]);
+  const labels   = months.map(m => m.label);
+
+  const hasData  = [...incData, ...expData].some(v => v > 0);
+  const canvas   = document.getElementById('dashMonthlyChart');
+  const empty    = document.getElementById('dashMonthlyEmpty');
+  const kpisEl   = document.getElementById('dashMonthKpis');
+
+  if (!hasData) {
+    empty.style.display = 'flex'; canvas.style.display = 'none'; kpisEl.innerHTML = ''; return;
+  }
+  empty.style.display = 'none'; canvas.style.display = 'block';
+
+  // KPI pills
+  const totalInc = incData.reduce((a, b) => a + b, 0);
+  const totalExp = expData.reduce((a, b) => a + b, 0);
+  const totalBal = totalInc - totalExp;
+  kpisEl.innerHTML = `
+    <span class="month-kpi-pill pill-income">Recebido: ${fmt(totalInc)}</span>
+    <span class="month-kpi-pill pill-expense">Gasto: ${fmt(totalExp)}</span>
+    <span class="month-kpi-pill pill-balance" style="color:${totalBal>=0?'var(--brand)':'var(--danger)'};background:${totalBal>=0?'#ede9fe':'var(--danger-light)'}">Saldo: ${fmt(totalBal)}</span>
+  `;
+
+  const gridColor = state.theme === 'dark' ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+  const textColor = state.theme === 'dark' ? '#94a3b8' : '#475569';
+
+  if (dashMonthlyChart) dashMonthlyChart.destroy();
+  dashMonthlyChart = new Chart(canvas, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Rendimentos',
+          data: incData,
+          backgroundColor: 'rgba(16,185,129,.75)',
+          borderRadius: 6,
+          borderSkipped: false,
+          order: 2,
+        },
+        {
+          type: 'bar',
+          label: 'Gastos',
+          data: expData,
+          backgroundColor: 'rgba(239,68,68,.75)',
+          borderRadius: 6,
+          borderSkipped: false,
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: 'Saldo',
+          data: balData,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,.12)',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: balData.map(v => v >= 0 ? '#6366f1' : '#ef4444'),
+          fill: true,
+          tension: .35,
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { padding: 16, boxWidth: 12, font: { size: 12, family: 'Inter' }, color: textColor } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } },
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+// ── INSIGHTS ───────────────────────────────────────────────
 function renderInsights(income, expense, balance, savingsRate) {
   const list = document.getElementById('insightsList');
   const insights = [];
@@ -321,97 +441,57 @@ function renderInsights(income, expense, balance, savingsRate) {
     return;
   }
 
-  // Spending more than earning
   if (expense > income) {
-    insights.push({
-      type: 'danger', icon: 'fa-fire',
-      title: 'Gastos maiores que a renda!',
-      desc: `Você gasta ${fmt(expense - income)} a mais do que ganha. Cada mês assim gera dívidas. Comece cortando gastos variáveis e opcionais.`,
-    });
+    insights.push({ type:'danger', icon:'fa-fire', title:'Gastos maiores que a renda!',
+      desc:`Você gasta ${fmt(expense - income)} a mais do que ganha. Corte gastos variáveis e opcionais primeiro.` });
   }
-
-  // Savings rate
   if (savingsRate < 10 && income > 0) {
-    insights.push({
-      type: 'warning', icon: 'fa-piggy-bank',
-      title: 'Taxa de poupança muito baixa',
-      desc: `Você poupa apenas ${savingsRate.toFixed(1)}% da renda. O ideal é 20%. Experimente a regra: ao receber, pague-se primeiro — guarde 20% antes de gastar qualquer coisa.`,
-    });
+    insights.push({ type:'warning', icon:'fa-piggy-bank', title:'Taxa de poupança muito baixa',
+      desc:`Você poupa ${savingsRate.toFixed(1)}% — ideal é 20%. Pague-se primeiro: ao receber, transfira 20% antes de qualquer gasto.` });
   } else if (savingsRate >= 20) {
-    insights.push({
-      type: 'success', icon: 'fa-star',
-      title: 'Poupança acima do ideal!',
-      desc: `Você poupa ${savingsRate.toFixed(1)}% da sua renda — excelente! Agora pense em investir esse dinheiro no Tesouro Direto ou CDB para ele crescer.`,
-    });
+    insights.push({ type:'success', icon:'fa-star', title:'Poupança acima do ideal!',
+      desc:`Você poupa ${savingsRate.toFixed(1)}% — excelente! Agora pense em investir esse dinheiro (Tesouro Direto, CDB).` });
   }
 
-  // Fixed expenses ratio
-  const fixedTotal = state.expenses.filter(e => e.type === 'fixo').reduce((s,e)=>s+parseFloat(e.amount),0);
+  const fixedTotal = state.expenses.filter(e => e.type === 'fixo').reduce((s,e) => s + parseFloat(e.amount), 0);
   const fixedRatio = income > 0 ? fixedTotal / income : 0;
   if (fixedRatio > 0.6) {
-    insights.push({
-      type: 'danger', icon: 'fa-lock',
-      title: 'Gastos fixos muito altos',
-      desc: `Seus gastos fixos representam ${(fixedRatio*100).toFixed(0)}% da sua renda (ideal: até 50%). Avalie renegociar contratos, trocar de plano ou reduzir alguma assinatura.`,
-    });
+    insights.push({ type:'danger', icon:'fa-lock', title:'Gastos fixos muito altos',
+      desc:`Fixos representam ${(fixedRatio*100).toFixed(0)}% da renda (ideal: até 50%). Renegocie contratos, troque planos, cancele o que não usa.` });
   }
 
-  // Leisure check
-  const leisure = state.expenses.filter(e => e.category === 'lazer').reduce((s,e)=>s+parseFloat(e.amount),0);
-  const leisureRatio = income > 0 ? leisure / income : 0;
-  if (leisureRatio > 0.3) {
-    insights.push({
-      type: 'warning', icon: 'fa-masks-theater',
-      title: 'Lazer comprometendo o orçamento',
-      desc: `Lazer e entretenimento estão em ${(leisureRatio*100).toFixed(0)}% da renda. A regra 50-30-20 sugere máximo 30% para desejos. Reveja se há excessos.`,
-    });
+  const leisure = state.expenses.filter(e => e.category === 'lazer').reduce((s,e) => s + parseFloat(e.amount), 0);
+  if (income > 0 && leisure / income > 0.3) {
+    insights.push({ type:'warning', icon:'fa-masks-theater', title:'Lazer comprometendo o orçamento',
+      desc:`Lazer em ${((leisure/income)*100).toFixed(0)}% da renda. Regra 50-30-20 sugere máximo 30% para desejos.` });
   }
 
-  // Subscriptions
-  const subs = state.expenses.filter(e => e.category === 'assinaturas').reduce((s,e)=>s+parseFloat(e.amount),0);
+  const subs = state.expenses.filter(e => e.category === 'assinaturas').reduce((s,e) => s + parseFloat(e.amount), 0);
   if (subs > 0) {
-    insights.push({
-      type: 'info', icon: 'fa-mobile-screen',
-      title: 'Revise suas assinaturas',
-      desc: `Você gasta ${fmt(subs)} em assinaturas. Anote quais usa de verdade — é comum pagar por serviços esquecidos. Cancele o que não usa.`,
-    });
+    insights.push({ type:'info', icon:'fa-mobile-screen', title:'Revise suas assinaturas',
+      desc:`Você gasta ${fmt(subs)} em assinaturas. Cancele o que não usa — é fácil esquecer de serviços que cobram automaticamente.` });
   }
 
-  // Debt
-  const debt = state.expenses.filter(e => e.category === 'dividas').reduce((s,e)=>s+parseFloat(e.amount),0);
+  const debt = state.expenses.filter(e => e.category === 'dividas').reduce((s,e) => s + parseFloat(e.amount), 0);
   if (debt > 0) {
-    const debtRatio = income > 0 ? debt / income : 0;
-    insights.push({
-      type: debtRatio > 0.3 ? 'danger' : 'warning', icon: 'fa-credit-card',
-      title: 'Dívidas em andamento',
-      desc: `Parcelas e dívidas consomem ${fmt(debt)}/mês (${(debtRatio*100).toFixed(0)}% da renda). Priorize quitar as de juros mais altos primeiro (método avalanche). Confira a aba "Aprender".`,
-    });
+    const dr = income > 0 ? debt / income : 0;
+    insights.push({ type: dr > 0.3 ? 'danger' : 'warning', icon:'fa-credit-card', title:'Dívidas em andamento',
+      desc:`Parcelas consomem ${fmt(debt)}/mês (${(dr*100).toFixed(0)}% da renda). Priorize quitar os de maiores juros primeiro.` });
   }
 
-  // No goals
   if (state.goals.length === 0) {
-    insights.push({
-      type: 'info', icon: 'fa-bullseye',
-      title: 'Defina uma meta financeira',
-      desc: `Quem tem objetivos claros economiza mais. Crie sua primeira meta — uma viagem, reserva de emergência ou qualquer sonho — e veja o progresso crescer!`,
-    });
+    insights.push({ type:'info', icon:'fa-bullseye', title:'Defina uma meta financeira',
+      desc:'Quem tem objetivos claros economiza mais. Crie sua primeira meta na aba Metas!' });
   }
 
-  // Emergency fund suggestion
-  if (savingsRate > 0 && state.goals.filter(g => g.name.toLowerCase().includes('emergência') || g.name.toLowerCase().includes('reserva')).length === 0) {
-    insights.push({
-      type: 'info', icon: 'fa-shield-halved',
-      title: 'Crie uma reserva de emergência',
-      desc: `A primeira meta de todo mundo deveria ser ter 3 a 6 meses de gastos guardados. Com seus gastos de ${fmt(expense)}/mês, você precisa de ${fmt(expense * 4)} como reserva mínima.`,
-    });
+  if (savingsRate > 0) {
+    insights.push({ type:'info', icon:'fa-shield-halved', title:'Crie uma reserva de emergência',
+      desc:`Tenha 3–6 meses de gastos guardados. Com ${fmt(expense)}/mês de gastos, você precisa de ${fmt(expense * 4)} como reserva mínima.` });
   }
 
   if (insights.length === 0) {
-    insights.push({
-      type: 'success', icon: 'fa-trophy',
-      title: 'Suas finanças estão saudáveis!',
-      desc: 'Continue monitorando mês a mês e pense em diversificar seus investimentos para fazer seu dinheiro trabalhar por você.',
-    });
+    insights.push({ type:'success', icon:'fa-trophy', title:'Suas finanças estão saudáveis!',
+      desc:'Continue monitorando e pense em diversificar investimentos para o dinheiro trabalhar por você.' });
   }
 
   list.innerHTML = insights.map(i => `
@@ -430,15 +510,14 @@ function renderGoalsPreview() {
   const list = document.getElementById('goalsPreviewList');
   if (state.goals.length === 0) { card.style.display = 'none'; return; }
   card.style.display = 'block';
-
-  list.innerHTML = state.goals.slice(0,3).map(g => {
+  list.innerHTML = state.goals.slice(0, 3).map(g => {
     const pct = Math.min(100, (g.saved / g.total) * 100);
     const color = pct >= 100 ? 'var(--success)' : pct >= 50 ? 'var(--brand)' : 'var(--warning)';
     return `
       <div class="goal-preview-item">
         <div class="goal-preview-emoji">${g.emoji}</div>
         <div class="goal-preview-info">
-          <div class="goal-preview-name">${g.name}</div>
+          <div class="goal-preview-name">${escHtml(g.name)}</div>
           <div class="goal-preview-bar-wrap">
             <div class="goal-preview-bar-fill" style="width:${pct}%;background:${color}"></div>
           </div>
@@ -449,21 +528,160 @@ function renderGoalsPreview() {
   }).join('');
 }
 
+// ── MONTHLY BREAKDOWN (shared for income / expense) ────────
+function renderMonthlyBreakdown(type) {
+  const isIncome   = type === 'income';
+  const items      = isIncome ? state.incomes : state.expenses;
+  const cardEl     = document.getElementById(isIncome ? 'incomeMonthlyCard' : 'expenseMonthlyCard');
+  const chartId    = isIncome ? 'incomeMonthlyChart' : 'expenseMonthlyChart';
+  const tableId    = isIncome ? 'incomeMonthlyTable' : 'expenseMonthlyTable';
+  const accumId    = isIncome ? 'incomeAccumulated' : 'expenseAccumulated';
+  const avgId      = isIncome ? 'incomeMonthAvg' : 'expenseMonthAvg';
+  const barColor   = isIncome ? 'rgba(16,185,129,.8)' : 'rgba(239,68,68,.8)';
+  const lineColor  = isIncome ? '#10b981' : '#ef4444';
+
+  if (items.length === 0) { cardEl.style.display = 'none'; return; }
+  cardEl.style.display = 'block';
+
+  const months      = getLast12Months();
+  const amountMap   = groupByMonth(items);
+  const countMap    = countByMonth(items);
+  const monthData   = months.map(m => ({ ...m, total: amountMap[m.key] || 0, count: countMap[m.key] || 0 }));
+  const accumulated = monthData.reduce((s, m) => s + m.total, 0);
+  const nonZero     = monthData.filter(m => m.total > 0);
+  const average     = nonZero.length > 0 ? accumulated / nonZero.length : 0;
+  const maxVal      = Math.max(...monthData.map(m => m.total), 1);
+
+  // Update chips
+  document.getElementById(accumId).textContent = fmt(accumulated);
+  document.getElementById(avgId).textContent   = `Média mensal: ${fmt(average)}`;
+
+  // Chart
+  const canvas    = document.getElementById(chartId);
+  const gridColor = state.theme === 'dark' ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+  const textColor = state.theme === 'dark' ? '#94a3b8' : '#475569';
+
+  const chartRef = isIncome ? incomeMonthChart : expenseMonthChart;
+  if (chartRef) chartRef.destroy();
+
+  const newChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: months.map(m => m.label),
+      datasets: [
+        {
+          label: isIncome ? 'Rendimentos' : 'Gastos',
+          data: monthData.map(m => m.total),
+          backgroundColor: barColor,
+          borderRadius: 6,
+          borderSkipped: false,
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: 'Acumulado',
+          data: monthData.reduce((acc, m, i) => { acc.push((acc[i-1] || 0) + m.total); return acc; }, []),
+          borderColor: lineColor,
+          borderWidth: 2,
+          pointRadius: 3,
+          fill: false,
+          tension: .35,
+          yAxisID: 'yAcc',
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { padding: 12, boxWidth: 10, font: { size: 11, family: 'Inter' }, color: textColor } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } },
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } },
+        y: {
+          grid: { color: gridColor },
+          ticks: { color: textColor, font: { size: 11 }, callback: v => 'R$' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v) },
+          beginAtZero: true,
+        },
+        yAcc: {
+          position: 'right',
+          grid: { display: false },
+          ticks: { color: lineColor, font: { size: 10 }, callback: v => 'R$' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v) },
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  if (isIncome) incomeMonthChart = newChart;
+  else          expenseMonthChart = newChart;
+
+  // Table
+  const tableEl = document.getElementById(tableId);
+  tableEl.innerHTML = `
+    <thead>
+      <tr>
+        <th>Mês</th>
+        <th style="text-align:right">Valor</th>
+        <th style="text-align:center">Itens</th>
+        <th class="month-bar-cell"></th>
+      </tr>
+    </thead>
+    <tbody>
+      ${monthData.map(m => {
+        const pct = maxVal > 0 ? (m.total / maxVal) * 100 : 0;
+        return `
+          <tr>
+            <td style="font-weight:500">${m.label}</td>
+            <td style="text-align:right;font-weight:${m.total > 0 ? 700 : 400}" class="${m.total === 0 ? 'month-zero' : ''}">
+              ${m.total > 0 ? fmt(m.total) : '—'}
+            </td>
+            <td style="text-align:center">
+              ${m.count > 0 ? `<span class="month-count">${m.count}</span>` : '—'}
+            </td>
+            <td class="month-bar-cell">
+              <div class="month-bar-bg">
+                <div class="month-bar-fill" style="width:${pct}%;background:${isIncome ? 'var(--success)' : 'var(--danger)'}"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('')}
+    </tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td>Acumulado 12m</td>
+        <td style="text-align:right;color:${isIncome ? 'var(--success)' : 'var(--danger)'}">${fmt(accumulated)}</td>
+        <td style="text-align:center"><span class="month-count">${items.length}</span></td>
+        <td></td>
+      </tr>
+      <tr class="total-row">
+        <td>Média mensal</td>
+        <td style="text-align:right;color:var(--text-2)">${fmt(average)}</td>
+        <td colspan="2" style="color:var(--text-3);font-size:11px">nos meses com lançamento</td>
+      </tr>
+    </tfoot>
+  `;
+}
+
 // ── INCOME ─────────────────────────────────────────────────
 document.getElementById('incomeForm').addEventListener('submit', e => {
   e.preventDefault();
   const income = {
     id: uid(),
-    desc: document.getElementById('incomeDesc').value.trim(),
-    amount: parseFloat(document.getElementById('incomeAmount').value),
+    desc:     document.getElementById('incomeDesc').value.trim(),
+    amount:   parseFloat(document.getElementById('incomeAmount').value),
     category: document.getElementById('incomeCategory').value,
-    freq: document.getElementById('incomeFreq').value,
-    month: document.getElementById('incomeMonth').value || currentMonth(),
+    freq:     document.getElementById('incomeFreq').value,
+    month:    document.getElementById('incomeMonth').value || currentMonth(),
   };
   if (!income.desc || isNaN(income.amount) || income.amount <= 0) return;
   state.incomes.push(income);
   save();
   renderIncomeList();
+  renderMonthlyBreakdown('income');
   renderDashboard();
   e.target.reset();
   document.getElementById('incomeMonth').value = currentMonth();
@@ -473,7 +691,7 @@ document.getElementById('incomeForm').addEventListener('submit', e => {
 function renderIncomeList() {
   const list = document.getElementById('incomeList');
   const chip = document.getElementById('totalIncomeChip');
-  const total = state.incomes.reduce((s,i) => s + parseFloat(i.amount), 0);
+  const total = state.incomes.reduce((s, i) => s + parseFloat(i.amount), 0);
   chip.textContent = `Total: ${fmt(total)}`;
 
   if (state.incomes.length === 0) {
@@ -492,7 +710,8 @@ function renderIncomeList() {
         </div>
       </div>
       <div class="item-amount income-amount">${fmt(parseFloat(i.amount))}</div>
-      <button class="item-del" onclick="deleteIncome('${i.id}')"><i class="fa-solid fa-trash"></i></button>
+      <button class="item-edit" onclick="openEditModal('income','${i.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+      <button class="item-del"  onclick="deleteIncome('${i.id}')"            title="Excluir"><i class="fa-solid fa-trash"></i></button>
     </div>
   `).join('');
 }
@@ -501,6 +720,7 @@ function deleteIncome(id) {
   state.incomes = state.incomes.filter(i => i.id !== id);
   save();
   renderIncomeList();
+  renderMonthlyBreakdown('income');
   renderDashboard();
   showToast('Rendimento removido', 'danger');
 }
@@ -510,16 +730,17 @@ document.getElementById('expenseForm').addEventListener('submit', e => {
   e.preventDefault();
   const expense = {
     id: uid(),
-    desc: document.getElementById('expenseDesc').value.trim(),
-    amount: parseFloat(document.getElementById('expenseAmount').value),
-    type: document.getElementById('expenseType').value,
+    desc:     document.getElementById('expenseDesc').value.trim(),
+    amount:   parseFloat(document.getElementById('expenseAmount').value),
+    type:     document.getElementById('expenseType').value,
     category: document.getElementById('expenseCategory').value,
-    month: document.getElementById('expenseMonth').value || currentMonth(),
+    month:    document.getElementById('expenseMonth').value || currentMonth(),
   };
   if (!expense.desc || isNaN(expense.amount) || expense.amount <= 0) return;
   state.expenses.push(expense);
   save();
   renderExpenseList();
+  renderMonthlyBreakdown('expense');
   renderDashboard();
   e.target.reset();
   document.getElementById('expenseMonth').value = currentMonth();
@@ -538,7 +759,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 function renderExpenseList() {
   const list = document.getElementById('expenseList');
   const chip = document.getElementById('totalExpenseChip');
-  const total = state.expenses.reduce((s,e) => s + parseFloat(e.amount), 0);
+  const total = state.expenses.reduce((s, e) => s + parseFloat(e.amount), 0);
   chip.textContent = `Total: ${fmt(total)}`;
 
   const filtered = state.expenseFilter === 'all'
@@ -561,7 +782,8 @@ function renderExpenseList() {
         </div>
       </div>
       <div class="item-amount expense-amount">${fmt(parseFloat(e.amount))}</div>
-      <button class="item-del" onclick="deleteExpense('${e.id}')"><i class="fa-solid fa-trash"></i></button>
+      <button class="item-edit" onclick="openEditModal('expense','${e.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+      <button class="item-del"  onclick="deleteExpense('${e.id}')"            title="Excluir"><i class="fa-solid fa-trash"></i></button>
     </div>
   `).join('');
 }
@@ -570,9 +792,96 @@ function deleteExpense(id) {
   state.expenses = state.expenses.filter(e => e.id !== id);
   save();
   renderExpenseList();
+  renderMonthlyBreakdown('expense');
   renderDashboard();
   showToast('Gasto removido', 'danger');
 }
+
+// ── EDIT MODAL ─────────────────────────────────────────────
+function openEditModal(type, id) {
+  const item = type === 'income'
+    ? state.incomes.find(i => i.id === id)
+    : state.expenses.find(e => e.id === id);
+  if (!item) return;
+
+  const isIncome = type === 'income';
+
+  document.getElementById('editId').value   = id;
+  document.getElementById('editType').value = type;
+  document.getElementById('editDesc').value    = item.desc;
+  document.getElementById('editAmount').value  = item.amount;
+  document.getElementById('editMonth').value   = item.month || currentMonth();
+
+  // Populate category select
+  const catSelect = document.getElementById('editCategory');
+  const cats = isIncome ? incomeCategories : expenseCategories;
+  catSelect.innerHTML = cats.map(c => `<option value="${c.value}" ${item.category === c.value ? 'selected' : ''}>${c.label}</option>`).join('');
+
+  // Show/hide type-specific fields
+  document.getElementById('editFreqGroup').style.display    = isIncome   ? 'flex' : 'none';
+  document.getElementById('editExpTypeGroup').style.display = !isIncome  ? 'flex' : 'none';
+
+  if (isIncome) {
+    document.getElementById('editFreq').value = item.freq || 'mensal';
+  } else {
+    document.getElementById('editExpenseType').value = item.type || 'variavel';
+  }
+
+  document.getElementById('editModalTitle').textContent = isIncome ? '✏️ Editar Rendimento' : '✏️ Editar Gasto';
+  document.getElementById('editModal').classList.add('show');
+  document.getElementById('editDesc').focus();
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('show');
+}
+
+document.getElementById('editModalClose').addEventListener('click', closeEditModal);
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editModal')) closeEditModal();
+});
+
+document.getElementById('editForm').addEventListener('submit', e => {
+  e.preventDefault();
+
+  const id     = document.getElementById('editId').value;
+  const type   = document.getElementById('editType').value;
+  const desc   = document.getElementById('editDesc').value.trim();
+  const amount = parseFloat(document.getElementById('editAmount').value);
+  const month  = document.getElementById('editMonth').value || currentMonth();
+  const cat    = document.getElementById('editCategory').value;
+
+  if (!desc || isNaN(amount) || amount <= 0) {
+    showToast('Preencha todos os campos corretamente', 'danger'); return;
+  }
+
+  if (type === 'income') {
+    const item = state.incomes.find(i => i.id === id);
+    if (!item) return;
+    item.desc     = desc;
+    item.amount   = amount;
+    item.month    = month;
+    item.category = cat;
+    item.freq     = document.getElementById('editFreq').value;
+    renderIncomeList();
+    renderMonthlyBreakdown('income');
+  } else {
+    const item = state.expenses.find(e => e.id === id);
+    if (!item) return;
+    item.desc     = desc;
+    item.amount   = amount;
+    item.month    = month;
+    item.category = cat;
+    item.type     = document.getElementById('editExpenseType').value;
+    renderExpenseList();
+    renderMonthlyBreakdown('expense');
+  }
+
+  save();
+  renderDashboard();
+  closeEditModal();
+  showToast('Alterações salvas! ✅');
+});
 
 // ── GOALS ──────────────────────────────────────────────────
 document.querySelectorAll('.emoji-btn').forEach(btn => {
@@ -587,10 +896,10 @@ document.getElementById('goalForm').addEventListener('submit', e => {
   e.preventDefault();
   const goal = {
     id: uid(),
-    name: document.getElementById('goalName').value.trim(),
-    emoji: state.selectedEmoji,
-    total: parseFloat(document.getElementById('goalTotal').value),
-    saved: parseFloat(document.getElementById('goalSaved').value) || 0,
+    name:     document.getElementById('goalName').value.trim(),
+    emoji:    state.selectedEmoji,
+    total:    parseFloat(document.getElementById('goalTotal').value),
+    saved:    parseFloat(document.getElementById('goalSaved').value) || 0,
     deadline: document.getElementById('goalDeadline').value,
     priority: document.getElementById('goalPriority').value,
   };
@@ -612,12 +921,10 @@ function renderGoalsList() {
 
   if (state.goals.length === 0) {
     empty.style.display = 'flex';
-    // Remove all goal cards
     list.querySelectorAll('.goal-card').forEach(c => c.remove());
     return;
   }
   empty.style.display = 'none';
-
   list.innerHTML = `<div class="list-empty" id="goalsEmpty" style="display:none"></div>` +
     state.goals.map(g => goalCardHTML(g)).join('');
 }
@@ -625,19 +932,19 @@ function renderGoalsList() {
 function goalCardHTML(g) {
   const pct = Math.min(100, (g.saved / g.total) * 100);
   const remaining = Math.max(0, g.total - g.saved);
-  let gradColor = pct >= 100 ? 'linear-gradient(90deg,#10b981,#059669)'
-    : pct >= 50 ? 'linear-gradient(90deg,#6366f1,#8b5cf6)'
+  const gradColor = pct >= 100
+    ? 'linear-gradient(90deg,#10b981,#059669)'
+    : pct >= 50
+    ? 'linear-gradient(90deg,#6366f1,#8b5cf6)'
     : 'linear-gradient(90deg,#f59e0b,#ef4444)';
 
   let deadlineStr = '';
   if (g.deadline) {
-    const dl = new Date(g.deadline + 'T00:00:00');
-    const now = new Date();
-    const diff = Math.ceil((dl - now) / (1000*60*60*24));
+    const dl   = new Date(g.deadline + 'T00:00:00');
+    const diff = Math.ceil((dl - new Date()) / (1000*60*60*24));
     deadlineStr = diff > 0 ? `${diff} dias restantes` : diff === 0 ? 'Hoje!' : 'Prazo encerrado';
   }
 
-  // Monthly suggestion
   const monthsLeft = g.deadline
     ? Math.max(1, Math.ceil((new Date(g.deadline + 'T00:00:00') - new Date()) / (1000*60*60*24*30)))
     : null;
@@ -690,7 +997,7 @@ function goalCardHTML(g) {
 
 function depositGoal(id) {
   const input = document.getElementById('dep_' + id);
-  const val = parseFloat(input.value);
+  const val   = parseFloat(input.value);
   if (isNaN(val) || val <= 0) { showToast('Digite um valor válido', 'danger'); return; }
   const goal = state.goals.find(g => g.id === id);
   if (!goal) return;
@@ -720,143 +1027,130 @@ const learnContent = {
         <div class="rule-block rule-30">30%<small>Desejos</small></div>
         <div class="rule-block rule-20">20%<small>Poupança</small></div>
       </div>
-      <h4><i class="fa-solid fa-house"></i> 50% — Necessidades (o que não pode faltar)</h4>
-      <p>Aluguel/financiamento, mercado, transporte, luz, água, saúde. Se passar de 50%, você precisa cortar ou aumentar sua renda.</p>
-      <h4><i class="fa-solid fa-star"></i> 30% — Desejos (o que você quer, mas não precisa)</h4>
-      <p>Restaurantes, viagens, roupas extras, streaming, academia, lazer. Esses gastos são válidos, mas têm limite.</p>
-      <h4><i class="fa-solid fa-piggy-bank"></i> 20% — Poupança e investimentos</h4>
-      <p>Essa parte vai direto para sua reserva de emergência e investimentos. <strong>Pague-se primeiro:</strong> assim que receber, transfira os 20% antes de gastar qualquer coisa.</p>
-      <h4><i class="fa-solid fa-lightbulb"></i> Como aplicar hoje</h4>
-      <ul>
-        <li>Calcule 50%, 30% e 20% da sua renda líquida</li>
-        <li>Categorize cada gasto do mês</li>
-        <li>Veja onde está estourando o limite</li>
-        <li>Ajuste durante o mês seguinte</li>
-      </ul>
+      <h4><i class="fa-solid fa-house"></i> 50% — Necessidades</h4>
+      <p>Aluguel, mercado, transporte, luz, água, saúde. Se passar de 50%, você precisa cortar ou aumentar a renda.</p>
+      <h4><i class="fa-solid fa-star"></i> 30% — Desejos</h4>
+      <p>Restaurantes, viagens, roupas extras, streaming. Válidos, mas com limite.</p>
+      <h4><i class="fa-solid fa-piggy-bank"></i> 20% — Poupança</h4>
+      <p><strong>Pague-se primeiro:</strong> transfira os 20% assim que receber, antes de qualquer gasto.</p>
     `,
   },
   emergencia: {
     title: '🛡️ Reserva de Emergência',
     body: `
-      <p>A reserva de emergência é a <strong>base de toda vida financeira saudável</strong>. Sem ela, qualquer imprevisto — demissão, doença, carro quebrado — vira dívida.</p>
+      <p>A base de toda vida financeira saudável. Sem ela, qualquer imprevisto vira dívida.</p>
       <h4><i class="fa-solid fa-calculator"></i> Quanto guardar?</h4>
       <ul>
         <li><strong>Mínimo:</strong> 3 meses de gastos essenciais</li>
         <li><strong>Ideal:</strong> 6 meses de gastos totais</li>
-        <li><strong>Para autônomos/MEI:</strong> 12 meses, pois a renda é menos previsível</li>
+        <li><strong>Autônomos:</strong> 12 meses</li>
       </ul>
       <h4><i class="fa-solid fa-bank"></i> Onde guardar?</h4>
-      <p>O dinheiro da reserva precisa ser <strong>líquido</strong> (resgatável na hora) e <strong>seguro</strong>. Boas opções:</p>
       <ul>
-        <li><strong>Tesouro Selic:</strong> seguro, rende bem e resgata em 1 dia</li>
-        <li><strong>CDB com liquidez diária</strong> de banco grande (acima de 100% do CDI)</li>
-        <li><strong>Conta remunerada</strong> de fintechs (Nubank, Inter, C6…)</li>
+        <li><strong>Tesouro Selic</strong> — seguro e resgata em 1 dia</li>
+        <li><strong>CDB com liquidez diária</strong> — acima de 100% do CDI</li>
+        <li><strong>Conta remunerada</strong> de fintech (Nubank, Inter…)</li>
       </ul>
-      <h4><i class="fa-solid fa-triangle-exclamation"></i> O que NÃO fazer</h4>
-      <ul>
-        <li>❌ Deixar na poupança (rendimento abaixo da inflação)</li>
-        <li>❌ Investir em ações (pode cair quando você mais precisar)</li>
-        <li>❌ Gastar com oportunidades antes de completar a reserva</li>
-      </ul>
-      <h4><i class="fa-solid fa-rocket"></i> Como montar a reserva rapidinho</h4>
-      <p>Separe <strong>um valor fixo todo mês</strong> antes de qualquer gasto. Mesmo que seja R$ 50 por mês — o hábito é mais importante que o valor no início.</p>
     `,
   },
   dividas: {
     title: '💳 Como Sair das Dívidas',
     body: `
-      <p>Dívida gera dívida — os juros compostos trabalham contra você. Mas com estratégia, é possível sair do vermelho.</p>
-      <h4><i class="fa-solid fa-list-ol"></i> Passo 1: Faça um inventário completo</h4>
-      <p>Liste todas as dívidas: <strong>credor, valor total, juros mensais e parcela</strong>. Encarar a realidade é o primeiro passo.</p>
+      <p>Com estratégia certa, é possível sair do vermelho mesmo com renda limitada.</p>
       <h4><i class="fa-solid fa-snowflake"></i> Método Bola de Neve</h4>
-      <p>Quite primeiro a <strong>dívida de menor valor</strong>, independente dos juros. A satisfação de eliminar uma dívida motiva a continuar. Depois aplique o valor pago nela na próxima.</p>
+      <p>Quite a <strong>dívida de menor valor</strong> primeiro. A satisfação motiva a continuar.</p>
       <h4><i class="fa-solid fa-mountain"></i> Método Avalanche</h4>
-      <p>Quite primeiro a <strong>dívida com maior juros</strong> (normalmente cartão de crédito e cheque especial). Matematicamente economiza mais dinheiro a longo prazo.</p>
-      <h4><i class="fa-solid fa-fire"></i> Cartão de crédito e cheque especial: emergência!</h4>
-      <p>Juros de 12-15% ao mês. Se você não paga o total da fatura, troque por um empréstimo pessoal (2-5% ao mês) ou consignado. A diferença é enorme.</p>
-      <h4><i class="fa-solid fa-handshake"></i> Negocie sempre</h4>
-      <ul>
-        <li>Ligue para os credores — muitos aceitam desconto para pagamento à vista</li>
-        <li>Feirões de renegociação (Serasa Limpa Nome, feirões dos bancos) oferecem descontos de até 90%</li>
-        <li>Nunca pegue empréstimo para pagar dívidas de menor juros</li>
-      </ul>
+      <p>Quite a <strong>dívida com maior juros</strong> primeiro. Economiza mais no longo prazo.</p>
+      <h4><i class="fa-solid fa-fire"></i> Cartão e cheque especial: emergência!</h4>
+      <p>Juros de 12–15% ao mês. Troque por empréstimo pessoal (2–5% ao mês) imediatamente.</p>
     `,
   },
   orcamento: {
     title: '📋 Como Fazer um Orçamento',
     body: `
-      <p>Orçamento não é restrição — é liberdade. Quem sabe para onde vai o dinheiro, consegue direcionar para o que realmente importa.</p>
-      <h4><i class="fa-solid fa-1"></i> Liste todos os seus rendimentos</h4>
-      <p>Salário líquido, freelas, aluguéis, dividendos. Use valores reais — não o que você espera ganhar, mas o que entra no banco.</p>
+      <p>Orçamento não é restrição — é liberdade para gastar no que importa.</p>
+      <h4><i class="fa-solid fa-1"></i> Liste todos os rendimentos</h4>
+      <p>Salário líquido, freelas, aluguéis. Use valores reais do banco.</p>
       <h4><i class="fa-solid fa-2"></i> Mapeie todos os gastos</h4>
-      <p>Abra o extrato bancário e cartão dos últimos 3 meses. Categorize cada gasto. Inclua tudo — até o cafézinho.</p>
-      <h4><i class="fa-solid fa-3"></i> Compare e identifique sobras ou faltas</h4>
-      <p>Se gastos > renda: corte os variáveis primeiro. Reduza o que é desejo antes do que é necessidade.</p>
-      <h4><i class="fa-solid fa-4"></i> Defina limites por categoria</h4>
-      <p>Use a regra 50-30-20 como base. Alimente seus gastos aqui no FinançasSim todo mês.</p>
-      <h4><i class="fa-solid fa-5"></i> Revise todo mês</h4>
-      <p>Orçamento não é estático. Revise no começo de cada mês. Com o tempo, ficará automático e você terá total controle.</p>
-      <h4><i class="fa-solid fa-lightbulb"></i> Dica de ouro</h4>
-      <p>Registre os gastos <strong>na hora</strong>, não no fim do mês. Pequenas compras somam muito e são fáceis de esquecer.</p>
+      <p>Abra extratos dos últimos 3 meses. Categorize tudo — até o cafézinho.</p>
+      <h4><i class="fa-solid fa-3"></i> Compare e ajuste</h4>
+      <p>Gastos > renda: corte variáveis primeiro. Use a regra 50-30-20.</p>
+      <h4><i class="fa-solid fa-4"></i> Revise todo mês</h4>
+      <p>Lançamentos aqui no FinançasSim ajudam a manter o controle automático.</p>
     `,
   },
   investir: {
     title: '📈 Começando a Investir',
     body: `
-      <p>Antes de investir, você precisa de: ✅ reserva de emergência completa e ✅ dívidas de alto custo quitadas. Se tiver ambos, chegou a hora!</p>
-      <h4><i class="fa-solid fa-shield"></i> Renda fixa: para iniciantes</h4>
+      <p>Antes: ✅ reserva de emergência completa e ✅ dívidas de alto custo quitadas.</p>
+      <h4><i class="fa-solid fa-shield"></i> Renda fixa (para começar)</h4>
       <ul>
-        <li><strong>Tesouro Direto (Tesouro Selic):</strong> o mais seguro do país, rendimento bom, mínimo de R$ 30</li>
-        <li><strong>CDB:</strong> emitido por bancos, com garantia do FGC até R$ 250k. Busque acima de 100% do CDI</li>
-        <li><strong>LCI/LCA:</strong> isentos de IR para pessoa física — ótima opção</li>
+        <li><strong>Tesouro Direto (Selic):</strong> mais seguro do país, mínimo R$ 30</li>
+        <li><strong>CDB:</strong> garantia do FGC até R$ 250k — busque acima de 100% do CDI</li>
+        <li><strong>LCI/LCA:</strong> isentos de IR para pessoa física</li>
       </ul>
-      <h4><i class="fa-solid fa-chart-line"></i> Renda variável: para o médio/longo prazo</h4>
-      <ul>
-        <li><strong>Fundos de índice (ETFs):</strong> ex. BOVA11 (Ibovespa) — diversificação automática</li>
-        <li><strong>FIIs (Fundos Imobiliários):</strong> pagam dividendos mensais, acessíveis a partir de ~R$ 10</li>
-        <li><strong>Ações:</strong> maior potencial e maior risco. Só após entender o básico</li>
-      </ul>
-      <h4><i class="fa-solid fa-calendar"></i> A regra mais importante</h4>
-      <p><strong>Consistência bate performance.</strong> Investir R$ 300/mês todo mês por 20 anos é muito melhor que esperar ter R$ 100.000 para começar. Os juros compostos precisam de tempo para funcionar.</p>
+      <h4><i class="fa-solid fa-calendar"></i> Regra mais importante</h4>
+      <p><strong>Consistência bate performance.</strong> R$ 300/mês por 20 anos supera esperar ter R$ 100.000.</p>
     `,
   },
   habitos: {
     title: '🧠 Hábitos que Mudam Tudo',
     body: `
-      <p>A maioria dos problemas financeiros não é falta de dinheiro — é falta de hábito. Estas práticas simples transformam finanças em piloto automático.</p>
-      <h4><i class="fa-solid fa-sun"></i> Hábito 1: Revise as finanças toda semana</h4>
-      <p>5 minutos toda segunda-feira. Veja quanto gastou, quanto tem e se está no caminho. Isso evita surpresas no fim do mês.</p>
-      <h4><i class="fa-solid fa-robot"></i> Hábito 2: Automatize tudo que puder</h4>
-      <p>Configure transferência automática no dia do salário para poupança/investimento. O que sai antes de ver, não sente falta.</p>
-      <h4><i class="fa-solid fa-cart-shopping"></i> Hábito 3: Regra das 24 horas</h4>
-      <p>Antes de qualquer compra não planejada acima de R$ 100, espere 24 horas. A maioria das compras por impulso passa. Economize muito assim.</p>
-      <h4><i class="fa-solid fa-tag"></i> Hábito 4: Compare antes de comprar</h4>
-      <p>Pesquise em pelo menos 3 lugares. Use aplicativos de cashback. Compre à vista sempre que possível — e peça desconto.</p>
-      <h4><i class="fa-solid fa-heart"></i> Hábito 5: Diferencie desejo de necessidade</h4>
-      <p>Antes de gastar, pergunte: "Isso vai me deixar mais feliz daqui a 1 ano?" Se não, provavelmente é impulso.</p>
-      <h4><i class="fa-solid fa-book"></i> Hábito 6: Leia sobre finanças</h4>
-      <p>30 minutos por semana lendo sobre finanças pessoais muda a mentalidade completamente. Sugestões: "Pai Rico, Pai Pobre", "O Homem Mais Rico da Babilônia", "Me Poupe!" (Nathalia Arcuri).</p>
+      <h4><i class="fa-solid fa-robot"></i> Automatize tudo</h4>
+      <p>Configure transferência automática no dia do salário para poupança. O que sai antes de ver, não sente falta.</p>
+      <h4><i class="fa-solid fa-cart-shopping"></i> Regra das 24 horas</h4>
+      <p>Antes de qualquer compra não planejada acima de R$ 100, espere 24h. A maioria passa.</p>
+      <h4><i class="fa-solid fa-sun"></i> Revise as finanças toda semana</h4>
+      <p>5 minutos toda segunda-feira evitam surpresas no fim do mês.</p>
+      <h4><i class="fa-solid fa-heart"></i> Desejo vs Necessidade</h4>
+      <p>Pergunte: "Isso vai me deixar mais feliz daqui a 1 ano?" Se não, provavelmente é impulso.</p>
     `,
   },
 };
 
-document.querySelectorAll('.learn-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
+// Free cards click
+document.querySelectorAll('.learn-card:not(.learn-card-premium) .learn-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
     const card = e.target.closest('.learn-card');
-    if (!card) return;
-    const module = card.dataset.module;
-    openLearnModal(module);
+    if (card) openLearnModal(card.dataset.module);
   });
 });
-document.querySelectorAll('.learn-card').forEach(card => {
+document.querySelectorAll('.learn-card:not(.learn-card-premium)').forEach(card => {
   card.addEventListener('click', () => openLearnModal(card.dataset.module));
+});
+
+// Premium cards → open paywall
+document.querySelectorAll('.learn-card-premium').forEach(card => {
+  card.addEventListener('click', openPaywallModal);
+});
+document.querySelectorAll('.btn-premium-unlock').forEach(btn => {
+  btn.addEventListener('click', e => { e.stopPropagation(); openPaywallModal(); });
+});
+
+function openPaywallModal() {
+  document.getElementById('paywallModal').classList.add('show');
+}
+function closePaywallModal() {
+  document.getElementById('paywallModal').classList.remove('show');
+}
+
+document.getElementById('paywallClose').addEventListener('click', closePaywallModal);
+document.getElementById('paywallSkip').addEventListener('click', closePaywallModal);
+document.getElementById('paywallModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('paywallModal')) closePaywallModal();
+});
+
+document.getElementById('paywallCta').addEventListener('click', () => {
+  // Simulate payment flow — replace with real payment integration
+  showToast('Redirecionando para o pagamento... 🔐');
+  setTimeout(() => closePaywallModal(), 1800);
 });
 
 function openLearnModal(module) {
   const content = learnContent[module];
   if (!content) return;
   document.getElementById('modalTitle').textContent = content.title;
-  document.getElementById('modalBody').innerHTML = content.body;
+  document.getElementById('modalBody').innerHTML    = content.body;
   document.getElementById('learnModal').classList.add('show');
 }
 
@@ -869,25 +1163,18 @@ document.getElementById('learnModal').addEventListener('click', e => {
   }
 });
 
-// ── Security helper ────────────────────────────────────────
-function escHtml(str) {
-  const div = document.createElement('div');
-  div.appendChild(document.createTextNode(str));
-  return div.innerHTML;
-}
-
 // ── Expose globals for inline onclick ──────────────────────
 window.deleteIncome  = deleteIncome;
 window.deleteExpense = deleteExpense;
 window.deleteGoal    = deleteGoal;
 window.depositGoal   = depositGoal;
+window.openEditModal = openEditModal;
 
 // ── Init ───────────────────────────────────────────────────
 function init() {
   load();
   applyTheme();
 
-  // Set default month
   const m = currentMonth();
   document.getElementById('incomeMonth').value  = m;
   document.getElementById('expenseMonth').value = m;
@@ -896,36 +1183,59 @@ function init() {
   renderIncomeList();
   renderExpenseList();
   renderGoalsList();
+  renderMonthlyBreakdown('income');
+  renderMonthlyBreakdown('expense');
 
-  // Demo data for first-time users
   if (state.incomes.length === 0 && state.expenses.length === 0 && state.goals.length === 0) {
     loadDemoData();
   }
 }
 
 function loadDemoData() {
+  const m = currentMonth();
+  // Helper to create month key N months ago
+  const prevMonth = (n) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - n);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  };
+
   state.incomes = [
-    { id: uid(), desc: 'Salário CLT', amount: 4500, category: 'salario', freq: 'mensal', month: currentMonth() },
-    { id: uid(), desc: 'Freela Design', amount: 800, category: 'freela', freq: 'unico', month: currentMonth() },
+    { id: uid(), desc: 'Salário CLT',   amount: 4500, category: 'salario',     freq: 'mensal', month: m },
+    { id: uid(), desc: 'Salário CLT',   amount: 4500, category: 'salario',     freq: 'mensal', month: prevMonth(1) },
+    { id: uid(), desc: 'Salário CLT',   amount: 4500, category: 'salario',     freq: 'mensal', month: prevMonth(2) },
+    { id: uid(), desc: 'Freela Design', amount: 800,  category: 'freela',      freq: 'unico',  month: m },
+    { id: uid(), desc: 'Freela Design', amount: 650,  category: 'freela',      freq: 'unico',  month: prevMonth(1) },
+    { id: uid(), desc: '13º Salário',   amount: 4500, category: 'bonus',       freq: 'anual',  month: prevMonth(3) },
   ];
   state.expenses = [
-    { id: uid(), desc: 'Aluguel', amount: 1200, type: 'fixo', category: 'moradia', month: currentMonth() },
-    { id: uid(), desc: 'Supermercado', amount: 600, type: 'variavel', category: 'alimentacao', month: currentMonth() },
-    { id: uid(), desc: 'Transporte (combustível)', amount: 350, type: 'fixo', category: 'transporte', month: currentMonth() },
-    { id: uid(), desc: 'Netflix + Spotify + Disney+', amount: 90, type: 'fixo', category: 'assinaturas', month: currentMonth() },
-    { id: uid(), desc: 'Academia', amount: 89, type: 'fixo', category: 'saude', month: currentMonth() },
-    { id: uid(), desc: 'Restaurantes / delivery', amount: 400, type: 'variavel', category: 'alimentacao', month: currentMonth() },
-    { id: uid(), desc: 'Parcela cartão de crédito', amount: 280, type: 'fixo', category: 'dividas', month: currentMonth() },
+    { id: uid(), desc: 'Aluguel',                   amount: 1200, type:'fixo',    category:'moradia',     month: m },
+    { id: uid(), desc: 'Aluguel',                   amount: 1200, type:'fixo',    category:'moradia',     month: prevMonth(1) },
+    { id: uid(), desc: 'Aluguel',                   amount: 1200, type:'fixo',    category:'moradia',     month: prevMonth(2) },
+    { id: uid(), desc: 'Supermercado',               amount: 600,  type:'variavel',category:'alimentacao', month: m },
+    { id: uid(), desc: 'Supermercado',               amount: 580,  type:'variavel',category:'alimentacao', month: prevMonth(1) },
+    { id: uid(), desc: 'Transporte',                 amount: 350,  type:'fixo',    category:'transporte',  month: m },
+    { id: uid(), desc: 'Transporte',                 amount: 350,  type:'fixo',    category:'transporte',  month: prevMonth(1) },
+    { id: uid(), desc: 'Netflix + Spotify + Disney+',amount: 90,   type:'fixo',    category:'assinaturas', month: m },
+    { id: uid(), desc: 'Netflix + Spotify + Disney+',amount: 90,   type:'fixo',    category:'assinaturas', month: prevMonth(1) },
+    { id: uid(), desc: 'Academia',                   amount: 89,   type:'fixo',    category:'saude',       month: m },
+    { id: uid(), desc: 'Restaurantes / delivery',    amount: 400,  type:'variavel',category:'alimentacao', month: m },
+    { id: uid(), desc: 'Restaurantes / delivery',    amount: 320,  type:'variavel',category:'alimentacao', month: prevMonth(1) },
+    { id: uid(), desc: 'Parcela cartão',             amount: 280,  type:'fixo',    category:'dividas',     month: m },
+    { id: uid(), desc: 'Parcela cartão',             amount: 280,  type:'fixo',    category:'dividas',     month: prevMonth(1) },
+    { id: uid(), desc: 'Compras de fim de ano',      amount: 1800, type:'variavel',category:'vestuario',   month: prevMonth(3) },
   ];
   state.goals = [
-    { id: uid(), name: 'Viagem para Lisboa', emoji: '✈️', total: 12000, saved: 3200, deadline: '2026-12-01', priority: 'alta' },
-    { id: uid(), name: 'Reserva de emergência', emoji: '🛡️', total: 15000, saved: 5000, deadline: '2026-08-01', priority: 'alta' },
+    { id: uid(), name: 'Viagem para Lisboa',   emoji:'✈️', total:12000, saved:3200, deadline:'2026-12-01', priority:'alta' },
+    { id: uid(), name: 'Reserva de emergência',emoji:'🛡️', total:15000, saved:5000, deadline:'2026-08-01', priority:'alta' },
   ];
   save();
   renderDashboard();
   renderIncomeList();
   renderExpenseList();
   renderGoalsList();
+  renderMonthlyBreakdown('income');
+  renderMonthlyBreakdown('expense');
   showToast('Dados de exemplo carregados! Edite à vontade 😊');
 }
 
