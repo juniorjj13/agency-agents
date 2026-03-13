@@ -52,7 +52,7 @@
 
   <div class="sidebar-footer">
     <div class="health-mini" id="healthMini">
-      <div class="health-label">Saúde Financeira</div>
+      <div class="health-label" data-i18n="health_label">Saúde Financeira</div>
       <div class="health-bar-wrap"><div class="health-bar-fill" id="healthBarFill"></div></div>
       <div class="health-score" id="healthScore">--</div>
     </div>
@@ -73,14 +73,14 @@
         <div class="dropdown-user" id="dropdownUser">
           <div class="dropdown-avatar" id="dropdownAvatar">--</div>
           <div>
-            <div class="dropdown-name" id="dropdownName">Visitante</div>
-            <div class="dropdown-email" id="dropdownEmail">Modo local</div>
+            <div class="dropdown-name" id="dropdownName" data-i18n="visitor">Visitante</div>
+            <div class="dropdown-email" id="dropdownEmail" data-i18n="local_mode">Modo local</div>
           </div>
         </div>
         <div class="dropdown-sync" id="dropdownSync"></div>
         <div class="dropdown-divider"></div>
-        <button class="dropdown-item" id="dropdownAuthBtn"><i class="fa-solid fa-right-to-bracket"></i> Entrar / Criar conta</button>
-        <button class="dropdown-item dropdown-item-danger" id="dropdownLogout" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+        <button class="dropdown-item" id="dropdownAuthBtn"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="sign_in">Entrar / Criar conta</span></button>
+        <button class="dropdown-item dropdown-item-danger" id="dropdownLogout" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="sign_out">Sair</span></button>
       </div>
     </div>
   </div>
@@ -96,14 +96,14 @@
   <section class="page active" id="page-dashboard">
     <div class="page-hero">
       <div class="hero-text">
-        <h1>Olá! Vamos cuidar do seu dinheiro? <span class="wave">👋</span></h1>
-        <p>Aqui você tem uma visão completa da sua saúde financeira — simples e sem complicação.</p>
+        <h1 data-i18n="hero_greeting">Olá! Vamos cuidar do seu dinheiro? 👋</h1>
+        <p data-i18n="hero_sub">Aqui você tem uma visão completa da sua saúde financeira — simples e sem complicação.</p>
       </div>
       <div class="hero-badge" id="heroBadge">
         <div class="badge-icon"><i class="fa-solid fa-heart-pulse"></i></div>
         <div>
-          <div class="badge-label">Saúde Financeira</div>
-          <div class="badge-value" id="badgeValue">Configure seus dados</div>
+          <div class="badge-label" data-i18n="health_badge">Saúde Financeira</div>
+          <div class="badge-value" id="badgeValue" data-i18n="badge_config">Configure seus dados</div>
         </div>
       </div>
     </div>
@@ -168,20 +168,20 @@
     <div class="charts-row">
       <div class="card chart-card">
         <div class="card-header">
-          <h3><i class="fa-solid fa-chart-donut"></i> Onde vai seu dinheiro?</h3>
+          <h3><i class="fa-solid fa-chart-donut"></i> <span data-i18n="chart_expense_title">Onde vai seu dinheiro?</span></h3>
         </div>
         <div class="chart-wrap">
           <canvas id="expenseChart"></canvas>
           <div class="chart-empty" id="expenseChartEmpty">
             <i class="fa-solid fa-chart-pie"></i>
-            <p>Adicione seus gastos para ver o gráfico</p>
+            <p data-i18n="chart_expense_empty">Adicione seus gastos para ver o gráfico</p>
           </div>
         </div>
       </div>
 
       <div class="card chart-card">
         <div class="card-header">
-          <h3><i class="fa-solid fa-chart-bar"></i> Este mês: Receita vs Gastos</h3>
+          <h3><i class="fa-solid fa-chart-bar"></i> <span data-i18n="chart_balance_title">Este mês: Receita vs Gastos</span></h3>
         </div>
         <div class="chart-wrap">
           <canvas id="balanceChart"></canvas>
@@ -192,14 +192,14 @@
     <!-- 12-month chart -->
     <div class="card">
       <div class="card-header">
-        <h3><i class="fa-solid fa-calendar-days"></i> Evolução — Últimos 12 meses</h3>
+        <h3><i class="fa-solid fa-calendar-days"></i> <span data-i18n="chart_12m_title">Evolução — Últimos 12 meses</span></h3>
         <div class="month-kpis" id="dashMonthKpis"></div>
       </div>
       <div class="chart-wrap" style="min-height:280px">
         <canvas id="dashMonthlyChart"></canvas>
         <div class="chart-empty" id="dashMonthlyEmpty">
           <i class="fa-solid fa-chart-bar"></i>
-          <p>Adicione lançamentos para ver a evolução mensal</p>
+          <p data-i18n="chart_12m_empty">Adicione lançamentos para ver a evolução mensal</p>
         </div>
       </div>
     </div>
@@ -207,12 +207,12 @@
     <!-- Insights / dicas -->
     <div class="card">
       <div class="card-header">
-        <h3><i class="fa-solid fa-lightbulb"></i> Pontos de Melhora</h3>
+        <h3><i class="fa-solid fa-lightbulb"></i> <span data-i18n="insights_title">Pontos de Melhora</span></h3>
       </div>
       <div class="insights-list" id="insightsList">
         <div class="insight-empty">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <p>Adicione seus rendimentos e gastos para receber dicas personalizadas!</p>
+          <p data-i18n="insights_empty">Adicione seus rendimentos e gastos para receber dicas personalizadas!</p>
         </div>
       </div>
     </div>
@@ -220,8 +220,8 @@
     <!-- Goals preview -->
     <div class="card" id="goalsPreviewCard" style="display:none">
       <div class="card-header">
-        <h3><i class="fa-solid fa-bullseye"></i> Suas Metas</h3>
-        <button class="btn-link" data-page="goals">Ver todas</button>
+        <h3><i class="fa-solid fa-bullseye"></i> <span data-i18n="goals_preview_title">Suas Metas</span></h3>
+        <button class="btn-link" data-page="goals" data-i18n="goals_view_all">Ver todas</button>
       </div>
       <div class="goals-preview-list" id="goalsPreviewList"></div>
     </div>
@@ -230,67 +230,67 @@
   <!-- ========== PAGE: INCOME ========== -->
   <section class="page" id="page-income">
     <div class="page-header-block">
-      <h2><i class="fa-solid fa-arrow-trend-up"></i> Meus Rendimentos</h2>
-      <p>Tudo que entra no seu bolso — salário, freelas, aluguéis, dividendos…</p>
+      <h2><i class="fa-solid fa-arrow-trend-up"></i> <span data-i18n="income_page_h">Meus Rendimentos</span></h2>
+      <p data-i18n="income_page_sub">Tudo que entra no seu bolso — salário, freelas, aluguéis, dividendos…</p>
     </div>
 
     <div class="two-col">
       <!-- Form -->
       <div class="card form-card">
-        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Adicionar Rendimento</h3></div>
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> <span data-i18n="income_form_h">Adicionar Rendimento</span></h3></div>
         <form id="incomeForm" class="finance-form">
           <div class="form-group">
-            <label>Descrição</label>
-            <input type="text" id="incomeDesc" placeholder="ex: Salário, Freela, Aluguel…" required />
+            <label data-i18n="lbl_desc">Descrição</label>
+            <input type="text" id="incomeDesc" data-i18n-ph="income_desc_ph" placeholder="ex: Salário, Freela, Aluguel…" required />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Valor (R$)</label>
+              <label data-i18n="lbl_amount">Valor (R$)</label>
               <input type="number" id="incomeAmount" placeholder="0,00" min="0" step="0.01" required />
             </div>
             <div class="form-group">
-              <label>Categoria</label>
+              <label data-i18n="lbl_category">Categoria</label>
               <select id="incomeCategory">
-                <option value="salario">💼 Salário</option>
-                <option value="freela">💻 Freela / Autônomo</option>
-                <option value="investimento">📈 Investimentos</option>
-                <option value="aluguel">🏠 Aluguel</option>
-                <option value="bonus">🎁 Bônus / 13º</option>
-                <option value="pensao">👨‍👩‍👧 Pensão / Benefício</option>
-                <option value="outros">✨ Outros</option>
+                <option value="salario" data-i18n="cat_salario">💼 Salário</option>
+                <option value="freela" data-i18n="cat_freela">💻 Freela / Autônomo</option>
+                <option value="investimento" data-i18n="cat_investimento">📈 Investimentos</option>
+                <option value="aluguel" data-i18n="cat_aluguel">🏠 Aluguel</option>
+                <option value="bonus" data-i18n="cat_bonus">🎁 Bônus / 13º</option>
+                <option value="pensao" data-i18n="cat_pensao">👨‍👩‍👧 Pensão / Benefício</option>
+                <option value="outros" data-i18n="cat_outros">✨ Outros</option>
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Frequência</label>
+              <label data-i18n="lbl_freq">Frequência</label>
               <select id="incomeFreq">
-                <option value="mensal">Mensal</option>
-                <option value="semanal">Semanal</option>
-                <option value="quinzenal">Quinzenal</option>
-                <option value="anual">Anual</option>
-                <option value="unico">Único (não recorrente)</option>
+                <option value="mensal" data-i18n="freq_mensal">Mensal</option>
+                <option value="semanal" data-i18n="freq_semanal">Semanal</option>
+                <option value="quinzenal" data-i18n="freq_quinzenal">Quinzenal</option>
+                <option value="anual" data-i18n="freq_anual">Anual</option>
+                <option value="unico" data-i18n="freq_unico">Único (não recorrente)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Mês de referência</label>
+              <label data-i18n="lbl_month">Mês de referência</label>
               <input type="month" id="incomeMonth" />
             </div>
           </div>
-          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Adicionar Rendimento</button>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> <span data-i18n="income_btn">Adicionar Rendimento</span></button>
         </form>
       </div>
 
       <!-- List -->
       <div class="card list-card">
         <div class="card-header">
-          <h3><i class="fa-solid fa-list"></i> Rendimentos cadastrados</h3>
+          <h3><i class="fa-solid fa-list"></i> <span data-i18n="income_list_h">Rendimentos cadastrados</span></h3>
           <div class="total-chip income-chip" id="totalIncomeChip">Total: R$ 0,00</div>
         </div>
         <div class="finance-list" id="incomeList">
           <div class="list-empty">
             <i class="fa-solid fa-inbox"></i>
-            <p>Nenhum rendimento cadastrado ainda.</p>
+            <p data-i18n="income_list_empty">Nenhum rendimento cadastrado ainda.</p>
           </div>
         </div>
       </div>
@@ -299,9 +299,9 @@
     <!-- Monthly income breakdown -->
     <div class="card monthly-card" id="incomeMonthlyCard" style="display:none">
       <div class="card-header">
-        <h3><i class="fa-solid fa-calendar-days"></i> Por mês — últimos 12 meses</h3>
+        <h3><i class="fa-solid fa-calendar-days"></i> <span data-i18n="income_12m_h">Por mês — últimos 12 meses</span></h3>
         <div class="monthly-kpi-row">
-          <div class="monthly-kpi income-chip">Acumulado: <strong id="incomeAccumulated">R$ 0,00</strong></div>
+          <div class="monthly-kpi income-chip"><span data-i18n="income_accum">Acumulado:</span> <strong id="incomeAccumulated">R$ 0,00</strong></div>
           <div class="monthly-kpi" id="incomeMonthAvg"></div>
         </div>
       </div>
@@ -319,72 +319,72 @@
   <!-- ========== PAGE: EXPENSES ========== -->
   <section class="page" id="page-expenses">
     <div class="page-header-block">
-      <h2><i class="fa-solid fa-arrow-trend-down"></i> Meus Gastos</h2>
-      <p>Controle cada centavo — fixos (aluguel, escola) e variáveis (mercado, lazer…)</p>
+      <h2><i class="fa-solid fa-arrow-trend-down"></i> <span data-i18n="expenses_page_h">Meus Gastos</span></h2>
+      <p data-i18n="expenses_page_sub">Controle cada centavo — fixos (aluguel, escola) e variáveis (mercado, lazer…)</p>
     </div>
 
     <div class="two-col">
       <!-- Form -->
       <div class="card form-card">
-        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Adicionar Gasto</h3></div>
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> <span data-i18n="expense_form_h">Adicionar Gasto</span></h3></div>
         <form id="expenseForm" class="finance-form">
           <div class="form-group">
-            <label>Descrição</label>
-            <input type="text" id="expenseDesc" placeholder="ex: Aluguel, Supermercado, Netflix…" required />
+            <label data-i18n="lbl_desc">Descrição</label>
+            <input type="text" id="expenseDesc" data-i18n-ph="expense_desc_ph" placeholder="ex: Aluguel, Supermercado, Netflix…" required />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Valor (R$)</label>
+              <label data-i18n="lbl_amount">Valor (R$)</label>
               <input type="number" id="expenseAmount" placeholder="0,00" min="0" step="0.01" required />
             </div>
             <div class="form-group">
-              <label>Tipo</label>
+              <label data-i18n="lbl_type">Tipo</label>
               <select id="expenseType">
-                <option value="fixo">🔒 Fixo (todo mês)</option>
-                <option value="variavel">🔄 Variável</option>
+                <option value="fixo" data-i18n="type_fixed">🔒 Fixo (todo mês)</option>
+                <option value="variavel" data-i18n="type_variable">🔄 Variável</option>
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Categoria</label>
+              <label data-i18n="lbl_category">Categoria</label>
               <select id="expenseCategory">
-                <option value="moradia">🏠 Moradia</option>
-                <option value="alimentacao">🍽️ Alimentação</option>
-                <option value="transporte">🚗 Transporte</option>
-                <option value="saude">💊 Saúde</option>
-                <option value="educacao">📚 Educação</option>
-                <option value="lazer">🎉 Lazer</option>
-                <option value="vestuario">👕 Vestuário</option>
-                <option value="assinaturas">📱 Assinaturas</option>
-                <option value="dividas">💳 Dívidas / Parcelas</option>
-                <option value="outros">✨ Outros</option>
+                <option value="moradia" data-i18n="exp_moradia">🏠 Moradia</option>
+                <option value="alimentacao" data-i18n="exp_alimentacao">🍽️ Alimentação</option>
+                <option value="transporte" data-i18n="exp_transporte">🚗 Transporte</option>
+                <option value="saude" data-i18n="exp_saude">💊 Saúde</option>
+                <option value="educacao" data-i18n="exp_educacao">📚 Educação</option>
+                <option value="lazer" data-i18n="exp_lazer">🎉 Lazer</option>
+                <option value="vestuario" data-i18n="exp_vestuario">👕 Vestuário</option>
+                <option value="assinaturas" data-i18n="exp_assinaturas">📱 Assinaturas</option>
+                <option value="dividas" data-i18n="exp_dividas">💳 Dívidas / Parcelas</option>
+                <option value="outros" data-i18n="cat_outros">✨ Outros</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Mês de referência</label>
+              <label data-i18n="lbl_month">Mês de referência</label>
               <input type="month" id="expenseMonth" />
             </div>
           </div>
-          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Adicionar Gasto</button>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> <span data-i18n="expense_btn">Adicionar Gasto</span></button>
         </form>
       </div>
 
       <!-- List -->
       <div class="card list-card">
         <div class="card-header">
-          <h3><i class="fa-solid fa-list"></i> Gastos cadastrados</h3>
+          <h3><i class="fa-solid fa-list"></i> <span data-i18n="expense_list_h">Gastos cadastrados</span></h3>
           <div class="total-chip expense-chip" id="totalExpenseChip">Total: R$ 0,00</div>
         </div>
         <div class="tabs">
-          <button class="tab active" data-filter="all">Todos</button>
-          <button class="tab" data-filter="fixo">Fixos</button>
-          <button class="tab" data-filter="variavel">Variáveis</button>
+          <button class="tab active" data-filter="all" data-i18n="tab_all">Todos</button>
+          <button class="tab" data-filter="fixo" data-i18n="tab_fixed">Fixos</button>
+          <button class="tab" data-filter="variavel" data-i18n="tab_variable">Variáveis</button>
         </div>
         <div class="finance-list" id="expenseList">
           <div class="list-empty">
             <i class="fa-solid fa-inbox"></i>
-            <p>Nenhum gasto cadastrado ainda.</p>
+            <p data-i18n="expense_list_empty">Nenhum gasto cadastrado ainda.</p>
           </div>
         </div>
       </div>
@@ -393,9 +393,9 @@
     <!-- Monthly expense breakdown -->
     <div class="card monthly-card" id="expenseMonthlyCard" style="display:none">
       <div class="card-header">
-        <h3><i class="fa-solid fa-calendar-days"></i> Por mês — últimos 12 meses</h3>
+        <h3><i class="fa-solid fa-calendar-days"></i> <span data-i18n="expense_12m_h">Por mês — últimos 12 meses</span></h3>
         <div class="monthly-kpi-row">
-          <div class="monthly-kpi expense-chip">Acumulado: <strong id="expenseAccumulated">R$ 0,00</strong></div>
+          <div class="monthly-kpi expense-chip"><span data-i18n="expense_accum">Acumulado:</span> <strong id="expenseAccumulated">R$ 0,00</strong></div>
           <div class="monthly-kpi" id="expenseMonthAvg"></div>
         </div>
       </div>
@@ -413,21 +413,21 @@
   <!-- ========== PAGE: GOALS ========== -->
   <section class="page" id="page-goals">
     <div class="page-header-block">
-      <h2><i class="fa-solid fa-bullseye"></i> Minhas Metas</h2>
-      <p>Defina objetivos e acompanhe o progresso — viagem, carro, reserva de emergência…</p>
+      <h2><i class="fa-solid fa-bullseye"></i> <span data-i18n="goals_page_h">Minhas Metas</span></h2>
+      <p data-i18n="goals_page_sub">Defina objetivos e acompanhe o progresso — viagem, carro, reserva de emergência…</p>
     </div>
 
     <div class="two-col">
       <!-- Form -->
       <div class="card form-card">
-        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Nova Meta</h3></div>
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> <span data-i18n="goal_form_h">Nova Meta</span></h3></div>
         <form id="goalForm" class="finance-form">
           <div class="form-group">
-            <label>Nome da meta</label>
-            <input type="text" id="goalName" placeholder="ex: Viagem para Europa, Carro novo…" required />
+            <label data-i18n="lbl_name">Nome da meta</label>
+            <input type="text" id="goalName" data-i18n-ph="goal_name_ph" placeholder="ex: Viagem para Europa, Carro novo…" required />
           </div>
           <div class="form-group">
-            <label>Escolha um ícone</label>
+            <label data-i18n="lbl_icon">Escolha um ícone</label>
             <div class="emoji-picker" id="emojiPicker">
               <button type="button" class="emoji-btn active" data-emoji="✈️">✈️</button>
               <button type="button" class="emoji-btn" data-emoji="🚗">🚗</button>
@@ -443,29 +443,29 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Valor total da meta (R$)</label>
+              <label data-i18n="lbl_total_goal">Valor total da meta (R$)</label>
               <input type="number" id="goalTotal" placeholder="ex: 15000" min="1" step="0.01" required />
             </div>
             <div class="form-group">
-              <label>Já tenho guardado (R$)</label>
+              <label data-i18n="lbl_saved">Já tenho guardado (R$)</label>
               <input type="number" id="goalSaved" placeholder="0" min="0" step="0.01" value="0" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Prazo desejado</label>
+              <label data-i18n="lbl_deadline">Prazo desejado</label>
               <input type="date" id="goalDeadline" />
             </div>
             <div class="form-group">
-              <label>Prioridade</label>
+              <label data-i18n="lbl_priority">Prioridade</label>
               <select id="goalPriority">
-                <option value="alta">🔴 Alta</option>
-                <option value="media" selected>🟡 Média</option>
-                <option value="baixa">🟢 Baixa</option>
+                <option value="alta" data-i18n="priority_high">🔴 Alta</option>
+                <option value="media" selected data-i18n="priority_med">🟡 Média</option>
+                <option value="baixa" data-i18n="priority_low">🟢 Baixa</option>
               </select>
             </div>
           </div>
-          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Criar Meta</button>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> <span data-i18n="goal_btn">Criar Meta</span></button>
         </form>
       </div>
 
@@ -473,7 +473,7 @@
       <div class="goals-full-list" id="goalsFullList">
         <div class="list-empty" id="goalsEmpty">
           <i class="fa-solid fa-bullseye"></i>
-          <p>Nenhuma meta criada ainda.<br>Comece definindo um objetivo!</p>
+          <p><span data-i18n="goal_empty">Nenhuma meta criada ainda.</span><br><span data-i18n="goal_empty_sub">Comece definindo um objetivo!</span></p>
         </div>
       </div>
     </div>
@@ -482,8 +482,8 @@
   <!-- ========== PAGE: DEBTS ========== -->
   <section class="page" id="page-debts">
     <div class="page-header-block">
-      <h2><i class="fa-solid fa-credit-card"></i> Minhas Dívidas</h2>
-      <p>Controle total das suas dívidas — financiamentos, hipoteca, cartão e mais.</p>
+      <h2><i class="fa-solid fa-credit-card"></i> <span data-i18n="debts_page_h">Minhas Dívidas</span></h2>
+      <p data-i18n="debts_page_sub">Controle total das suas dívidas — financiamentos, hipoteca, cartão e mais.</p>
     </div>
 
     <!-- KPI Cards -->
@@ -491,33 +491,33 @@
       <div class="kpi-card debt-kpi-total">
         <div class="kpi-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Saldo Devedor Total</div>
+          <div class="kpi-label" data-i18n="debt_kpi_total_lbl">Saldo Devedor Total</div>
           <div class="kpi-value" id="kpiDebtTotal">R$ 0,00</div>
-          <div class="kpi-sub" id="kpiDebtCount">nenhuma dívida</div>
+          <div class="kpi-sub" id="kpiDebtCount" data-i18n="debt_kpi_none">nenhuma dívida</div>
         </div>
       </div>
       <div class="kpi-card debt-kpi-monthly">
         <div class="kpi-icon"><i class="fa-solid fa-calendar-check"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Parcela Mensal Total</div>
+          <div class="kpi-label" data-i18n="debt_kpi_monthly_lbl">Parcela Mensal Total</div>
           <div class="kpi-value" id="kpiDebtMonthly">R$ 0,00</div>
-          <div class="kpi-sub" id="kpiDebtCommit">do orçamento mensal</div>
+          <div class="kpi-sub" id="kpiDebtCommit" data-i18n="debt_kpi_budget">do orçamento mensal</div>
         </div>
       </div>
       <div class="kpi-card debt-kpi-overdue" id="kpiDebtOverdueCard">
         <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Em Atraso</div>
+          <div class="kpi-label" data-i18n="debt_kpi_overdue_lbl">Em Atraso</div>
           <div class="kpi-value" id="kpiDebtOverdue">0</div>
-          <div class="kpi-sub" id="kpiDebtOverdueSub">sem atrasos</div>
+          <div class="kpi-sub" id="kpiDebtOverdueSub" data-i18n="debt_kpi_no_overdue">sem atrasos</div>
         </div>
       </div>
       <div class="kpi-card debt-kpi-burden">
         <div class="kpi-icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
         <div class="kpi-info">
-          <div class="kpi-label">Comprometimento</div>
+          <div class="kpi-label" data-i18n="debt_kpi_burden_lbl">Comprometimento</div>
           <div class="kpi-value" id="kpiDebtBurden">0%</div>
-          <div class="kpi-sub">da renda com parcelas</div>
+          <div class="kpi-sub" data-i18n="debt_kpi_burden_sub">da renda com parcelas</div>
         </div>
       </div>
     </div>
@@ -527,101 +527,101 @@
     <div class="two-col">
       <!-- Form -->
       <div class="card form-card">
-        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Adicionar Dívida</h3></div>
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> <span data-i18n="debt_form_h">Adicionar Dívida</span></h3></div>
         <form id="debtForm" class="finance-form">
           <div class="form-group">
-            <label>Nome / Descrição</label>
-            <input type="text" id="debtName" placeholder="ex: Financiamento do Carro, Cartão Nubank…" required />
+            <label data-i18n="lbl_debt_name">Nome / Descrição</label>
+            <input type="text" id="debtName" data-i18n-ph="debt_name_ph" placeholder="ex: Financiamento do Carro, Cartão Nubank…" required />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Tipo</label>
+              <label data-i18n="lbl_type">Tipo</label>
               <select id="debtType">
-                <option value="bancaria">🏦 Bancária</option>
-                <option value="hipoteca">🏠 Hipoteca / Imóvel</option>
-                <option value="carro">🚗 Financiamento Carro</option>
-                <option value="cartao">💳 Cartão de Crédito</option>
-                <option value="pessoal">👤 Empréstimo Pessoal</option>
-                <option value="consorcio">🤝 Consórcio</option>
-                <option value="outros">✨ Outros</option>
+                <option value="bancaria" data-i18n="debt_form_bancaria">🏦 Bancária</option>
+                <option value="hipoteca" data-i18n="debt_form_hipoteca">🏠 Hipoteca / Imóvel</option>
+                <option value="carro" data-i18n="debt_form_carro">🚗 Financiamento Carro</option>
+                <option value="cartao" data-i18n="debt_form_cartao">💳 Cartão de Crédito</option>
+                <option value="pessoal" data-i18n="debt_form_pessoal">👤 Empréstimo Pessoal</option>
+                <option value="consorcio" data-i18n="debt_form_consorcio">🤝 Consórcio</option>
+                <option value="outros" data-i18n="cat_outros">✨ Outros</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Status</label>
+              <label data-i18n="lbl_status">Status</label>
               <select id="debtStatus">
-                <option value="pagando">✅ Pagando normalmente</option>
-                <option value="em_atraso">⚠️ Em atraso</option>
-                <option value="pausado">⏸️ Pausado / Negociando</option>
-                <option value="quitado">🎉 Quitado</option>
+                <option value="pagando" data-i18n="status_pagando">✅ Pagando normalmente</option>
+                <option value="em_atraso" data-i18n="status_atraso">⚠️ Em atraso</option>
+                <option value="pausado" data-i18n="status_pausado">⏸️ Pausado / Negociando</option>
+                <option value="quitado" data-i18n="status_quitado">🎉 Quitado</option>
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Saldo devedor atual (R$)</label>
+              <label data-i18n="lbl_remaining">Saldo devedor atual (R$)</label>
               <input type="number" id="debtRemaining" placeholder="0,00" min="0" step="0.01" required />
             </div>
             <div class="form-group">
-              <label>Valor total da dívida (R$)</label>
+              <label data-i18n="lbl_total_amount">Valor total da dívida (R$)</label>
               <input type="number" id="debtTotalAmount" placeholder="0,00" min="0" step="0.01" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Valor da parcela (R$)</label>
+              <label data-i18n="lbl_installment">Valor da parcela (R$)</label>
               <input type="number" id="debtInstallmentValue" placeholder="0,00" min="0" step="0.01" required />
             </div>
             <div class="form-group">
-              <label>Dia de vencimento</label>
+              <label data-i18n="lbl_due_day">Dia de vencimento</label>
               <input type="number" id="debtDueDay" placeholder="ex: 10" min="1" max="31" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Parcelas pagas</label>
+              <label data-i18n="lbl_paid_inst">Parcelas pagas</label>
               <input type="number" id="debtPaidInstallments" placeholder="0" min="0" value="0" />
             </div>
             <div class="form-group">
-              <label>Total de parcelas</label>
+              <label data-i18n="lbl_total_inst">Total de parcelas</label>
               <input type="number" id="debtTotalInstallments" placeholder="ex: 60" min="1" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Taxa de juros (%)</label>
+              <label data-i18n="lbl_interest_rate">Taxa de juros (%)</label>
               <input type="number" id="debtRate" placeholder="1,5" min="0" step="0.01" />
             </div>
             <div class="form-group">
-              <label>Período da taxa</label>
+              <label data-i18n="lbl_rate_period">Período da taxa</label>
               <select id="debtRateType">
-                <option value="mensal">Mensal (a.m.)</option>
-                <option value="anual">Anual (a.a.)</option>
+                <option value="mensal" data-i18n="rate_monthly">Mensal (a.m.)</option>
+                <option value="anual" data-i18n="rate_annual">Anual (a.a.)</option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label>Parcelas em atraso</label>
+            <label data-i18n="lbl_overdue_inst_lbl">Parcelas em atraso</label>
             <input type="number" id="debtOverdueInstallments" placeholder="0" min="0" value="0" />
           </div>
-          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Adicionar Dívida</button>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> <span data-i18n="debt_btn">Adicionar Dívida</span></button>
         </form>
       </div>
 
       <!-- List -->
       <div class="debt-list-col">
         <div class="debt-list-header">
-          <h3><i class="fa-solid fa-list"></i> Dívidas cadastradas</h3>
+          <h3><i class="fa-solid fa-list"></i> <span data-i18n="debt_list_h">Dívidas cadastradas</span></h3>
           <div class="tabs" id="debtTabs">
-            <button class="tab active" data-debt-filter="all">Todas</button>
-            <button class="tab" data-debt-filter="pagando">Pagando</button>
-            <button class="tab" data-debt-filter="em_atraso">Em atraso</button>
-            <button class="tab" data-debt-filter="quitado">Quitadas</button>
+            <button class="tab active" data-debt-filter="all" data-i18n="tab_all_f">Todas</button>
+            <button class="tab" data-debt-filter="pagando" data-i18n="tab_paying">Pagando</button>
+            <button class="tab" data-debt-filter="em_atraso" data-i18n="tab_overdue">Em atraso</button>
+            <button class="tab" data-debt-filter="quitado" data-i18n="tab_paid_off">Quitadas</button>
           </div>
         </div>
         <div id="debtList">
           <div class="list-empty">
             <i class="fa-solid fa-hand-holding-dollar"></i>
-            <p>Nenhuma dívida cadastrada ainda.<br>Adicione para controlar seus compromissos.</p>
+            <p><span data-i18n="debt_empty">Nenhuma dívida cadastrada ainda.</span><br><span data-i18n="debt_empty_sub">Adicione para controlar seus compromissos.</span></p>
           </div>
         </div>
       </div>
@@ -631,99 +631,12 @@
   <!-- ========== PAGE: LEARN ========== -->
   <section class="page" id="page-learn">
     <div class="page-header-block">
-      <h2><i class="fa-solid fa-graduation-cap"></i> Aprenda sobre Finanças</h2>
-      <p>Conceitos simples para quem quer colocar as finanças em ordem — sem enrolação.</p>
+      <h2><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="learn_page_h">Aprenda sobre Finanças</span></h2>
+      <p data-i18n="learn_page_sub">Conceitos simples para quem quer colocar as finanças em ordem — sem enrolação.</p>
     </div>
 
-    <div class="learn-grid">
-
-      <div class="learn-card" data-module="regra50">
-        <div class="learn-card-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
-          <i class="fa-solid fa-percent"></i>
-        </div>
-        <div class="learn-card-body">
-          <span class="learn-tag">Método</span>
-          <h3>A Regra 50-30-20</h3>
-          <p>A forma mais simples de distribuir o seu dinheiro e nunca passar sufoco no fim do mês.</p>
-          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
-        </div>
-      </div>
-
-      <div class="learn-card learn-card-premium" data-module="emergencia">
-        <div class="learn-card-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">
-          <i class="fa-solid fa-shield-halved"></i>
-        </div>
-        <div class="premium-lock-overlay">
-          <div class="lock-badge"><i class="fa-solid fa-lock"></i> Premium</div>
-        </div>
-        <div class="learn-card-body">
-          <span class="learn-tag learn-tag-premium"><i class="fa-solid fa-crown"></i> Premium</span>
-          <h3>Reserva de Emergência</h3>
-          <p>Por que você precisa de dinheiro parado no banco — e quanto guardar antes de investir.</p>
-          <button class="btn-premium-unlock">Desbloquear <i class="fa-solid fa-lock"></i></button>
-        </div>
-      </div>
-
-      <div class="learn-card learn-card-premium" data-module="dividas">
-        <div class="learn-card-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)">
-          <i class="fa-solid fa-hand-holding-dollar"></i>
-        </div>
-        <div class="premium-lock-overlay">
-          <div class="lock-badge"><i class="fa-solid fa-lock"></i> Premium</div>
-        </div>
-        <div class="learn-card-body">
-          <span class="learn-tag learn-tag-premium"><i class="fa-solid fa-crown"></i> Premium</span>
-          <h3>Como sair das dívidas</h3>
-          <p>Estratégias práticas para quitar dívidas — do método bola de neve ao avalanche.</p>
-          <button class="btn-premium-unlock">Desbloquear <i class="fa-solid fa-lock"></i></button>
-        </div>
-      </div>
-
-      <div class="learn-card learn-card-premium" data-module="orcamento">
-        <div class="learn-card-icon" style="background:linear-gradient(135deg,#10b981,#059669)">
-          <i class="fa-solid fa-file-invoice-dollar"></i>
-        </div>
-        <div class="premium-lock-overlay">
-          <div class="lock-badge"><i class="fa-solid fa-lock"></i> Premium</div>
-        </div>
-        <div class="learn-card-body">
-          <span class="learn-tag learn-tag-premium"><i class="fa-solid fa-crown"></i> Premium</span>
-          <h3>Como fazer um orçamento</h3>
-          <p>Passo a passo para montar seu orçamento mensal e finalmente saber para onde vai seu dinheiro.</p>
-          <button class="btn-premium-unlock">Desbloquear <i class="fa-solid fa-lock"></i></button>
-        </div>
-      </div>
-
-      <div class="learn-card learn-card-premium" data-module="investir">
-        <div class="learn-card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
-          <i class="fa-solid fa-chart-line"></i>
-        </div>
-        <div class="premium-lock-overlay">
-          <div class="lock-badge"><i class="fa-solid fa-lock"></i> Premium</div>
-        </div>
-        <div class="learn-card-body">
-          <span class="learn-tag learn-tag-premium"><i class="fa-solid fa-crown"></i> Premium</span>
-          <h3>Começando a investir</h3>
-          <p>Onde colocar o dinheiro sobrando — Tesouro Direto, CDB, ações: o que é melhor para iniciantes.</p>
-          <button class="btn-premium-unlock">Desbloquear <i class="fa-solid fa-lock"></i></button>
-        </div>
-      </div>
-
-      <div class="learn-card learn-card-premium" data-module="habitos">
-        <div class="learn-card-icon" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)">
-          <i class="fa-solid fa-brain"></i>
-        </div>
-        <div class="premium-lock-overlay">
-          <div class="lock-badge"><i class="fa-solid fa-lock"></i> Premium</div>
-        </div>
-        <div class="learn-card-body">
-          <span class="learn-tag learn-tag-premium"><i class="fa-solid fa-crown"></i> Premium</span>
-          <h3>Hábitos que mudam tudo</h3>
-          <p>Os pequenos hábitos financeiros que, praticados todo dia, fazem uma diferença enorme a longo prazo.</p>
-          <button class="btn-premium-unlock">Desbloquear <i class="fa-solid fa-lock"></i></button>
-        </div>
-      </div>
-
+    <div class="learn-grid" id="learnGrid">
+      <!-- cards generated dynamically by renderLearn() -->
     </div>
   </section>
 
@@ -736,39 +649,39 @@
     <div class="paywall-hero">
       <div class="paywall-icon"><i class="fa-solid fa-crown"></i></div>
       <h2>FinançasSim <span class="paywall-badge">Pro</span></h2>
-      <p>Desbloqueie todos os módulos de aprendizado e acelere sua jornada financeira</p>
+      <p data-i18n="paywall_desc">Desbloqueie todos os módulos de aprendizado e acelere sua jornada financeira</p>
     </div>
     <div class="paywall-features">
-      <div class="paywall-feat"><i class="fa-solid fa-check"></i> Reserva de Emergência</div>
-      <div class="paywall-feat"><i class="fa-solid fa-check"></i> Como sair das dívidas</div>
-      <div class="paywall-feat"><i class="fa-solid fa-check"></i> Como fazer um orçamento</div>
-      <div class="paywall-feat"><i class="fa-solid fa-check"></i> Começando a investir</div>
-      <div class="paywall-feat"><i class="fa-solid fa-check"></i> Hábitos que mudam tudo</div>
+      <div class="paywall-feat"><i class="fa-solid fa-check"></i> <span data-i18n="paywall_feat1">Reserva de Emergência</span></div>
+      <div class="paywall-feat"><i class="fa-solid fa-check"></i> <span data-i18n="paywall_feat2">Como sair das dívidas</span></div>
+      <div class="paywall-feat"><i class="fa-solid fa-check"></i> <span data-i18n="paywall_feat3">Como fazer um orçamento</span></div>
+      <div class="paywall-feat"><i class="fa-solid fa-check"></i> <span data-i18n="paywall_feat4">Começando a investir</span></div>
+      <div class="paywall-feat"><i class="fa-solid fa-check"></i> <span data-i18n="paywall_feat5">Hábitos que mudam tudo</span></div>
     </div>
     <div class="paywall-price">
       <div class="price-tag">
-        <span class="price-from">de <s>R$ 29,90</s></span>
-        <span class="price-main">R$ 14,90<span class="price-period">/mês</span></span>
-        <span class="price-sub">ou R$ 99,90/ano — economize 44%</span>
+        <span class="price-from" data-i18n="price_from">de <s>R$ 29,90</s></span>
+        <span class="price-main">R$ 14,90<span class="price-period" data-i18n="price_period">/mês</span></span>
+        <span class="price-sub" data-i18n="price_sub">ou R$ 99,90/ano — economize 44%</span>
       </div>
     </div>
     <div class="paywall-actions">
       <button class="btn-paywall-cta" id="paywallCta">
-        <i class="fa-solid fa-crown"></i> Assinar Pro agora
+        <i class="fa-solid fa-crown"></i> <span data-i18n="paywall_cta">Assinar Pro agora</span>
       </button>
-      <button class="btn-link paywall-skip" id="paywallSkip">Continuar no plano gratuito</button>
+      <button class="btn-link paywall-skip" id="paywallSkip" data-i18n="paywall_skip">Continuar no plano gratuito</button>
     </div>
 
     <div class="paywall-code-section">
-      <div class="paywall-code-divider"><span>ou já tenho um código de acesso</span></div>
+      <div class="paywall-code-divider"><span data-i18n="paywall_code_div">ou já tenho um código de acesso</span></div>
       <div class="paywall-code-form" id="paywallCodeForm">
-        <input type="password" id="premiumCodeInput" placeholder="Digite seu código..." autocomplete="off" />
-        <button type="button" id="premiumCodeBtn"><i class="fa-solid fa-unlock"></i> Desbloquear</button>
+        <input type="password" id="premiumCodeInput" data-i18n-ph="paywall_code_ph" placeholder="Digite seu código..." autocomplete="off" />
+        <button type="button" id="premiumCodeBtn"><i class="fa-solid fa-unlock"></i> <span data-i18n="paywall_code_btn">Desbloquear</span></button>
       </div>
       <div class="paywall-code-error" id="paywallCodeError"></div>
       <div class="paywall-code-login-hint" id="paywallCodeHint">
         <i class="fa-solid fa-circle-info"></i>
-        Faça <button class="btn-link" id="paywallLoginLink">login</button> para que o desbloqueio fique salvo na sua conta.
+        <span data-i18n="paywall_login_pre">Faça</span> <button class="btn-link" id="paywallLoginLink">login</button> <span data-i18n="paywall_login_post">para que o desbloqueio fique salvo na sua conta.</span>
       </div>
     </div>
   </div>
@@ -778,7 +691,7 @@
 <div class="modal-overlay" id="editModal">
   <div class="modal modal-sm">
     <div class="modal-header">
-      <h3 id="editModalTitle">Editar item</h3>
+      <h3 id="editModalTitle" data-i18n="edit_modal_title">Editar item</h3>
       <button class="modal-close" id="editModalClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
@@ -786,41 +699,41 @@
         <input type="hidden" id="editId" />
         <input type="hidden" id="editType" />
         <div class="form-group">
-          <label>Descrição</label>
+          <label data-i18n="lbl_desc">Descrição</label>
           <input type="text" id="editDesc" required />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Valor (R$)</label>
+            <label data-i18n="lbl_amount">Valor (R$)</label>
             <input type="number" id="editAmount" min="0" step="0.01" required />
           </div>
           <div class="form-group">
-            <label>Mês de referência</label>
+            <label data-i18n="lbl_month">Mês de referência</label>
             <input type="month" id="editMonth" />
           </div>
         </div>
         <div class="form-group" id="editCategoryGroup">
-          <label>Categoria</label>
+          <label data-i18n="lbl_category">Categoria</label>
           <select id="editCategory"></select>
         </div>
         <div class="form-group" id="editFreqGroup" style="display:none">
-          <label>Frequência</label>
+          <label data-i18n="lbl_freq_edit">Frequência</label>
           <select id="editFreq">
-            <option value="mensal">Mensal</option>
-            <option value="semanal">Semanal</option>
-            <option value="quinzenal">Quinzenal</option>
-            <option value="anual">Anual</option>
-            <option value="unico">Único (não recorrente)</option>
+            <option value="mensal" data-i18n="freq_mensal">Mensal</option>
+            <option value="semanal" data-i18n="freq_semanal">Semanal</option>
+            <option value="quinzenal" data-i18n="freq_quinzenal">Quinzenal</option>
+            <option value="anual" data-i18n="freq_anual">Anual</option>
+            <option value="unico" data-i18n="freq_unico">Único (não recorrente)</option>
           </select>
         </div>
         <div class="form-group" id="editExpTypeGroup" style="display:none">
-          <label>Tipo</label>
+          <label data-i18n="lbl_type_edit">Tipo</label>
           <select id="editExpenseType">
-            <option value="fixo">🔒 Fixo (todo mês)</option>
-            <option value="variavel">🔄 Variável</option>
+            <option value="fixo" data-i18n="type_fixed">🔒 Fixo (todo mês)</option>
+            <option value="variavel" data-i18n="type_variable">🔄 Variável</option>
           </select>
         </div>
-        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="lbl_save_changes">Salvar alterações</span></button>
       </form>
     </div>
   </div>
@@ -857,8 +770,8 @@
   <div class="modal modal-sm">
     <div class="modal-header auth-modal-header">
       <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin">Entrar</button>
-        <button class="auth-tab" id="tabRegister">Criar conta</button>
+        <button class="auth-tab active" id="tabLogin" data-i18n="auth_login_tab">Entrar</button>
+        <button class="auth-tab" id="tabRegister" data-i18n="auth_register_tab">Criar conta</button>
       </div>
       <button class="modal-close" id="authModalClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -868,56 +781,56 @@
       <form id="loginForm" class="finance-form auth-form" style="padding:0">
         <div class="auth-hero">
           <div class="auth-hero-icon"><i class="fa-solid fa-seedling"></i></div>
-          <p>Entre para sincronizar seus dados na nuvem e acessar de qualquer dispositivo.</p>
+          <p data-i18n="auth_login_desc">Entre para sincronizar seus dados na nuvem e acessar de qualquer dispositivo.</p>
         </div>
         <div class="form-group">
-          <label>E-mail</label>
+          <label data-i18n="lbl_email">E-mail</label>
           <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email" required />
         </div>
         <div class="form-group">
-          <label>Senha</label>
+          <label data-i18n="lbl_password">Senha</label>
           <div class="input-eye-wrap">
-            <input type="password" id="loginPassword" placeholder="Sua senha" autocomplete="current-password" required />
+            <input type="password" id="loginPassword" data-i18n-ph="lbl_password_ph" placeholder="Sua senha" autocomplete="current-password" required />
             <button type="button" class="input-eye" data-target="loginPassword"><i class="fa-solid fa-eye"></i></button>
           </div>
         </div>
         <div class="auth-error" id="loginError" style="display:none"></div>
         <button type="submit" class="btn-primary" id="loginSubmit">
-          <i class="fa-solid fa-right-to-bracket"></i> Entrar
+          <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="auth_btn_login">Entrar</span>
         </button>
-        <div class="auth-switch">Não tem conta? <button type="button" class="btn-link" id="goRegister">Criar gratuitamente</button></div>
+        <div class="auth-switch"><span data-i18n="auth_no_account">Não tem conta?</span> <button type="button" class="btn-link" id="goRegister" data-i18n="auth_create_free">Criar gratuitamente</button></div>
       </form>
 
       <!-- Register -->
       <form id="registerForm" class="finance-form auth-form" style="padding:0;display:none">
         <div class="auth-hero">
           <div class="auth-hero-icon"><i class="fa-solid fa-user-plus"></i></div>
-          <p>Crie sua conta gratuita e salve seus dados com segurança na nuvem.</p>
+          <p data-i18n="auth_reg_desc">Crie sua conta gratuita e salve seus dados com segurança na nuvem.</p>
         </div>
         <div class="form-group">
-          <label>Nome</label>
-          <input type="text" id="regName" placeholder="Seu nome" autocomplete="name" required />
+          <label data-i18n="lbl_name_auth">Nome</label>
+          <input type="text" id="regName" data-i18n-ph="reg_name_ph" placeholder="Seu nome" autocomplete="name" required />
         </div>
         <div class="form-group">
-          <label>E-mail</label>
+          <label data-i18n="lbl_email">E-mail</label>
           <input type="email" id="regEmail" placeholder="seu@email.com" autocomplete="email" required />
         </div>
         <div class="form-group">
-          <label>Senha <span style="color:var(--text-3);font-weight:400">(mín. 6 caracteres)</span></label>
+          <label data-i18n="lbl_password">Senha <span style="color:var(--text-3);font-weight:400" data-i18n="lbl_password_hint">(mín. 6 caracteres)</span></label>
           <div class="input-eye-wrap">
-            <input type="password" id="regPassword" placeholder="Crie uma senha forte" autocomplete="new-password" required />
+            <input type="password" id="regPassword" data-i18n-ph="reg_pass_ph" placeholder="Crie uma senha forte" autocomplete="new-password" required />
             <button type="button" class="input-eye" data-target="regPassword"><i class="fa-solid fa-eye"></i></button>
           </div>
         </div>
         <div class="form-group">
-          <label>Confirmar senha</label>
-          <input type="password" id="regConfirm" placeholder="Repita a senha" autocomplete="new-password" required />
+          <label data-i18n="lbl_confirm">Confirmar senha</label>
+          <input type="password" id="regConfirm" data-i18n-ph="reg_confirm_ph" placeholder="Repita a senha" autocomplete="new-password" required />
         </div>
         <div class="auth-error" id="regError" style="display:none"></div>
         <button type="submit" class="btn-primary" id="regSubmit">
-          <i class="fa-solid fa-user-plus"></i> Criar conta grátis
+          <i class="fa-solid fa-user-plus"></i> <span data-i18n="auth_btn_register">Criar conta grátis</span>
         </button>
-        <div class="auth-switch">Já tem conta? <button type="button" class="btn-link" id="goLogin">Entrar</button></div>
+        <div class="auth-switch"><span data-i18n="auth_has_account">Já tem conta?</span> <button type="button" class="btn-link" id="goLogin" data-i18n="auth_sign_in">Entrar</button></div>
       </form>
 
     </div>
@@ -928,87 +841,87 @@
 <div class="modal-overlay" id="debtEditModal">
   <div class="modal modal-sm">
     <div class="modal-header">
-      <h3>✏️ Editar Dívida</h3>
+      <h3 data-i18n="lbl_edit_debt">✏️ Editar Dívida</h3>
       <button class="modal-close" id="debtEditClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <form id="debtEditForm" class="finance-form" style="padding:0">
         <input type="hidden" id="debtEditId" />
         <div class="form-group">
-          <label>Nome / Descrição</label>
+          <label data-i18n="lbl_debt_name">Nome / Descrição</label>
           <input type="text" id="debtEditName" required />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Tipo</label>
+            <label data-i18n="lbl_type">Tipo</label>
             <select id="debtEditType">
-              <option value="bancaria">🏦 Bancária</option>
-              <option value="hipoteca">🏠 Hipoteca / Imóvel</option>
-              <option value="carro">🚗 Financiamento Carro</option>
-              <option value="cartao">💳 Cartão de Crédito</option>
-              <option value="pessoal">👤 Empréstimo Pessoal</option>
-              <option value="consorcio">🤝 Consórcio</option>
-              <option value="outros">✨ Outros</option>
+              <option value="bancaria" data-i18n="debt_form_bancaria">🏦 Bancária</option>
+              <option value="hipoteca" data-i18n="debt_form_hipoteca">🏠 Hipoteca / Imóvel</option>
+              <option value="carro" data-i18n="debt_form_carro">🚗 Financiamento Carro</option>
+              <option value="cartao" data-i18n="debt_form_cartao">💳 Cartão de Crédito</option>
+              <option value="pessoal" data-i18n="debt_form_pessoal">👤 Empréstimo Pessoal</option>
+              <option value="consorcio" data-i18n="debt_form_consorcio">🤝 Consórcio</option>
+              <option value="outros" data-i18n="cat_outros">✨ Outros</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Status</label>
+            <label data-i18n="lbl_status">Status</label>
             <select id="debtEditStatus">
-              <option value="pagando">✅ Pagando normalmente</option>
-              <option value="em_atraso">⚠️ Em atraso</option>
-              <option value="pausado">⏸️ Pausado / Negociando</option>
-              <option value="quitado">🎉 Quitado</option>
+              <option value="pagando" data-i18n="status_pagando">✅ Pagando normalmente</option>
+              <option value="em_atraso" data-i18n="status_atraso">⚠️ Em atraso</option>
+              <option value="pausado" data-i18n="status_pausado">⏸️ Pausado / Negociando</option>
+              <option value="quitado" data-i18n="status_quitado">🎉 Quitado</option>
             </select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Saldo devedor (R$)</label>
+            <label data-i18n="lbl_remaining">Saldo devedor (R$)</label>
             <input type="number" id="debtEditRemaining" min="0" step="0.01" required />
           </div>
           <div class="form-group">
-            <label>Valor total (R$)</label>
+            <label data-i18n="lbl_total_amount">Valor total (R$)</label>
             <input type="number" id="debtEditTotalAmount" min="0" step="0.01" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Parcela mensal (R$)</label>
+            <label data-i18n="lbl_installment">Parcela mensal (R$)</label>
             <input type="number" id="debtEditInstallment" min="0" step="0.01" required />
           </div>
           <div class="form-group">
-            <label>Dia de vencimento</label>
+            <label data-i18n="lbl_due_day">Dia de vencimento</label>
             <input type="number" id="debtEditDueDay" min="1" max="31" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Parcelas pagas</label>
+            <label data-i18n="lbl_paid_inst">Parcelas pagas</label>
             <input type="number" id="debtEditPaid" min="0" />
           </div>
           <div class="form-group">
-            <label>Total de parcelas</label>
+            <label data-i18n="lbl_total_inst">Total de parcelas</label>
             <input type="number" id="debtEditTotalInst" min="1" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Taxa de juros (%)</label>
+            <label data-i18n="lbl_interest_rate">Taxa de juros (%)</label>
             <input type="number" id="debtEditRate" min="0" step="0.01" />
           </div>
           <div class="form-group">
-            <label>Período</label>
+            <label data-i18n="lbl_rate_period">Período</label>
             <select id="debtEditRateType">
-              <option value="mensal">Mensal (a.m.)</option>
-              <option value="anual">Anual (a.a.)</option>
+              <option value="mensal" data-i18n="rate_monthly">Mensal (a.m.)</option>
+              <option value="anual" data-i18n="rate_annual">Anual (a.a.)</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label>Parcelas em atraso</label>
+          <label data-i18n="lbl_overdue_inst_lbl">Parcelas em atraso</label>
           <input type="number" id="debtEditOverdue" min="0" />
         </div>
-        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="lbl_save_changes">Salvar alterações</span></button>
       </form>
     </div>
   </div>
