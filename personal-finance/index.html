@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinançasSim — Sua vida financeira simplificada</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-seedling"></i></div>
+      <span class="logo-text">FinançasSim</span>
+    </div>
+    <button class="sidebar-close" id="sidebarClose"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <ul class="nav-menu">
+    <li class="nav-item active" data-page="dashboard">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>Dashboard</span>
+    </li>
+    <li class="nav-item" data-page="income">
+      <i class="fa-solid fa-arrow-trend-up"></i>
+      <span>Rendimentos</span>
+    </li>
+    <li class="nav-item" data-page="expenses">
+      <i class="fa-solid fa-arrow-trend-down"></i>
+      <span>Gastos</span>
+    </li>
+    <li class="nav-item" data-page="goals">
+      <i class="fa-solid fa-bullseye"></i>
+      <span>Metas</span>
+    </li>
+    <li class="nav-item" data-page="learn">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <span>Aprender</span>
+    </li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <div class="health-mini" id="healthMini">
+      <div class="health-label">Saúde Financeira</div>
+      <div class="health-bar-wrap"><div class="health-bar-fill" id="healthBarFill"></div></div>
+      <div class="health-score" id="healthScore">--</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== TOPBAR ===================== -->
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+  <div class="topbar-title" id="topbarTitle">Dashboard</div>
+  <div class="topbar-actions">
+    <button class="btn-icon" id="themeToggle" title="Alternar tema"><i class="fa-solid fa-moon"></i></button>
+    <div class="avatar">JJ</div>
+  </div>
+</header>
+
+<!-- ===================== OVERLAY ===================== -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ===================== MAIN ===================== -->
+<main class="main-content">
+
+  <!-- ========== PAGE: DASHBOARD ========== -->
+  <section class="page active" id="page-dashboard">
+    <div class="page-hero">
+      <div class="hero-text">
+        <h1>Olá! Vamos cuidar do seu dinheiro? <span class="wave">👋</span></h1>
+        <p>Aqui você tem uma visão completa da sua saúde financeira — simples e sem complicação.</p>
+      </div>
+      <div class="hero-badge" id="heroBadge">
+        <div class="badge-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div>
+          <div class="badge-label">Saúde Financeira</div>
+          <div class="badge-value" id="badgeValue">Configure seus dados</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card income-card">
+        <div class="kpi-icon"><i class="fa-solid fa-circle-up"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Total de Rendimentos</div>
+          <div class="kpi-value" id="kpiIncome">R$ 0,00</div>
+          <div class="kpi-sub" id="kpiIncomeSub">nenhum lançamento</div>
+        </div>
+      </div>
+      <div class="kpi-card expense-card">
+        <div class="kpi-icon"><i class="fa-solid fa-circle-down"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Total de Gastos</div>
+          <div class="kpi-value" id="kpiExpense">R$ 0,00</div>
+          <div class="kpi-sub" id="kpiExpenseSub">nenhum lançamento</div>
+        </div>
+      </div>
+      <div class="kpi-card balance-card" id="kpiBalanceCard">
+        <div class="kpi-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Saldo Mensal</div>
+          <div class="kpi-value" id="kpiBalance">R$ 0,00</div>
+          <div class="kpi-sub" id="kpiBalanceSub">receita − gastos</div>
+        </div>
+      </div>
+      <div class="kpi-card savings-card">
+        <div class="kpi-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+        <div class="kpi-info">
+          <div class="kpi-label">Taxa de Poupança</div>
+          <div class="kpi-value" id="kpiSavings">0%</div>
+          <div class="kpi-sub">ideal: acima de 20%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerta principal -->
+    <div class="alert-box" id="mainAlert" style="display:none"></div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-chart-donut"></i> Onde vai seu dinheiro?</h3>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="expenseChart"></canvas>
+          <div class="chart-empty" id="expenseChartEmpty">
+            <i class="fa-solid fa-chart-pie"></i>
+            <p>Adicione seus gastos para ver o gráfico</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-chart-bar"></i> Receita vs Gastos</h3>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="balanceChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights / dicas -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fa-solid fa-lightbulb"></i> Pontos de Melhora</h3>
+      </div>
+      <div class="insights-list" id="insightsList">
+        <div class="insight-empty">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <p>Adicione seus rendimentos e gastos para receber dicas personalizadas!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goals preview -->
+    <div class="card" id="goalsPreviewCard" style="display:none">
+      <div class="card-header">
+        <h3><i class="fa-solid fa-bullseye"></i> Suas Metas</h3>
+        <button class="btn-link" data-page="goals">Ver todas</button>
+      </div>
+      <div class="goals-preview-list" id="goalsPreviewList"></div>
+    </div>
+  </section>
+
+  <!-- ========== PAGE: INCOME ========== -->
+  <section class="page" id="page-income">
+    <div class="page-header-block">
+      <h2><i class="fa-solid fa-arrow-trend-up"></i> Meus Rendimentos</h2>
+      <p>Tudo que entra no seu bolso — salário, freelas, aluguéis, dividendos…</p>
+    </div>
+
+    <div class="two-col">
+      <!-- Form -->
+      <div class="card form-card">
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Adicionar Rendimento</h3></div>
+        <form id="incomeForm" class="finance-form">
+          <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" id="incomeDesc" placeholder="ex: Salário, Freela, Aluguel…" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="incomeAmount" placeholder="0,00" min="0" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="incomeCategory">
+                <option value="salario">💼 Salário</option>
+                <option value="freela">💻 Freela / Autônomo</option>
+                <option value="investimento">📈 Investimentos</option>
+                <option value="aluguel">🏠 Aluguel</option>
+                <option value="bonus">🎁 Bônus / 13º</option>
+                <option value="pensao">👨‍👩‍👧 Pensão / Benefício</option>
+                <option value="outros">✨ Outros</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Frequência</label>
+              <select id="incomeFreq">
+                <option value="mensal">Mensal</option>
+                <option value="semanal">Semanal</option>
+                <option value="quinzenal">Quinzenal</option>
+                <option value="anual">Anual</option>
+                <option value="unico">Único (não recorrente)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Mês de referência</label>
+              <input type="month" id="incomeMonth" />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Adicionar Rendimento</button>
+        </form>
+      </div>
+
+      <!-- List -->
+      <div class="card list-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-list"></i> Rendimentos cadastrados</h3>
+          <div class="total-chip income-chip" id="totalIncomeChip">Total: R$ 0,00</div>
+        </div>
+        <div class="finance-list" id="incomeList">
+          <div class="list-empty">
+            <i class="fa-solid fa-inbox"></i>
+            <p>Nenhum rendimento cadastrado ainda.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PAGE: EXPENSES ========== -->
+  <section class="page" id="page-expenses">
+    <div class="page-header-block">
+      <h2><i class="fa-solid fa-arrow-trend-down"></i> Meus Gastos</h2>
+      <p>Controle cada centavo — fixos (aluguel, escola) e variáveis (mercado, lazer…)</p>
+    </div>
+
+    <div class="two-col">
+      <!-- Form -->
+      <div class="card form-card">
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Adicionar Gasto</h3></div>
+        <form id="expenseForm" class="finance-form">
+          <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" id="expenseDesc" placeholder="ex: Aluguel, Supermercado, Netflix…" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="expenseAmount" placeholder="0,00" min="0" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Tipo</label>
+              <select id="expenseType">
+                <option value="fixo">🔒 Fixo (todo mês)</option>
+                <option value="variavel">🔄 Variável</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="expenseCategory">
+                <option value="moradia">🏠 Moradia</option>
+                <option value="alimentacao">🍽️ Alimentação</option>
+                <option value="transporte">🚗 Transporte</option>
+                <option value="saude">💊 Saúde</option>
+                <option value="educacao">📚 Educação</option>
+                <option value="lazer">🎉 Lazer</option>
+                <option value="vestuario">👕 Vestuário</option>
+                <option value="assinaturas">📱 Assinaturas</option>
+                <option value="dividas">💳 Dívidas / Parcelas</option>
+                <option value="outros">✨ Outros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Mês de referência</label>
+              <input type="month" id="expenseMonth" />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Adicionar Gasto</button>
+        </form>
+      </div>
+
+      <!-- List -->
+      <div class="card list-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-list"></i> Gastos cadastrados</h3>
+          <div class="total-chip expense-chip" id="totalExpenseChip">Total: R$ 0,00</div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" data-filter="all">Todos</button>
+          <button class="tab" data-filter="fixo">Fixos</button>
+          <button class="tab" data-filter="variavel">Variáveis</button>
+        </div>
+        <div class="finance-list" id="expenseList">
+          <div class="list-empty">
+            <i class="fa-solid fa-inbox"></i>
+            <p>Nenhum gasto cadastrado ainda.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PAGE: GOALS ========== -->
+  <section class="page" id="page-goals">
+    <div class="page-header-block">
+      <h2><i class="fa-solid fa-bullseye"></i> Minhas Metas</h2>
+      <p>Defina objetivos e acompanhe o progresso — viagem, carro, reserva de emergência…</p>
+    </div>
+
+    <div class="two-col">
+      <!-- Form -->
+      <div class="card form-card">
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Nova Meta</h3></div>
+        <form id="goalForm" class="finance-form">
+          <div class="form-group">
+            <label>Nome da meta</label>
+            <input type="text" id="goalName" placeholder="ex: Viagem para Europa, Carro novo…" required />
+          </div>
+          <div class="form-group">
+            <label>Escolha um ícone</label>
+            <div class="emoji-picker" id="emojiPicker">
+              <button type="button" class="emoji-btn active" data-emoji="✈️">✈️</button>
+              <button type="button" class="emoji-btn" data-emoji="🚗">🚗</button>
+              <button type="button" class="emoji-btn" data-emoji="🏠">🏠</button>
+              <button type="button" class="emoji-btn" data-emoji="🎓">🎓</button>
+              <button type="button" class="emoji-btn" data-emoji="💍">💍</button>
+              <button type="button" class="emoji-btn" data-emoji="🏥">🏥</button>
+              <button type="button" class="emoji-btn" data-emoji="🛡️">🛡️</button>
+              <button type="button" class="emoji-btn" data-emoji="💻">💻</button>
+              <button type="button" class="emoji-btn" data-emoji="🎮">🎮</button>
+              <button type="button" class="emoji-btn" data-emoji="🌟">🌟</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Valor total da meta (R$)</label>
+              <input type="number" id="goalTotal" placeholder="ex: 15000" min="1" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Já tenho guardado (R$)</label>
+              <input type="number" id="goalSaved" placeholder="0" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Prazo desejado</label>
+              <input type="date" id="goalDeadline" />
+            </div>
+            <div class="form-group">
+              <label>Prioridade</label>
+              <select id="goalPriority">
+                <option value="alta">🔴 Alta</option>
+                <option value="media" selected>🟡 Média</option>
+                <option value="baixa">🟢 Baixa</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Criar Meta</button>
+        </form>
+      </div>
+
+      <!-- Goals list -->
+      <div class="goals-full-list" id="goalsFullList">
+        <div class="list-empty" id="goalsEmpty">
+          <i class="fa-solid fa-bullseye"></i>
+          <p>Nenhuma meta criada ainda.<br>Comece definindo um objetivo!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PAGE: LEARN ========== -->
+  <section class="page" id="page-learn">
+    <div class="page-header-block">
+      <h2><i class="fa-solid fa-graduation-cap"></i> Aprenda sobre Finanças</h2>
+      <p>Conceitos simples para quem quer colocar as finanças em ordem — sem enrolação.</p>
+    </div>
+
+    <div class="learn-grid">
+
+      <div class="learn-card" data-module="regra50">
+        <div class="learn-card-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+          <i class="fa-solid fa-percent"></i>
+        </div>
+        <div class="learn-card-body">
+          <span class="learn-tag">Método</span>
+          <h3>A Regra 50-30-20</h3>
+          <p>A forma mais simples de distribuir o seu dinheiro e nunca passar sufoco no fim do mês.</p>
+          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="learn-card" data-module="emergencia">
+        <div class="learn-card-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="learn-card-body">
+          <span class="learn-tag">Proteção</span>
+          <h3>Reserva de Emergência</h3>
+          <p>Por que você precisa de dinheiro parado no banco — e quanto guardar antes de investir.</p>
+          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="learn-card" data-module="dividas">
+        <div class="learn-card-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        <div class="learn-card-body">
+          <span class="learn-tag">Dívidas</span>
+          <h3>Como sair das dívidas</h3>
+          <p>Estratégias práticas para quitar dívidas — do método bola de neve ao avalanche.</p>
+          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="learn-card" data-module="orcamento">
+        <div class="learn-card-icon" style="background:linear-gradient(135deg,#10b981,#059669)">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div class="learn-card-body">
+          <span class="learn-tag">Controle</span>
+          <h3>Como fazer um orçamento</h3>
+          <p>Passo a passo para montar seu orçamento mensal e finalmente saber para onde vai seu dinheiro.</p>
+          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="learn-card" data-module="investir">
+        <div class="learn-card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="learn-card-body">
+          <span class="learn-tag">Investimentos</span>
+          <h3>Começando a investir</h3>
+          <p>Onde colocar o dinheiro sobrando — Tesouro Direto, CDB, ações: o que é melhor para iniciantes.</p>
+          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="learn-card" data-module="habitos">
+        <div class="learn-card-icon" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <div class="learn-card-body">
+          <span class="learn-tag">Mentalidade</span>
+          <h3>Hábitos que mudam tudo</h3>
+          <p>Os pequenos hábitos financeiros que, praticados todo dia, fazem uma diferença enorme a longo prazo.</p>
+          <button class="btn-outline learn-btn">Aprender <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== MODAL: Learn ===================== -->
+<div class="modal-overlay" id="learnModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
