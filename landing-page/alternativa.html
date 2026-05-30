@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Médicos que não se atualizam colocam pacientes em risco e carreiras em perigo. Descubra como manter-se clinicamente atual sem sacrificar seu tempo." />
-  <title>Atualiza Clínica – Para Médicos Que Não Podem Errar</title>
+  <meta name="description" content="DermAtual – Formação em Dermatologia baseada em evidência atual. Para dermatologistas que não podem errar por desatualização clínica." />
+  <title>DermAtual – Formação Profissional em Dermatologia 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -16,24 +16,27 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:         #1a56db;
-      --blue-light:   #3b82f6;
-      --blue-glow:    rgba(26,86,219,.25);
+      --teal:         #00c9b1;
+      --teal-dark:    #009e8d;
+      --teal-glow:    rgba(0,201,177,.25);
+      --teal-muted:   rgba(0,201,177,.08);
       --red:          #dc2626;
-      --red-muted:    rgba(220,38,38,.12);
+      --red-muted:    rgba(220,38,38,.10);
       --amber:        #d97706;
-      --amber-muted:  rgba(217,119,6,.12);
-      --green:        #16a34a;
-      --green-muted:  rgba(22,163,74,.12);
-      --dark:         #0a0f1e;
-      --darker:       #060a14;
-      --surface:      #0f1626;
-      --surface-2:    #151d30;
-      --border:       rgba(255,255,255,.08);
-      --text:         #f1f5f9;
-      --text-muted:   #94a3b8;
-      --text-subtle:  #64748b;
-      --pad:          96px 20px;
+      --amber-muted:  rgba(217,119,6,.10);
+      --indigo:       #6366f1;
+      --yellow:       #fbbf24;
+      --dark:         #07111a;
+      --darker:       #040c12;
+      --surface:      #0c1a24;
+      --surface-2:    #112030;
+      --card-bg:      rgba(255,255,255,.04);
+      --card-border:  rgba(255,255,255,.08);
+      --discord:      #5865f2;
+      --text:         #f0f6fa;
+      --text-muted:   #8faab8;
+      --text-subtle:  #506070;
+      --pad:          92px 20px;
     }
 
     html { scroll-behavior: smooth; }
@@ -48,51 +51,69 @@
 
     /* ── Layout ── */
     .container { max-width: 700px; margin: 0 auto; padding: 0 20px; }
-    .container-wide { max-width: 900px; margin: 0 auto; padding: 0 20px; }
 
-    /* ── Scroll animation ── */
+    /* ── Animations ── */
     .reveal {
       opacity: 0;
-      transform: translateY(24px);
+      transform: translateY(26px);
       transition: opacity .65s ease, transform .65s ease;
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    /* ── Typography ── */
+    /* ── Eyebrow labels ── */
     .eyebrow {
-      font-size: .75rem;
+      font-size: .72rem;
       font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
       color: var(--text-muted);
       margin-bottom: 12px;
+      display: block;
     }
-    .eyebrow.danger { color: var(--red); }
+    .eyebrow.danger { color: #fca5a5; }
+    .eyebrow.accent { color: var(--teal); }
+
+    /* ── Section headings ── */
+    .s-title {
+      font-size: clamp(1.5rem, 4.5vw, 2.1rem);
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      margin-bottom: 12px;
+    }
+    .s-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
 
     /* ── Buttons ── */
     .btn-primary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      background: var(--blue);
-      color: #fff;
+      gap: 9px;
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+      color: #000;
       font-size: 1rem;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: .5px;
       padding: 17px 42px;
-      border-radius: 8px;
+      border-radius: 50px;
       text-decoration: none;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 24px var(--blue-glow);
-      transition: background .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 6px 28px var(--teal-glow);
+      transition: filter .2s, transform .2s, box-shadow .2s;
+      white-space: nowrap;
     }
     .btn-primary:hover {
-      background: var(--blue-light);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 36px var(--blue-glow);
+      filter: brightness(1.1);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px var(--teal-glow);
     }
 
     .btn-ghost {
@@ -103,9 +124,9 @@
       font-size: .9rem;
       font-weight: 600;
       text-decoration: none;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
       padding: 12px 28px;
-      border-radius: 8px;
+      border-radius: 50px;
       transition: border-color .2s, color .2s;
     }
     .btn-ghost:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
@@ -113,33 +134,33 @@
     /* ═══════════════════════════════════════
        STICKY BAR
     ═══════════════════════════════════════ */
-    #sticky {
+    #sticky-bar {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 999;
-      background: rgba(6,10,20,.9);
+      background: rgba(4,12,18,.92);
       backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
+      border-bottom: 1px solid rgba(0,201,177,.18);
+      padding: 11px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       transform: translateY(-100%);
-      transition: transform .3s ease;
+      transition: transform .35s ease;
     }
-    #sticky.show { transform: translateY(0); }
-    #sticky .brand {
+    #sticky-bar.show { transform: translateY(0); }
+    #sticky-bar .bar-brand {
       font-size: .9rem;
-      font-weight: 800;
-      letter-spacing: .5px;
-      color: var(--text);
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--teal);
+      white-space: nowrap;
     }
-    #sticky .brand span { color: var(--blue-light); }
-    #sticky .btn-primary { font-size: .8rem; padding: 10px 22px; }
+    #sticky-bar .btn-primary { font-size: .8rem; padding: 9px 20px; box-shadow: none; }
 
     /* ═══════════════════════════════════════
-       HERO — ABERTURA COM A PERGUNTA
+       HERO
     ═══════════════════════════════════════ */
     #hero {
       position: relative;
@@ -151,25 +172,38 @@
       text-align: center;
       padding: 80px 20px 90px;
       background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(26,86,219,.18) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 55% at 50% -5%, rgba(0,201,177,.14) 0%, transparent 70%),
         linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%);
     }
-
-    /* subtle grid texture */
     #hero::before {
       content: '';
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 48px 48px;
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 52px 52px;
       pointer-events: none;
     }
+    .hero-inner { position: relative; z-index: 1; width: 100%; max-width: 720px; margin: 0 auto; }
 
-    .hero-inner { position: relative; z-index: 1; }
+    /* Logo */
+    .logo-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; margin-bottom: 24px;
+    }
+    .logo-name {
+      font-size: 2.4rem; font-weight: 900; letter-spacing: 3px;
+      line-height: 1; text-transform: uppercase;
+    }
+    .logo-name .l1 { color: var(--text); }
+    .logo-name .l2 { color: var(--teal); }
+    .logo-tagline {
+      font-size: .72rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text-muted); margin-top: 4px;
+    }
 
-    /* red warning bar */
+    /* Warning pill */
     .warning-bar {
       display: inline-flex;
       align-items: center;
@@ -177,46 +211,58 @@
       background: var(--red-muted);
       border: 1px solid rgba(220,38,38,.3);
       border-radius: 50px;
-      padding: 8px 20px;
-      font-size: .82rem;
+      padding: 8px 22px;
+      font-size: .8rem;
       font-weight: 700;
       color: #fca5a5;
       letter-spacing: .5px;
       text-transform: uppercase;
-      margin-bottom: 36px;
+      margin-bottom: 28px;
     }
 
     #hero h1 {
-      font-size: clamp(1.9rem, 5.5vw, 3rem);
+      font-size: clamp(1.85rem, 5.5vw, 2.9rem);
       font-weight: 900;
       line-height: 1.15;
-      max-width: 680px;
-      margin: 0 auto 28px;
-      letter-spacing: -.02em;
+      max-width: 660px;
+      margin: 0 auto 20px;
+      letter-spacing: -.025em;
     }
-    #hero h1 .accent { color: var(--blue-light); }
     #hero h1 .danger { color: #fca5a5; }
+    #hero h1 .accent { color: var(--teal); }
 
-    .hero-context {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 520px;
-      margin: 0 auto 44px;
-      line-height: 1.75;
+    /* Video */
+    .video-wrap {
+      width: 100%; max-width: 620px;
+      margin: 20px auto 28px;
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 12px 60px rgba(0,0,0,.7), 0 0 0 1px rgba(0,201,177,.15);
+      aspect-ratio: 16/9; background: #000;
+    }
+    .video-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+    .badge-live {
+      display: inline-block;
+      border: 2px solid rgba(255,255,255,.5);
+      border-radius: 50px;
+      padding: 9px 32px;
+      font-size: .85rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text); margin-bottom: 10px;
+    }
+    .hero-schedule {
+      font-size: 1.2rem; font-weight: 800; color: var(--text); margin-bottom: 4px;
+    }
+    .hero-tz { font-size: .88rem; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-sub {
+      font-size: 1.05rem; color: var(--text-muted);
+      max-width: 480px; margin: 0 auto 32px; line-height: 1.7;
     }
 
     .hero-cta-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
-
-    .hero-guarantee {
-      font-size: .8rem;
-      color: var(--text-subtle);
-      margin-top: 8px;
-    }
+    .hero-guarantee { font-size: .78rem; color: var(--text-subtle); }
 
     /* ═══════════════════════════════════════
        SCENARIO — AGITAÇÃO
@@ -224,442 +270,407 @@
     #scenario {
       padding: var(--pad);
       background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
     }
-
     .scenario-intro {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      text-align: center;
-      max-width: 580px;
-      margin: 0 auto 60px;
-      line-height: 1.8;
+      font-size: 1.1rem; color: var(--text-muted); text-align: center;
+      max-width: 580px; margin: 0 auto 52px; line-height: 1.8;
     }
     .scenario-intro strong { color: var(--text); }
 
     .scenario-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-width: 680px;
-      margin: 0 auto 60px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; max-width: 680px; margin: 0 auto 52px;
     }
     @media (max-width: 540px) { .scenario-grid { grid-template-columns: 1fr; } }
 
     .scenario-card {
       background: var(--red-muted);
-      border: 1px solid rgba(220,38,38,.2);
-      border-radius: 14px;
-      padding: 22px 20px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
+      border: 1px solid rgba(220,38,38,.18);
+      border-radius: 14px; padding: 20px 18px;
+      display: flex; gap: 13px; align-items: flex-start;
     }
-    .scenario-card .sc-icon {
-      font-size: 1.6rem;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .scenario-card .sc-text {
-      font-size: .95rem;
-      color: #fca5a5;
-      line-height: 1.5;
-    }
+    .scenario-card .sc-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .scenario-card .sc-text { font-size: .92rem; color: #fca5a5; line-height: 1.55; }
     .scenario-card .sc-text strong { color: #fff; }
 
     .pivot-quote {
-      max-width: 600px;
-      margin: 0 auto;
+      max-width: 600px; margin: 0 auto;
       background: rgba(255,255,255,.03);
-      border-left: 3px solid var(--blue-light);
-      border-radius: 0 12px 12px 0;
-      padding: 24px 28px;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 12px 12px 0; padding: 22px 26px;
     }
     .pivot-quote p {
-      font-size: 1.15rem;
-      font-style: italic;
-      color: var(--text-muted);
-      line-height: 1.75;
+      font-size: 1.1rem; font-style: italic;
+      color: var(--text-muted); line-height: 1.75;
     }
     .pivot-quote p strong { color: var(--text); font-style: normal; }
-    .pivot-quote .pq-source {
-      margin-top: 12px;
-      font-size: .82rem;
-      color: var(--text-subtle);
-    }
+    .pivot-quote .pq-source { margin-top: 10px; font-size: .8rem; color: var(--text-subtle); }
 
     /* ═══════════════════════════════════════
-       STAKES — AS CONSEQUÊNCIAS REAIS
+       STAKES — CONSEQUÊNCIAS REAIS
     ═══════════════════════════════════════ */
-    #stakes {
-      padding: var(--pad);
-      background: var(--darker);
-      text-align: center;
-    }
-
-    #stakes h2 {
-      font-size: clamp(1.5rem, 4vw, 2.1rem);
-      font-weight: 900;
-      line-height: 1.2;
-      margin-bottom: 14px;
-      letter-spacing: -.02em;
-    }
-    #stakes .sub {
-      color: var(--text-muted);
-      max-width: 520px;
-      margin: 0 auto 56px;
-    }
+    #stakes { padding: var(--pad); background: var(--darker); text-align: center; }
 
     .stakes-trio {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      max-width: 720px;
-      margin: 0 auto 52px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px; max-width: 720px; margin: 40px auto 44px;
     }
     @media (max-width: 600px) { .stakes-trio { grid-template-columns: 1fr; } }
 
-    .stake-card {
-      border-radius: 16px;
-      padding: 28px 22px;
-      text-align: left;
-    }
-    .stake-card.patient  { background: var(--red-muted);   border: 1px solid rgba(220,38,38,.2); }
-    .stake-card.career   { background: var(--amber-muted); border: 1px solid rgba(217,119,6,.2); }
-    .stake-card.legal    { background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.25); }
+    .stake-card { border-radius: 16px; padding: 26px 20px; text-align: left; }
+    .stake-card.patient { background: var(--red-muted);   border: 1px solid rgba(220,38,38,.2); }
+    .stake-card.career  { background: var(--amber-muted); border: 1px solid rgba(217,119,6,.2); }
+    .stake-card.legal   { background: rgba(99,102,241,.09); border: 1px solid rgba(99,102,241,.22); }
 
-    .stake-card .sk-icon { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .stake-card .sk-icon { font-size: 1.9rem; margin-bottom: 10px; display: block; }
     .stake-card .sk-label {
-      font-size: .7rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
+      font-size: .68rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 5px;
     }
-    .stake-card.patient  .sk-label { color: #fca5a5; }
-    .stake-card.career   .sk-label { color: #fcd34d; }
-    .stake-card.legal    .sk-label { color: #a5b4fc; }
+    .stake-card.patient .sk-label { color: #fca5a5; }
+    .stake-card.career  .sk-label { color: #fcd34d; }
+    .stake-card.legal   .sk-label { color: #a5b4fc; }
 
-    .stake-card .sk-title {
-      font-size: 1rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--text);
-      line-height: 1.3;
-    }
-    .stake-card .sk-desc {
-      font-size: .88rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-    }
+    .stake-card .sk-title { font-size: .98rem; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+    .stake-card .sk-desc  { font-size: .86rem; color: var(--text-muted); line-height: 1.55; }
 
     .stakes-callout {
-      max-width: 580px;
-      margin: 0 auto;
-      background: linear-gradient(135deg, rgba(26,86,219,.12) 0%, rgba(26,86,219,.05) 100%);
-      border: 1px solid rgba(26,86,219,.3);
-      border-radius: 16px;
-      padding: 28px 28px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      line-height: 1.7;
+      max-width: 580px; margin: 0 auto;
+      background: linear-gradient(135deg, rgba(0,201,177,.1) 0%, rgba(0,201,177,.04) 100%);
+      border: 1px solid rgba(0,201,177,.25);
+      border-radius: 16px; padding: 26px 26px;
+      font-size: 1.1rem; font-weight: 600; color: var(--text-muted); line-height: 1.7;
     }
     .stakes-callout strong { color: var(--text); }
 
     /* ═══════════════════════════════════════
-       SOLUTION — A VIRADA
+       METHODOLOGY
     ═══════════════════════════════════════ */
-    #solution {
+    #methodology {
       padding: var(--pad);
       background:
-        radial-gradient(ellipse 60% 50% at 50% 0%, rgba(26,86,219,.1) 0%, transparent 70%),
-        var(--surface);
+        linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.88) 100%),
+        url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
       text-align: center;
-      border-top: 1px solid var(--border);
     }
 
-    #solution h2 {
-      font-size: clamp(1.5rem, 4vw, 2.1rem);
-      font-weight: 900;
-      line-height: 1.2;
-      margin-bottom: 14px;
-      letter-spacing: -.02em;
+    .method-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 13px; max-width: 620px; margin: 36px auto 48px;
     }
+    @media (max-width: 480px) { .method-grid { grid-template-columns: 1fr; } }
 
-    .solution-features {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      max-width: 660px;
-      margin: 48px auto 52px;
-    }
-    @media (max-width: 500px) { .solution-features { grid-template-columns: 1fr; } }
-
-    .feature-card {
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 18px;
-      text-align: left;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
+    .method-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 18px 16px;
+      display: flex; align-items: flex-start; gap: 12px; text-align: left;
       transition: border-color .2s, background .2s;
     }
-    .feature-card:hover {
-      border-color: rgba(26,86,219,.4);
-      background: rgba(26,86,219,.06);
+    .method-card:hover {
+      border-color: rgba(0,201,177,.4);
+      background: rgba(0,201,177,.05);
     }
-    .feature-card .fc-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
-    .feature-card .fc-title {
-      font-size: .97rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
+    .method-card .mc-icon { font-size: 1.35rem; flex-shrink: 0; margin-top: 2px; }
+    .method-card .mc-text { font-size: .92rem; color: var(--text-muted); line-height: 1.45; }
+    .method-card .mc-text strong { color: var(--text); }
+
+    /* ═══════════════════════════════════════
+       ABOUT
+    ═══════════════════════════════════════ */
+    #about { padding: var(--pad); background: var(--surface-2); text-align: center; }
+
+    .about-name-title {
+      font-size: clamp(1.7rem, 5vw, 2.3rem);
+      font-weight: 900; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 32px;
     }
-    .feature-card .fc-desc {
-      font-size: .87rem;
-      color: var(--text-muted);
-      line-height: 1.5;
+    .about-bio {
+      font-size: 1.03rem; color: var(--text-muted);
+      max-width: 580px; margin: 0 auto 20px; line-height: 1.85;
+    }
+    .stat-row {
+      display: flex; justify-content: center;
+      gap: 40px; flex-wrap: wrap; margin-top: 40px;
+    }
+    .stat-item { text-align: center; }
+    .stat-number { font-size: 2rem; font-weight: 900; color: var(--teal); line-height: 1; }
+    .stat-label {
+      font-size: .78rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;
     }
 
     /* ═══════════════════════════════════════
-       PROOF — DEPOIMENTOS
+       PLATFORMS — DISCORD + DERM FLIX
     ═══════════════════════════════════════ */
-    #proof {
+    #platforms {
       padding: var(--pad);
-      background: var(--darker);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.80) 0%, rgba(0,0,0,.92) 100%),
+        url('https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
       text-align: center;
     }
 
-    #proof h2 {
-      font-size: clamp(1.4rem, 4vw, 2rem);
-      font-weight: 900;
-      line-height: 1.2;
-      letter-spacing: -.02em;
-      margin-bottom: 14px;
+    .platform-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 18px; max-width: 640px; margin: 40px auto 0;
+    }
+    @media (max-width: 520px) { .platform-cards { grid-template-columns: 1fr; } }
+
+    .platform-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 30px 22px; text-align: center;
+      transition: transform .2s, border-color .2s;
+    }
+    .platform-card:hover { transform: translateY(-4px); }
+
+    .platform-card .pc-logo { font-size: 3.2rem; margin-bottom: 12px; display: block; line-height: 1; }
+    .platform-card .pc-name {
+      font-size: 1.25rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;
+    }
+    .platform-card .pc-badge {
+      display: inline-block;
+      border-radius: 8px; padding: 5px 16px;
+      font-size: .78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+    }
+    .platform-card .pc-desc { font-size: .93rem; color: var(--text-muted); line-height: 1.6; }
+    .platform-card .pc-desc strong { color: var(--teal); }
+
+    .card-discord { border-color: rgba(88,101,242,.3); }
+    .card-discord .pc-name { color: var(--discord); }
+    .card-discord .pc-badge {
+      background: rgba(88,101,242,.12); border: 1px solid rgba(88,101,242,.3); color: var(--discord);
+    }
+    .card-discord:hover { border-color: rgba(88,101,242,.5); }
+
+    .card-dermflix { border-color: rgba(0,201,177,.2); }
+    .card-dermflix .pc-name { color: var(--teal); }
+    .card-dermflix .pc-badge {
+      background: rgba(0,201,177,.1); border: 1px solid rgba(0,201,177,.3); color: var(--teal);
+    }
+    .card-dermflix:hover { border-color: rgba(0,201,177,.4); }
+
+    .dermflix-logo {
+      display: inline-flex; align-items: center;
+      gap: 6px; margin-bottom: 12px;
+      font-size: 2.4rem; font-weight: 900;
+      color: var(--teal); font-style: italic; line-height: 1;
+    }
+    .dermflix-logo .df-text {
+      font-size: 1.1rem; font-style: normal;
+      font-weight: 900; line-height: 1.1; color: var(--teal);
     }
 
-    .testimonials {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 640px;
-      margin: 48px auto 0;
+    /* ═══════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════ */
+    #testimonials { padding: var(--pad); background: var(--darker); text-align: center; }
+
+    .shield-icon {
+      font-size: 3.2rem; margin-bottom: 14px; display: block;
+      filter: drop-shadow(0 4px 16px rgba(0,201,177,.4));
     }
 
-    .tcard {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px 22px;
-      text-align: left;
-      display: flex;
-      gap: 16px;
-      transition: border-color .2s;
+    .testimonial-list {
+      display: flex; flex-direction: column;
+      gap: 14px; max-width: 640px; margin: 36px auto 0;
     }
-    .tcard:hover { border-color: rgba(26,86,219,.3); }
+    .testimonial-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 20px; display: flex;
+      gap: 15px; text-align: left; transition: border-color .2s;
+    }
+    .testimonial-card:hover { border-color: rgba(0,201,177,.3); }
 
-    .t-ava {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1a3a8f, #0f2060);
-      border: 2px solid rgba(59,130,246,.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--blue-light);
-      flex-shrink: 0;
+    .t-avatar {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal-dark), #003d36);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 900; color: var(--teal);
+      border: 2px solid rgba(0,201,177,.3);
     }
     .t-body { flex: 1; }
-    .t-name { font-size: .95rem; font-weight: 700; color: var(--text); }
-    .t-role { font-size: .78rem; color: var(--text-subtle); margin-bottom: 6px; }
-    .t-stars { color: #fbbf24; font-size: .85rem; margin-bottom: 8px; letter-spacing: 1px; }
-    .t-text { font-size: .92rem; color: var(--text-muted); line-height: 1.6; }
+    .t-name { font-size: .96rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .t-role { font-size: .76rem; color: var(--text-subtle); margin-bottom: 6px; }
+    .t-stars { color: var(--yellow); font-size: .82rem; margin-bottom: 6px; letter-spacing: 1px; }
+    .t-text { font-size: .9rem; color: var(--text-muted); line-height: 1.55; }
     .t-text strong { color: var(--text); }
 
     /* ═══════════════════════════════════════
-       OFFER — PREÇO & CTA
+       PRICING
     ═══════════════════════════════════════ */
-    #offer {
+    #pricing {
       padding: var(--pad);
-      background: var(--surface);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.93) 100%),
+        url('https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=900&auto=format&fit=crop&q=60') center/cover no-repeat;
       text-align: center;
-      border-top: 1px solid var(--border);
     }
 
-    #offer h2 {
-      font-size: clamp(1.5rem, 4vw, 2.1rem);
-      font-weight: 900;
-      line-height: 1.2;
-      letter-spacing: -.02em;
-      margin-bottom: 14px;
+    .price-comparison {
+      max-width: 540px; margin: 36px auto 0;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; overflow: hidden;
+    }
+    .price-comparison-header {
+      background: rgba(255,255,255,.04);
+      padding: 16px 24px;
+      font-size: .78rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--teal); border-bottom: 1px solid var(--card-border);
+    }
+    .price-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.04); font-size: .93rem;
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row .pr-label { color: var(--text-muted); }
+    .price-row .pr-value { font-weight: 700; color: var(--text); }
+    .price-row.total-row {
+      background: rgba(220,38,38,.07);
+      border-top: 1px solid rgba(220,38,38,.18);
+    }
+    .price-row.total-row .pr-label { color: var(--text); font-weight: 700; }
+    .price-row.total-row .pr-value { color: var(--red); font-size: 1.08rem; }
+
+    .price-divider {
+      display: flex; align-items: center;
+      gap: 12px; padding: 22px 20px;
+      font-size: .82rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+    }
+    .price-divider::before, .price-divider::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.1);
     }
 
-    .offer-box {
-      max-width: 560px;
-      margin: 40px auto 0;
-      background: linear-gradient(135deg, rgba(26,86,219,.1) 0%, rgba(26,86,219,.04) 100%);
-      border: 1.5px solid rgba(26,86,219,.4);
-      border-radius: 20px;
-      overflow: hidden;
+    .price-final-box {
+      max-width: 540px; margin: 24px auto 0;
+      background: linear-gradient(135deg, rgba(0,201,177,.1) 0%, rgba(0,201,177,.04) 100%);
+      border: 2px solid rgba(0,201,177,.4);
+      border-radius: 20px; padding: 30px 26px; text-align: center;
     }
+    .pf-title {
+      font-size: .76rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+    }
+    .pf-year {
+      font-size: 1.35rem; font-weight: 900; color: var(--teal);
+      text-transform: uppercase; margin-bottom: 18px;
+    }
+    .pf-amount {
+      font-size: 2.4rem; font-weight: 900; color: var(--teal); line-height: 1; margin-bottom: 4px;
+    }
+    .pf-or { font-size: .88rem; color: var(--text-muted); margin: 8px 0; }
+    .pf-installment { font-size: .97rem; color: var(--text-muted); margin-bottom: 18px; }
 
-    .offer-header {
-      background: rgba(26,86,219,.12);
-      padding: 20px 28px;
-      border-bottom: 1px solid rgba(26,86,219,.2);
+    .payment-icons {
+      display: flex; justify-content: center; gap: 24px;
+      margin: 10px 0 24px;
     }
-    .offer-header .oh-label {
-      font-size: .72rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: #93c5fd;
-      margin-bottom: 4px;
+    .payment-icon {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      font-size: .78rem; color: var(--text-muted);
     }
-    .offer-header .oh-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .offer-body { padding: 28px; }
-
-    .offer-includes {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      text-align: left;
-      margin-bottom: 28px;
-    }
-    .offer-includes li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: .95rem;
-      color: var(--text-muted);
-    }
-    .offer-includes li .oi-check { color: #34d399; flex-shrink: 0; font-size: 1rem; margin-top: 2px; }
-
-    .offer-price-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .offer-was {
-      font-size: 1rem;
-      color: var(--text-subtle);
-      text-decoration: line-through;
-    }
-    .offer-amount {
-      font-size: 2.6rem;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1;
-    }
-    .offer-period {
-      font-size: .9rem;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-
-    .offer-cta-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .offer-cta-wrap .btn-primary { width: 100%; font-size: 1rem; padding: 18px; }
-
-    .offer-note {
-      font-size: .8rem;
-      color: var(--text-subtle);
-    }
+    .payment-icon .pi-icon { font-size: 1.9rem; }
 
     /* ═══════════════════════════════════════
-       FINAL — URGÊNCIA
+       BONUS
     ═══════════════════════════════════════ */
-    #final {
+    #bonus { padding: var(--pad); background: var(--surface); text-align: center; }
+
+    .bonus-stamp {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 86px; height: 86px;
+      border: 3px dashed var(--teal); border-radius: 50%;
+      font-size: .85rem; font-weight: 900; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 14px;
+      background: rgba(0,201,177,.06);
+      box-shadow: 0 0 24px rgba(0,201,177,.18);
+    }
+
+    .bonus-card {
+      max-width: 520px; margin: 28px auto 32px;
+      background: #fff; border-radius: 20px; padding: 30px 26px;
+    }
+    .bonus-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .bonus-list li {
+      display: flex; align-items: flex-start; gap: 13px;
+      font-size: .97rem; color: #111; font-weight: 600;
+      text-align: left; line-height: 1.45;
+    }
+    .bonus-list li .bl-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+
+    .urgency-line { font-size: .88rem; color: var(--text-muted); margin-bottom: 8px; }
+
+    /* ═══════════════════════════════════════
+       FINAL CTA
+    ═══════════════════════════════════════ */
+    #cta-final {
       padding: var(--pad);
       text-align: center;
       background:
-        radial-gradient(ellipse 70% 50% at 50% 100%, rgba(26,86,219,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 70% 55% at 50% 100%, rgba(0,201,177,.1) 0%, transparent 70%),
         var(--darker);
+      border-top: 1px solid rgba(0,201,177,.12);
+    }
+    #cta-final .s-title { color: var(--teal); }
+    #cta-final p {
+      font-size: 1.05rem; color: var(--text-muted);
+      max-width: 500px; margin: 0 auto 36px; line-height: 1.75;
     }
 
-    #final h2 {
-      font-size: clamp(1.6rem, 5vw, 2.4rem);
-      font-weight: 900;
-      line-height: 1.15;
-      letter-spacing: -.025em;
-      max-width: 620px;
-      margin: 0 auto 20px;
-    }
-    #final h2 .accent { color: var(--blue-light); }
-
-    #final .final-sub {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      max-width: 500px;
-      margin: 0 auto 44px;
-      line-height: 1.75;
-    }
-
-    .whatsapp-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: #16a34a;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      padding: 18px 44px;
-      border-radius: 8px;
+    .whatsapp-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #25d366; color: #fff;
+      font-size: 1rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      padding: 18px 44px; border-radius: 50px;
       text-decoration: none;
-      box-shadow: 0 6px 28px rgba(22,163,74,.35);
+      box-shadow: 0 8px 32px rgba(37,211,102,.35);
       transition: filter .2s, transform .2s, box-shadow .2s;
     }
-    .whatsapp-btn:hover {
-      filter: brightness(1.1);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 36px rgba(22,163,74,.5);
+    .whatsapp-cta:hover {
+      filter: brightness(1.1); transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(37,211,102,.5);
     }
-    .whatsapp-btn .wa-icon { font-size: 1.3rem; }
-
-    .final-note {
-      margin-top: 18px;
-      font-size: .82rem;
-      color: var(--text-subtle);
-    }
+    .whatsapp-icon { font-size: 1.3rem; }
+    .cta-note { margin-top: 16px; font-size: .82rem; color: var(--text-subtle); }
 
     /* ═══════════════════════════════════════
        FOOTER
     ═══════════════════════════════════════ */
     footer {
-      padding: 36px 20px;
-      background: #030507;
+      padding: 34px 20px; background: #030a0d;
       text-align: center;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--card-border);
     }
-    footer .f-brand { font-weight: 800; color: var(--blue-light); font-size: .95rem; }
-    footer p { font-size: .8rem; color: var(--text-subtle); margin-top: 8px; line-height: 1.7; }
+    footer .f-brand { font-weight: 900; color: var(--teal); font-size: .95rem; }
+    footer p { font-size: .78rem; color: var(--text-subtle); margin-top: 8px; line-height: 1.7; }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 540px) {
+      :root { --pad: 64px 18px; }
+      .btn-primary { font-size: .92rem; padding: 15px 28px; }
+      .whatsapp-cta { font-size: .92rem; padding: 15px 26px; }
+      .price-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+      .stat-row { gap: 24px; }
+      #sticky-bar .bar-brand { font-size: .78rem; }
+    }
   </style>
 </head>
 <body>
 
 <!-- ══ STICKY BAR ══ -->
-<div id="sticky">
-  <span class="brand"><span>Atualiza</span>Clínica</span>
-  <a href="#final" class="btn-primary">Quero Me Atualizar</a>
+<div id="sticky-bar">
+  <span class="bar-brand">DermAtual</span>
+  <a href="#cta-final" class="btn-primary">Garantir Minha Vaga</a>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -668,8 +679,17 @@
 <section id="hero">
   <div class="hero-inner">
 
+    <!-- Logo -->
+    <div class="logo-wrap reveal">
+      <div class="logo-name">
+        <span class="l1">Derm</span><span class="l2">Atual</span>
+      </div>
+      <div class="logo-tagline">Formação em Dermatologia Baseada em Evidência</div>
+    </div>
+
+    <!-- Consequence hook -->
     <div class="warning-bar reveal">
-      ⚠️ Para Médicos Que Não Podem Errar
+      ⚠️ Para Dermatologistas Que Não Podem Errar
     </div>
 
     <h1 class="reveal">
@@ -678,89 +698,107 @@
       por não estar <span class="accent">atualizado?</span>
     </h1>
 
-    <p class="hero-context reveal">
-      Cada semana sem atualização é uma janela aberta para o erro.
-      Não estamos falando de sobrecarga de conteúdo —
-      estamos falando de <strong>desfecho de paciente, processo ético e reputação destruída</strong>.
+    <!-- Video -->
+    <div class="video-wrap reveal">
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="DermAtual – Formação Profissional em Dermatologia"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen loading="lazy">
+      </iframe>
+    </div>
+
+    <!-- Program details -->
+    <div class="badge-live reveal">Online e ao Vivo</div>
+    <p class="hero-schedule reveal">3 noites das 19:30 até 22:30</p>
+    <p class="hero-tz reveal">(horário de Brasília)</p>
+
+    <p class="hero-sub reveal">
+      Formação profissional em dermatologia do zero à consistência clínica —
+      com método, estrutura e acompanhamento real.
     </p>
 
     <div class="hero-cta-group reveal">
-      <a href="#final" class="btn-primary">
-        🔒 Proteger Minha Prática Agora
-      </a>
-      <a href="#solution" class="btn-ghost">Ver como funciona ↓</a>
-      <p class="hero-guarantee">Sem risco — 7 dias de garantia incondicional</p>
+      <a href="#cta-final" class="btn-primary">🔒 Quero Garantir Minha Vaga</a>
+      <a href="#scenario" class="btn-ghost">Ver por que isso importa ↓</a>
+      <p class="hero-guarantee">Vagas limitadas por turma</p>
     </div>
 
   </div>
 </section>
 
 <!-- ══════════════════════════════════════════
-     SCENARIO — OS CENÁRIOS QUE NINGUÉM QUER VIVER
+     SCENARIO — AGITAÇÃO
 ══════════════════════════════════════════ -->
 <section id="scenario">
   <div class="container">
 
-    <p class="eyebrow danger text-center reveal">Os cenários que ninguém te conta na residência</p>
+    <span class="eyebrow danger text-center reveal">Os cenários que ninguém te conta na residência</span>
     <p class="scenario-intro reveal">
       Você passou anos estudando para ser competente.
-      Mas a medicina muda — e <strong>o que era padrão-ouro em 2020 pode ser má prática em 2026.</strong>
+      Mas a dermatologia muda — e <strong>o que era padrão-ouro em 2020 pode ser má prática em 2026.</strong>
       Você sabe exatamente o que mudou na sua especialidade nos últimos 18 meses?
     </p>
 
     <div class="scenario-grid reveal">
       <div class="scenario-card">
-        <span class="sc-icon">🩺</span>
+        <span class="sc-icon">🔬</span>
         <div class="sc-text">
-          <strong>Prescrição fora do guideline atual.</strong>
-          A droga que você aprendeu como primeira linha foi reclassificada. Seu paciente não respondeu.
+          <strong>Critério diagnóstico desatualizado.</strong>
+          O novo staging de melanoma mudou o ponto de corte.
+          Você usou o antigo. O encaminhamento chegou tarde.
         </div>
       </div>
       <div class="scenario-card">
-        <span class="sc-icon">📋</span>
+        <span class="sc-icon">💊</span>
         <div class="sc-text">
-          <strong>Diagnóstico atrasado.</strong>
-          O novo critério diagnóstico mudou o ponto de corte. Você usou o antigo. O resultado chegou tarde.
+          <strong>Prescrição fora do guideline atual.</strong>
+          O imunobiológico que você indicou perdeu a primeira linha para um novo agente.
+          Seu paciente não respondeu.
         </div>
       </div>
       <div class="scenario-card">
         <span class="sc-icon">⚖️</span>
         <div class="sc-text">
-          <strong>Notificação ao CFM.</strong>
-          Colega que foi ao conselho por uma conduta que era aceitável — até mudar o consenso da sociedade.
+          <strong>Notificação ao CRM.</strong>
+          Colega foi ao conselho por conduta aceita na época —
+          até o consenso da SBD ser atualizado.
         </div>
       </div>
       <div class="scenario-card">
         <span class="sc-icon">🔇</span>
         <div class="sc-text">
-          <strong>Silêncio embaraçoso na visita.</strong>
-          O residente fez uma pergunta sobre o novo protocolo e você não soube responder.
+          <strong>Silêncio na frente do paciente.</strong>
+          Ele perguntou sobre o novo protocolo que viu no Instagram.
+          Você não soube responder.
         </div>
       </div>
     </div>
 
     <div class="pivot-quote reveal">
       <p>
-        "O problema não é falta de competência. É que <strong>a medicina avança mais rápido do que qualquer médico consegue acompanhar sozinho</strong> — e o sistema não perdoa a defasagem."
+        "O problema não é falta de competência. É que
+        <strong>a dermatologia avança mais rápido do que qualquer médico consegue acompanhar sozinho</strong>
+        — e o paciente, o CRM e o mercado não perdoam a defasagem."
       </p>
-      <p class="pq-source">— Dr. [Nome do Fundador], [Especialidade], [Instituição]</p>
+      <p class="pq-source">— Dr. [Nome do Fundador], Dermatologista, [Instituição]</p>
     </div>
 
   </div>
 </section>
 
 <!-- ══════════════════════════════════════════
-     STAKES — O QUE REALMENTE ESTÁ EM JOGO
+     STAKES — CONSEQUÊNCIAS REAIS
 ══════════════════════════════════════════ -->
 <section id="stakes">
   <div class="container">
 
-    <p class="eyebrow danger text-center reveal">O que realmente está em jogo</p>
-    <h2 class="reveal">
+    <span class="eyebrow danger text-center reveal">O que realmente está em jogo</span>
+    <h2 class="s-title text-center reveal">
       Não é "perder uma atualização".<br>
       É isso que pode custar:
     </h2>
-    <p class="sub reveal">
+    <p class="s-sub text-center reveal" style="margin-bottom:0;">
       Cada gap de conhecimento carrega um risco real e mensurável.
     </p>
 
@@ -770,15 +808,15 @@
         <div class="sk-label">Paciente</div>
         <div class="sk-title">Desfecho clínico adverso</div>
         <div class="sk-desc">
-          Conduta baseada em evidência desatualizada. O paciente que não precisaria ter piorado.
+          Conduta baseada em evidência desatualizada. O diagnóstico de melanoma que poderia ter sido precoce.
         </div>
       </div>
       <div class="stake-card career">
         <span class="sk-icon">🏥</span>
         <div class="sk-label">Carreira</div>
-        <div class="sk-title">Reputação e mercado</div>
+        <div class="sk-title">Reputação e autoridade</div>
         <div class="sk-desc">
-          Pacientes perguntam. Colegas percebem. Hospitais avaliam. Sua autoridade clínica é seu maior ativo.
+          Pacientes pesquisam. Colegas percebem. Hospitais avaliam. Sua autoridade clínica é seu maior ativo.
         </div>
       </div>
       <div class="stake-card legal">
@@ -786,7 +824,7 @@
         <div class="sk-label">Jurídico & Ético</div>
         <div class="sk-title">Processo e CRM</div>
         <div class="sk-desc">
-          "Conduta divergente do consenso vigente" é o argumento mais comum em processos médicos.
+          "Conduta divergente do consenso vigente da SBD" — o argumento mais comum em processos dermatológicos.
         </div>
       </div>
     </div>
@@ -800,167 +838,301 @@
 </section>
 
 <!-- ══════════════════════════════════════════
-     SOLUTION — A RESPOSTA
+     METHODOLOGY
 ══════════════════════════════════════════ -->
-<section id="solution">
+<section id="methodology">
   <div class="container">
 
-    <p class="eyebrow text-center reveal">A Solução</p>
-    <h2 class="reveal">
-      Atualização clínica de alta relevância —<br>
-      <span style="color: var(--blue-light);">sem desperdiçar seu tempo escasso</span>
+    <span class="eyebrow accent text-center reveal">A Solução</span>
+    <h2 class="s-title text-center reveal" style="color: var(--teal);">
+      "Metodologia Estruturada<br>Para Formar Dermatologistas Consistentes"
     </h2>
-    <p class="section-sub reveal" style="color:var(--text-muted); text-align:center; max-width:520px; margin: 0 auto;">
-      Filtramos o que importa, traduzimos para a prática real e entregamos de forma que você absorve em minutos, não horas.
+    <p class="s-sub text-center reveal">
+      Um programa completo — do zero à prática clínica segura com acompanhamento em cada etapa.
     </p>
 
-    <div class="solution-features reveal">
-      <div class="feature-card">
-        <span class="fc-icon">🎯</span>
-        <div>
-          <div class="fc-title">Curadoria por especialidade</div>
-          <div class="fc-desc">Só o que mudou e impacta sua prática direta — sem ruído, sem irrelevância.</div>
-        </div>
+    <div class="method-grid reveal">
+      <div class="method-card">
+        <span class="mc-icon">📅</span>
+        <div class="mc-text"><strong>3 dias de nivelamento</strong><br>e estrutura base da especialidade</div>
       </div>
-      <div class="feature-card">
-        <span class="fc-icon">⚡</span>
-        <div>
-          <div class="fc-title">Formato para médico ocupado</div>
-          <div class="fc-desc">Resumos clínicos de 10 minutos com aplicação imediata. Sem horas de aula gravada.</div>
-        </div>
+      <div class="method-card">
+        <span class="mc-icon">🎥</span>
+        <div class="mc-text"><strong>3 dias intensivos AO VIVO</strong><br>do MÉTODO pelo Zoom</div>
       </div>
-      <div class="feature-card">
-        <span class="fc-icon">🔔</span>
-        <div>
-          <div class="fc-title">Alertas de mudança de guideline</div>
-          <div class="fc-desc">Você é notificado quando sai novo consenso relevante para a sua área. Em tempo real.</div>
-        </div>
+      <div class="method-card">
+        <span class="mc-icon">🔬</span>
+        <div class="mc-text"><strong>Estrutura completa</strong><br>de leitura e diagnóstico clínico</div>
       </div>
-      <div class="feature-card">
-        <span class="fc-icon">💬</span>
-        <div>
-          <div class="fc-title">Discussão de casos ao vivo</div>
-          <div class="fc-desc">Sala com especialistas — dúvidas clínicas reais respondidas na hora, como uma junta médica.</div>
-        </div>
+      <div class="method-card">
+        <span class="mc-icon">🏛️</span>
+        <div class="mc-text"><strong>Aplicação na prática</strong><br>dos 5 Pilares da Formação</div>
       </div>
-      <div class="feature-card">
-        <span class="fc-icon">📚</span>
-        <div>
-          <div class="fc-title">Biblioteca de protocolos</div>
-          <div class="fc-desc">Protocolos atualizados sempre à mão, consultáveis em 30 segundos na beira do leito.</div>
-        </div>
+      <div class="method-card">
+        <span class="mc-icon">💬</span>
+        <div class="mc-text"><strong>Sala ao vivo</strong><br>no Discord com especialistas</div>
       </div>
-      <div class="feature-card">
-        <span class="fc-icon">🛡️</span>
-        <div>
-          <div class="fc-title">Rastreamento de updates</div>
-          <div class="fc-desc">Histórico das atualizações que você consumiu — documentação da sua atualização contínua.</div>
-        </div>
+      <div class="method-card">
+        <span class="mc-icon">🔄</span>
+        <div class="mc-text"><strong>Reforço semanal</strong><br>pelo Zoom — casos clínicos reais</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">▶️</span>
+        <div class="mc-text"><strong>Plataforma Derm Flix</strong><br>com aulas gravadas da formação</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-icon">📱</span>
+        <div class="mc-text"><strong>Acompanhamento contínuo</strong><br>por WhatsApp</div>
       </div>
     </div>
 
     <div class="text-center reveal">
-      <a href="#offer" class="btn-primary">Ver Planos e Valores</a>
+      <a href="#cta-final" class="btn-primary">Quero Fazer Parte</a>
     </div>
 
   </div>
 </section>
 
 <!-- ══════════════════════════════════════════
-     PROOF — MÉDICOS QUE JÁ USAM
+     ABOUT
 ══════════════════════════════════════════ -->
-<section id="proof">
+<section id="about">
   <div class="container">
 
-    <p class="eyebrow text-center reveal">O que dizem os médicos</p>
-    <h2 class="reveal">Colegas que pararam de torcer para não ter vacilado</h2>
+    <span class="eyebrow text-center reveal">Quem é o Fundador</span>
+    <h2 class="about-name-title reveal">[Nome do Fundador]</h2>
 
-    <div class="testimonials reveal">
-
-      <div class="tcard">
-        <div class="t-ava">RS</div>
-        <div class="t-body">
-          <div class="t-name">Dr. Rafael Souza</div>
-          <div class="t-role">Cardiologista • Hospital das Clínicas, SP</div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">
-            Recebi um alerta sobre mudança no guideline de anticoagulação dois dias antes de atender
-            um paciente com FA. <strong>Literalmente mudou a conduta.</strong> Não sei o que teria acontecido se eu não soubesse.
-          </p>
-        </div>
-      </div>
-
-      <div class="tcard">
-        <div class="t-ava">MA</div>
-        <div class="t-body">
-          <div class="t-name">Dra. Marina Alves</div>
-          <div class="t-role">Clínica Geral • Consultório Particular, RJ</div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">
-            Eu perdia noites tentando me atualizar e nunca sentia que estava sendo suficiente. Hoje
-            tenho <strong>clareza do que mudou na minha especialidade</strong> — e durmo melhor.
-          </p>
-        </div>
-      </div>
-
-      <div class="tcard">
-        <div class="t-ava">PL</div>
-        <div class="t-body">
-          <div class="t-name">Dr. Paulo Lima</div>
-          <div class="t-role">Intensivista • UTI Adulto, Belo Horizonte</div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">
-            Na UTI, cada decisão tem peso. Precisava de <strong>segurança clínica baseada no que é atual</strong>,
-            não no que aprendi há 5 anos. A plataforma me dá exatamente isso.
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════════
-     OFFER — PREÇO
-══════════════════════════════════════════ -->
-<section id="offer">
-  <div class="container">
-
-    <p class="eyebrow text-center reveal">Investimento</p>
-    <h2 class="reveal">Menos do que um livro-texto.<br>Mais do que qualquer livro-texto entrega.</h2>
-    <p class="section-sub reveal" style="color:var(--text-muted); text-align:center; max-width:480px; margin:0 auto;">
-      Um processo ético custa em média R$ 50.000 em honorários de defesa. Um erro de conduta custa mais do que isso em reputação.
+    <p class="about-bio reveal">
+      Dermatologista com especialização em [área], fundador do DermAtual e referência nacional
+      em formação clínica baseada em evidência atual. Construiu sua autoridade atendendo,
+      pesquisando e formando médicos ao longo de mais de uma década.
     </p>
 
-    <div class="offer-box reveal">
-      <div class="offer-header">
-        <div class="oh-label">Plano Anual</div>
-        <div class="oh-title">AtualizaClínica Pro — Acesso Completo</div>
+    <p class="about-bio reveal">
+      Sua metodologia nasceu da frustração com cursos que ensinam teoria desatualizada —
+      e do compromisso de que cada médico formado pelo DermAtual saia seguro para
+      <strong style="color: var(--text);">tomar decisões clínicas baseadas no que é real e atual</strong>.
+    </p>
+
+    <p class="about-bio reveal">
+      Resultado sustentável não vem de memorização, mas de leitura estruturada,
+      raciocínio clínico sólido e aplicação rigorosa de <strong style="color: var(--text);">MÉTODO</strong>.
+    </p>
+
+    <div class="stat-row reveal">
+      <div class="stat-item">
+        <div class="stat-number">+10</div>
+        <div class="stat-label">Anos de prática</div>
       </div>
-      <div class="offer-body">
-        <ul class="offer-includes">
-          <li><span class="oi-check">✓</span> Curadoria semanal por especialidade</li>
-          <li><span class="oi-check">✓</span> Alertas de mudança de guideline em tempo real</li>
-          <li><span class="oi-check">✓</span> Discussões de casos ao vivo com especialistas</li>
-          <li><span class="oi-check">✓</span> Biblioteca de protocolos atualizados</li>
-          <li><span class="oi-check">✓</span> Histórico documentado da sua atualização</li>
-          <li><span class="oi-check">✓</span> Acesso em qualquer dispositivo, a qualquer hora</li>
-        </ul>
-
-        <div class="offer-price-row">
-          <span class="offer-was">R$ 297/mês</span>
-          <span class="offer-amount">R$ 197</span>
-        </div>
-        <p class="offer-period">/mês no plano anual — R$ 2.364 cobrado uma vez</p>
-
-        <div class="offer-cta-wrap">
-          <a href="#final" class="btn-primary">
-            🔒 Começar Agora com Garantia de 7 Dias
-          </a>
-          <p class="offer-note">Cancele quando quiser. Sem fidelidade obrigatória.</p>
-        </div>
+      <div class="stat-item">
+        <div class="stat-number">+500</div>
+        <div class="stat-label">Médicos formados</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">5★</div>
+        <div class="stat-label">Avaliação média</div>
       </div>
     </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PLATFORMS — DISCORD + DERM FLIX
+══════════════════════════════════════════ -->
+<section id="platforms">
+  <div class="container">
+
+    <h2 class="s-title text-center reveal" style="color:var(--teal);">
+      Comunidade &amp; Plataforma
+    </h2>
+    <p class="s-sub text-center reveal">
+      Duas ferramentas exclusivas para acelerar e consolidar sua evolução clínica.
+    </p>
+
+    <div class="platform-cards reveal">
+
+      <!-- Discord -->
+      <div class="platform-card card-discord">
+        <span class="pc-logo">🎮</span>
+        <div class="pc-name">Discord</div>
+        <div class="pc-badge">Sala ao Vivo</div>
+        <p class="pc-desc">
+          Discutimos casos com os alunos <strong>mostrando as marcações diagnósticas</strong>
+          e tirando dúvidas clínicas na hora — como uma junta médica em tempo real.
+        </p>
+      </div>
+
+      <!-- Derm Flix -->
+      <div class="platform-card card-dermflix">
+        <div class="dermflix-logo">
+          N
+          <div class="df-text">Derm<br>Flix</div>
+        </div>
+        <div class="pc-badge">Aulas Gravadas</div>
+        <p class="pc-desc">
+          Onde ficam todas as aulas gravadas da formação para você assistir e
+          estudar <strong>quando e onde quiser</strong>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="container">
+
+    <span class="shield-icon reveal">🛡️</span>
+    <h2 class="s-title text-center reveal" style="color:var(--teal);">
+      Método Validado<br>Pelos Nossos Alunos
+    </h2>
+
+    <div class="testimonial-list reveal">
+
+      <div class="testimonial-card">
+        <div class="t-avatar">DB</div>
+        <div class="t-body">
+          <div class="t-name">Danniel Barbosa</div>
+          <div class="t-role">Dermatologista • São Paulo, SP</div>
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">
+            O DermAtual foi e está sendo de grande importância na minha evolução clínica.
+            <strong>O método é claro, o acompanhamento é real</strong> e os resultados no consultório aparecem.
+          </p>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="t-avatar">JP</div>
+        <div class="t-body">
+          <div class="t-name">João Pedro Vaz</div>
+          <div class="t-role">Médico em Formação • Residência Dermatologia, RJ</div>
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">
+            A escolha de me especializar com o DermAtual foi a melhor decisão da minha carreira.
+            <strong>Aprendo com quem realmente pratica</strong> — não com teoria de livro desatualizado.
+          </p>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="t-avatar">KF</div>
+        <div class="t-body">
+          <div class="t-name">Keoma Farias</div>
+          <div class="t-role">Dermatologista • Consultório Particular, BH</div>
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">
+            Sem dúvidas o <strong>melhor custo-benefício</strong> e o melhor lugar para se tornar
+            um dermatologista seguro. Parei de depender de colegas para tomar decisões clínicas.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PRICING
+══════════════════════════════════════════ -->
+<section id="pricing">
+  <div class="container">
+
+    <span class="eyebrow accent text-center reveal">Investimento</span>
+    <h2 class="s-title text-center reveal" style="color:var(--teal);">
+      Seu Investimento
+    </h2>
+    <p class="s-sub text-center reveal">
+      Veja o que você estaria pagando separado — e o que você paga na Formação DermAtual.
+    </p>
+
+    <div class="price-comparison reveal">
+      <div class="price-comparison-header">Se você tivesse que pagar por:</div>
+      <div class="price-row">
+        <span class="pr-label">Curso estruturado</span>
+        <span class="pr-value">R$ 5.000,00</span>
+      </div>
+      <div class="price-row">
+        <span class="pr-label">Nivelamento técnico</span>
+        <span class="pr-value">R$ 1.200,00</span>
+      </div>
+      <div class="price-row">
+        <span class="pr-label">Acompanhamento clínico</span>
+        <span class="pr-value">R$ 600,00</span>
+      </div>
+      <div class="price-row">
+        <span class="pr-label">Aulas complementares</span>
+        <span class="pr-value">R$ 600,00</span>
+      </div>
+      <div class="price-row total-row">
+        <span class="pr-label">O investimento seria muito superior</span>
+        <span class="pr-value">R$ 7.400,00</span>
+      </div>
+    </div>
+
+    <div class="price-divider reveal">Mas hoje, na Formação DermAtual 2026</div>
+
+    <div class="price-final-box reveal">
+      <p class="pf-title">Formação DermAtual</p>
+      <p class="pf-year">2026</p>
+      <p class="pf-amount">R$ 5.000</p>
+      <p class="pf-or">— ou —</p>
+      <p class="pf-installment">Parcelamento no cartão de crédito</p>
+
+      <div class="payment-icons">
+        <div class="payment-icon">
+          <span class="pi-icon">💳</span>
+          <span>Cartão</span>
+        </div>
+        <div class="payment-icon">
+          <span class="pi-icon">🔷</span>
+          <span>Pix</span>
+        </div>
+      </div>
+
+      <a href="#cta-final" class="btn-primary" style="width:100%;justify-content:center;">
+        Quero Me Inscrever Agora
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BONUS
+══════════════════════════════════════════ -->
+<section id="bonus">
+  <div class="container text-center">
+
+    <div class="bonus-stamp reveal">Bônus</div>
+    <h2 class="s-title reveal" style="color:var(--teal);">Bônus Para Você Aproveitar</h2>
+
+    <div class="bonus-card reveal">
+      <ul class="bonus-list">
+        <li>
+          <span class="bl-icon">💬</span>
+          <span><strong>3 meses de sala ao vivo</strong> no Discord — discussão de casos clínicos em tempo real</span>
+        </li>
+        <li>
+          <span class="bl-icon">▶️</span>
+          <span><strong>3 meses de Derm Flix</strong> com todas as aulas gravadas da Formação para rever quando quiser</span>
+        </li>
+        <li>
+          <span class="bl-icon">📘</span>
+          <span><strong>E-book exclusivo</strong> com as estratégias e os 5 Pilares do método DermAtual</span>
+        </li>
+      </ul>
+    </div>
+
+    <p class="urgency-line reveal">⚠️ Vagas limitadas por turma — não perca sua oportunidade.</p>
+
+    <h3 class="s-title reveal" style="color:var(--teal);font-size:clamp(1.6rem,5vw,2.2rem);">
+      Garanta Já<br>a Sua Vaga!
+    </h3>
 
   </div>
 </section>
@@ -968,27 +1140,28 @@
 <!-- ══════════════════════════════════════════
      FINAL CTA — FECHAMENTO COM A DOR
 ══════════════════════════════════════════ -->
-<section id="final">
+<section id="cta-final">
   <div class="container">
 
-    <h2 class="reveal">
+    <h2 class="s-title reveal" style="color:var(--teal);text-align:center;font-size:clamp(1.6rem,5vw,2.3rem);">
       Você não pode controlar<br>
-      <span class="accent">o que a medicina descobre amanhã.</span><br>
-      Mas pode controlar se vai saber.
+      o que a dermatologia descobre amanhã.<br>
+      <span style="color:var(--text);">Mas pode controlar se vai saber.</span>
     </h2>
 
-    <p class="final-sub reveal">
-      Cada dia sem atualização é mais um dia de exposição.
+    <p class="reveal">
+      Cada dia sem atualização é mais um dia de exposição clínica.
       Seus pacientes, sua licença e sua carreira merecem o melhor de você —
       e o melhor de você precisa do que é atual.
+      Vagas limitadas — inscreva-se agora e comece sua formação na próxima turma.
     </p>
 
-    <div class="reveal">
-      <a href="https://wa.me/5511987392915" target="_blank" rel="noopener" class="whatsapp-btn">
-        <span class="wa-icon">💬</span>
-        Quero Me Atualizar — Falar Agora
+    <div class="text-center reveal">
+      <a href="https://wa.me/5511987392915" target="_blank" rel="noopener" class="whatsapp-cta">
+        <span class="whatsapp-icon">💬</span>
+        Quero Fazer Parte da Próxima Formação
       </a>
-      <p class="final-note">Clique e fale pelo WhatsApp — resposta em minutos</p>
+      <p class="cta-note">Clique e fale agora pelo WhatsApp — resposta imediata</p>
     </div>
 
   </div>
@@ -996,20 +1169,20 @@
 
 <!-- ══ FOOTER ══ -->
 <footer>
-  <div class="f-brand">AtualizaClínica</div>
+  <div class="f-brand">DermAtual</div>
   <p>
-    &copy; 2026 AtualizaClínica. Todos os direitos reservados.<br>
-    Este produto é destinado a profissionais de saúde devidamente registrados nos seus respectivos conselhos.
-    O conteúdo tem fins educacionais e não substitui o julgamento clínico individual.
+    &copy; 2026 DermAtual – Formação em Dermatologia. Todos os direitos reservados.<br>
+    Destinado a médicos devidamente registrados no CRM. Conteúdo de fins educacionais —
+    não substitui o julgamento clínico individual. Resultados variam conforme dedicação e contexto de prática.
   </p>
 </footer>
 
 <!-- ══ SCRIPTS ══ -->
 <script>
   /* Sticky bar */
-  const bar = document.getElementById('sticky');
+  const bar = document.getElementById('sticky-bar');
   window.addEventListener('scroll', () => {
-    bar.classList.toggle('show', window.scrollY > 280);
+    bar.classList.toggle('show', window.scrollY > 300);
   }, { passive: true });
 
   /* Scroll reveal */
